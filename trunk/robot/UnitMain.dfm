@@ -1,8 +1,8 @@
 object frmLogin: TfrmLogin
   Left = 211
   Top = 211
-  Width = 569
-  Height = 416
+  Width = 636
+  Height = 421
   Caption = 'maple'#39's robot'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,9 +17,9 @@ object frmLogin: TfrmLogin
   object spgcntrl1: TsPageControl
     Left = 0
     Top = 0
-    Width = 561
-    Height = 384
-    ActivePage = stbsht1
+    Width = 628
+    Height = 389
+    ActivePage = stbsht3
     Align = alClient
     TabOrder = 0
     SkinData.SkinSection = 'PAGECONTROL'
@@ -153,7 +153,7 @@ object frmLogin: TfrmLogin
         BoundLabel.MaxWidth = 0
         BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'COMBOBOX'
-        ItemHeight = 0
+        ItemHeight = 13
         ItemIndex = -1
         TabOrder = 4
         Text = 'http://'
@@ -233,10 +233,20 @@ object frmLogin: TfrmLogin
         BoundLabel.MaxWidth = 0
         BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'COMBOBOX'
-        ItemHeight = 0
+        ItemHeight = 13
         ItemIndex = -1
         TabOrder = 9
         Text = 'http://'
+      end
+      object btnReLoadPic: TsButton
+        Left = 232
+        Top = 136
+        Width = 75
+        Height = 25
+        Caption = 'ReLoad'
+        TabOrder = 10
+        OnClick = btnReLoadPicClick
+        SkinData.SkinSection = 'BUTTON'
       end
     end
     object stbsht1: TsTabSheet
@@ -246,8 +256,8 @@ object frmLogin: TfrmLogin
       object spgcntrl2: TsPageControl
         Left = 0
         Top = 0
-        Width = 553
-        Height = 356
+        Width = 620
+        Height = 361
         ActivePage = stbsht5
         Align = alClient
         TabOrder = 0
@@ -319,7 +329,7 @@ object frmLogin: TfrmLogin
           object spnl3: TsPanel
             Left = 0
             Top = 0
-            Width = 545
+            Width = 612
             Height = 33
             Align = alTop
             BevelOuter = bvNone
@@ -393,7 +403,7 @@ object frmLogin: TfrmLogin
             Left = 0
             Top = 33
             Width = 73
-            Height = 295
+            Height = 300
             Align = alLeft
             BevelOuter = bvNone
             TabOrder = 1
@@ -409,12 +419,12 @@ object frmLogin: TfrmLogin
           object wbPage: TWebBrowser
             Left = 73
             Top = 33
-            Width = 472
-            Height = 295
+            Width = 539
+            Height = 300
             Align = alClient
             TabOrder = 2
             ControlData = {
-              4C000000C83000007D1E00000000000000000000000000000000000000000000
+              4C000000B5370000021F00000000000000000000000000000000000000000000
               000000004C000000000000000000000001000000E0D057007335CF11AE690800
               2B2E126208000000000000004C0000000114020000000000C000000000000046
               8000000000000000000000000000000000000000000000000000000000000000
@@ -477,7 +487,6 @@ object frmLogin: TfrmLogin
     IconVisible = True
     IconIndex = 0
     LeftPopup = True
-    MinimizeToTray = True
     Left = 580
     Top = 320
   end

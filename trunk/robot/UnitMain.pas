@@ -7,7 +7,7 @@ uses
   Dialogs, StdCtrls, sComboBox, ExtCtrls, sPanel, sLabel, sEdit, Buttons,
   sSpeedButton, sButton, sRadioButton, IdBaseComponent, IdComponent,
   IdTCPConnection, IdTCPClient, IdHTTP, sMemo, ComCtrls, sPageControl,
-  OleCtrls, SHDocVw, CoolTrayIcon, sSpinEdit, MSHTML;
+  OleCtrls, SHDocVw, CoolTrayIcon, sSpinEdit, MSHTML, DBCtrls, jpeg;
 
 type
   TfrmLogin = class(TForm)
@@ -48,6 +48,7 @@ type
     btnOpen: TsButton;
     cbbLoopURL: TsComboBox;
     edtCount: TsSpinEdit;
+    btnReLoadPic: TsButton;
     procedure btnLoginClick(Sender: TObject);
     procedure enter2Tab(Sender: TObject; var Key: Word;
       Shift: TShiftState);
@@ -56,6 +57,7 @@ type
     procedure btnWBLoginClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btnOpenClick(Sender: TObject);
+    procedure btnReLoadPicClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -127,11 +129,11 @@ end;
 procedure TfrmLogin.cbbPicURLKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key <> 13 then 
+  if Key = 13 then 
   begin
     // Key of Enter
     { TODO -omaple -c :  2009-7-3 9:59:59 }
-
+    btnReLoadPicClick(btnReLoadPic);
   end;
 end;
 
@@ -160,12 +162,13 @@ end;
 
 procedure TfrmLogin.FormShow(Sender: TObject);
 begin
+  { TODO -omaple -c : Test data 2009-7-3 15:59:47 }
 	cbbURL.Text := 'http://passport.baidu.com/?login&tpl=mn';
   edtName.Text := 'm_aple';
   edtNameParam.Text := 'username';
   edtPwd.Text := 'ikjikj';
   edtPwdParam.Text := 'normModPsp';
-  
+  cbbPicURL.Text := 'http://ptlogin2.qq.com/getimage?aid=8000201&0.6812752916028424'; // QQTEst
 end;
 
 procedure TfrmLogin.btnOpenClick(Sender: TObject);
@@ -173,6 +176,20 @@ var
   o:Olevariant;
 begin
 	wbPage.Navigate(cbbURL.Text, o);
+end;
+
+procedure TfrmLogin.btnReLoadPicClick(Sender: TObject);
+var
+  jpg: TJPEGImage;
+  imagestream: TMemoryStream;
+begin
+  idhtpMain := TIdHTTP.Create(nil);
+  imagestream := TMemoryStream.Create;
+  jpg := TJPEGImage.Create;
+  idhtpMain.Get(cbbPicURL.Text, imagestream);
+  imagestream.Position := 0;
+  jpg.LoadFromStream(imagestream);
+  imgPic.Picture.Assign(jpg);
 end;
 
 end.
