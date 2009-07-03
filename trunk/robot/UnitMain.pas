@@ -7,7 +7,8 @@ uses
   Dialogs, StdCtrls, sComboBox, ExtCtrls, sPanel, sLabel, sEdit, Buttons,
   sSpeedButton, sButton, sRadioButton, IdBaseComponent, IdComponent,
   IdTCPConnection, IdTCPClient, IdHTTP, sMemo, ComCtrls, sPageControl,
-  OleCtrls, SHDocVw, CoolTrayIcon, sSpinEdit, MSHTML, DBCtrls, jpeg;
+  OleCtrls, SHDocVw, CoolTrayIcon, sSpinEdit, MSHTML, DBCtrls, jpeg,
+  sAlphaListBox, Menus;
 
 type
   TfrmLogin = class(TForm)
@@ -41,14 +42,27 @@ type
     mmoRes: TsMemo;
     stbsht5: TsTabSheet;
     spnl3: TsPanel;
-    btnWBLogin: TsButton;
     spnl4: TsPanel;
     lbl5: TsLabel;
     wbPage: TWebBrowser;
-    btnOpen: TsButton;
-    cbbLoopURL: TsComboBox;
-    edtCount: TsSpinEdit;
     btnReLoadPic: TsButton;
+    lstOtherPar: TsListBox;
+    edtOther: TsEdit;
+    lbl7: TsLabel;
+    edtCount: TsSpinEdit;
+    spnl5: TsPanel;
+    cbbLoopURL: TsComboBox;
+    spnl6: TsPanel;
+    btnOpen: TsButton;
+    btnWBLogin: TsButton;
+    edtInterval: TsSpinEdit;
+    tmrMain: TTimer;
+    btnStop: TsButton;
+    spnl7: TsPanel;
+    btnLoop: TsButton;
+    pmTray: TPopupMenu;
+    Exit1: TMenuItem;
+    odo1: TMenuItem;
     procedure btnLoginClick(Sender: TObject);
     procedure enter2Tab(Sender: TObject; var Key: Word;
       Shift: TShiftState);
@@ -58,6 +72,16 @@ type
     procedure FormShow(Sender: TObject);
     procedure btnOpenClick(Sender: TObject);
     procedure btnReLoadPicClick(Sender: TObject);
+    procedure edtOtherKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure cbbLoopURLKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure tmrMainTimer(Sender: TObject);
+    procedure btnStopClick(Sender: TObject);
+    procedure btnLoopClick(Sender: TObject);
+    procedure Exit1Click(Sender: TObject);
+    procedure Show1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -80,6 +104,7 @@ var
   aParam: TStrings;
   aStream: TStringStream;
   isGet: Boolean;
+  i: integer;
 begin
   btnLogin.Enabled := False;
 	idhtpMain := TIdHTTP.Create(nil);
@@ -88,17 +113,28 @@ begin
   mmoRes.Lines.Clear;
   isGet := rbGet.Checked;
   getURL := cbbURL.Text;
-  sParam := '?' + edtNameParam.Text + '=' + edtName.Text
-  	+ '&' + edtPwdParam.Text + '=' + edtPwd.Text
-    + '&' + edtPicParam.Text + '=' + edtPic.Text;
   if isGet then
-    postURL := getURL + sParam
+  begin  
+    sParam := '?' + edtNameParam.Text + '=' + edtName.Text
+      + '&' + edtPwdParam.Text + '=' + edtPwd.Text
+      + '&' + edtPicParam.Text + '=' + edtPic.Text;
+    for i := 0 to lstOtherPar.Items.Count - 1 do
+    begin
+      sParam := sParam + '?' + lstOtherPar.Items[i];
+    end;    
+    postURL := getURL + sParam;
+  end    
   else
   begin
   	postURL := getURL;
 		aParam.Add(edtNameParam.Text + '=' + edtName.Text);
     aParam.Add(edtPwdParam.Text + '=' + edtPwd.Text);
     aParam.Add(edtPicParam.Text + '=' + edtPic.Text);
+		for i := 0 to lstOtherPar.Items.Count - 1 do
+    begin
+			aParam.Add(lstOtherPar.Items[i]);
+    end;
+    
   end;
   try
 //    getHTML := idhtpMain.Get(getURL);
@@ -112,7 +148,6 @@ begin
     ShowMessage('连接失败！！！');
   end;
   
-  idhtpMain.Free;
   aParam.Free;
   aStream.Free;
 
@@ -182,14 +217,68 @@ procedure TfrmLogin.btnReLoadPicClick(Sender: TObject);
 var
   jpg: TJPEGImage;
   imagestream: TMemoryStream;
+  idhtpTmp: TIdHTTP;
 begin
-  idhtpMain := TIdHTTP.Create(nil);
+  idhtpTmp := TIdHTTP.Create(nil);
   imagestream := TMemoryStream.Create;
   jpg := TJPEGImage.Create;
-  idhtpMain.Get(cbbPicURL.Text, imagestream);
+  idhtpTmp.Get(cbbPicURL.Text, imagestream);
   imagestream.Position := 0;
   jpg.LoadFromStream(imagestream);
   imgPic.Picture.Assign(jpg);
+end;
+
+procedure TfrmLogin.edtOtherKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+	if Key <> 13 then exit; { 判断是按执行键}
+  lstOtherPar.Items.Add(edtOther.Text);  
+end;
+
+procedure TfrmLogin.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+	idhtpMain.Free;
+end;
+
+procedure TfrmLogin.cbbLoopURLKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+var
+  i: integer;
+begin
+	if Key <> 13 then exit; { 判断是按执行键}
+  btnLoop.Click;
+end;
+
+procedure TfrmLogin.tmrMainTimer(Sender: TObject);
+begin
+  if (edtCount.Value = 0) then
+  begin
+    tmrMain.Enabled := False;
+    Exit;
+  end;  
+  wbPage.Navigate(cbbLoopURL.Text);
+  edtCount.Value := edtCount.Value - 1;
+end;
+
+procedure TfrmLogin.btnStopClick(Sender: TObject);
+begin
+	tmrMain.Enabled := False;
+end;
+
+procedure TfrmLogin.btnLoopClick(Sender: TObject);
+begin
+  tmrMain.Interval := 1000 * edtInterval.Value;
+  tmrMain.Enabled := True;
+end;
+
+procedure TfrmLogin.Exit1Click(Sender: TObject);
+begin
+	Close;
+end;
+
+procedure TfrmLogin.Show1Click(Sender: TObject);
+begin
+	Self.Visible := True;
 end;
 
 end.
