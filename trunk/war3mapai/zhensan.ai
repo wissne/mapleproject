@@ -1,0 +1,4538 @@
+globals
+
+//integer i=0	
+//unit HeroShop1
+//unit HeroShop2
+//unit mshop
+unit mHero =null
+location suguoBaseLoc=Location(-6600,-7800)
+location weiguoBaseLoc=Location(6000,7000)
+location mBaseLoc=null
+location mEnemyBaseLoc =null
+location mdubingLoc=null
+location zs_He_middle=Location(-850,-780)
+location zs_dubing_cdt_loc=null
+boolean isdebug=false
+integer mHeroId=0
+integer mForceId=0
+integer buyItemLevel=1
+integer fightLevel=0
+integer goHomeLevel=0
+integer MaxSlot=6
+integer bj_MAX_PLAYER_SLOTS=12
+integer bj_groupEnumTypeId=0
+integer mUnitId=0
+integer ShopNearbyRange=300
+integer zs_dubingParam=260
+integer array mSkillArray
+real zs_budaoXieLiangBaseD=95
+real zs_budaoXieLiangBaseW=85
+
+real zs_budaoXieLiangD=95
+real zs_budaoXieLiangW=85
+real zs_chiyaoSafeRangetoEnemy=1600
+real zs_SafeLocRangeToEnemyA=620
+real zs_SafeLocRangeToEnemy=620
+real zs_SafeLocRangeToTower=1000
+real zs_ToNearestHeroRange=9999
+real zs_SafeLocRndParamDgree=90
+real zs_gardRange=1600
+real za_rect_range=1200
+string array digit_str
+constant real      bj_PI                            = 3.14159
+constant real      bj_RADTODEG                      = 180.0/bj_PI
+item array HeroItems
+//
+
+location zs_middleline_loc1
+location zs_middleline_loc2
+location zs_middleline_loc3
+location zs_middleline_loc4
+
+
+
+
+timer testTimer=CreateTimer()
+
+
+
+
+
+
+//
+//mellee Parameter
+integer array zs_action_prioty_arry
+unit budaobingW=null
+unit budaobingD=null
+unit HeroD=null
+unit TowerD=null
+unit TowerW=null
+unit NearestEnemyBubing=null
+unit FarestAllyBubing=null
+
+unit uTmp=null
+boolean bArived=false
+boolean zs_kickoff=false
+real sleepTime=1
+location safeLoc=null
+real EnemyHeroHP=99999
+real EnemyHeroMP=99999
+real MyHeroHP=0
+real MyHeroMP=0
+real rangeToTowerD=99999
+real rangeToTowerW=99999
+real rangeToHeroD=999999
+integer  EnemyHeroLevel=0
+integer  mHeroLevel=0
+integer EnemyCount=0
+integer AllyCount=0
+integer crEnemyHeroOrder=0
+boolean bTmp=false
+integer array spell_damage_m
+integer zs_prioty_index=0
+location za_middle_fireLoc=null
+real rangeToFireLine=999999
+//integer array spell_damage_d
+
+
+
+
+
+
+
+
+endglobals
+
+
+function debugstr takes string s returns nothing
+if isdebug then
+call DisplayToAll(s)
+endif
+endfunction
+
+function intd_str takes nothing returns nothing
+     set digit_str[0]="0"
+     set digit_str[1]="1"
+     set digit_str[2]="2"
+     set digit_str[3]="3"
+     set digit_str[4]="4"
+     set digit_str[5]="5"
+     set digit_str[6]="6"
+     set digit_str[7]="7"
+     set digit_str[8]="8"
+     set digit_str[9]="9"
+
+    //return
+endfunction
+
+
+
+function ITS takes integer ic returns string
+    local string s = ""
+    local integer i = ic
+    local integer ialt = 0
+    local boolean neg = false
+
+    if i == 0 then
+      return "0"
+    endif
+    if i < 0 then
+      set neg = true
+      set i = -i
+    endif
+    loop
+      exitwhen i == 0
+      set ialt = i
+      set i = i / 10
+      set s = digit_str[ ialt - 10*i ] + s
+    endloop
+    if neg then
+      return "-"+s
+    endif
+    return s
+endfunction
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+function IsUnitDeadBJ takes unit whichUnit returns boolean
+    return GetUnitState(whichUnit, UNIT_STATE_LIFE) <= 0
+endfunction
+function IsDead takes unit TheUnit returns boolean
+return(TheUnit==null)or(IsUnitType(TheUnit,UNIT_TYPE_DEAD))or(IsUnitDeadBJ(TheUnit))
+endfunction
+function IsAlive takes unit TheUnit returns boolean
+return(TheUnit!=null)and(IsDead(TheUnit)==false)
+endfunction
+
+
+function GetUnitLocLevel takes unit TheUnit returns integer
+local integer TheLvl=0
+if(TheUnit!=null)and(IsAlive(TheUnit))then
+set TheLvl=(GetTerrainCliffLevel(GetUnitX(TheUnit),GetUnitY(TheUnit)))
+endif
+return TheLvl
+endfunction
+function AngleBetweenPoints takes location locA, location locB returns real
+    return bj_RADTODEG * Atan2(GetLocationY(locB) - GetLocationY(locA), GetLocationX(locB) - GetLocationX(locA))
+endfunction
+function IsBackFacing takes unit TheUnit,unit TheTarget returns boolean
+local real TheDir
+local location UnitLoc
+local location TargetLoc
+local real TargetDir
+local real tmpval
+if(TheUnit!=null)and(TheTarget!=null)and(IsAlive(TheUnit))and(IsAlive(TheTarget))then
+set TheDir=GetUnitFacing(TheUnit)
+set UnitLoc=GetUnitLoc(TheUnit)
+set TargetLoc=GetUnitLoc(TheTarget)
+set TargetDir=AngleBetweenPoints(UnitLoc,TargetLoc)
+call RemoveLocation(TargetLoc)
+call RemoveLocation(UnitLoc)
+if TheDir>=TargetDir then
+set tmpval=TheDir-TargetDir
+else
+set tmpval=TargetDir-TheDir
+endif
+if(tmpval>=150)and(tmpval<=210)then
+return(true)
+endif
+endif
+return(false)
+endfunction
+function RangeLocToLoc takes location TheStart,location TheTarget returns real
+local real TheXRange
+local real TheYRange
+set TheXRange=GetLocationX(TheTarget)-GetLocationX(TheStart)
+set TheXRange=TheXRange*TheXRange
+set TheYRange=GetLocationY(TheTarget)-GetLocationY(TheStart)
+set TheYRange=TheYRange*TheYRange
+return(SquareRoot(TheXRange+TheYRange))
+endfunction
+
+function debugLoc takes location loc,integer id returns nothing
+local effect fx
+if not isdebug then
+return 
+endif
+    if id==1 then 
+    set fx=AddSpecialEffectLoc("Abilities\\Spells\\Other\\Monsoon\\MonsoonBoltTarget.mdl",loc)
+    endif
+    if id==2 then
+    set fx=AddSpecialEffectLoc("Abilities\\Spells\\Items\\AIem\\AIemTarget.mdl",loc)
+    endif
+    if id==3 then
+    set fx=AddSpecialEffectLoc("Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdl",loc)
+    endif
+    
+    call DestroyEffect(fx)
+    //return
+endfunction
+function HeroStop takes nothing  returns boolean
+   return  IssueImmediateOrder( mHero, "stop" )
+endfunction
+
+function Abs takes real TheValue returns real
+if TheValue<0 then
+return(-TheValue)
+else
+return(TheValue)
+endif
+endfunction
+
+function middleLocBetweenTwoLoc takes location loc1,location loc2 returns location
+return Location((GetLocationX(loc1)+GetLocationX(loc2))/2,(GetLocationY(loc1)+GetLocationY(loc2))/2)
+endfunction
+function RangeToLine takes location LineStart,location LineEnd,location ThePoint returns real
+local real dX
+local real dY
+local real TheRange
+set dX=GetLocationX(LineEnd)-GetLocationX(LineStart)
+set dY=GetLocationY(LineEnd)-GetLocationY(LineStart)
+set TheRange=SquareRoot((dX*dX)+(dY*dY))
+if TheRange==0 then
+set TheRange=RangeLocToLoc(LineStart,ThePoint)
+else
+set TheRange=Abs((dY*GetLocationX(ThePoint))+((-dX)*GetLocationY(ThePoint)))/TheRange
+endif
+return(TheRange)
+endfunction
+
+ 
+function isUnitInRect takes unit TheUnit,location loc1,location loc2,location loc3,location loc4 returns boolean
+ local boolean rb=false
+ local location theLoc=null
+ local real range1=RangeLocToLoc(loc1,loc2)
+ local real range2=RangeLocToLoc(loc1,loc4)
+ if (TheUnit==null or not IsAlive(TheUnit)) then
+ return false
+ endif
+ set theLoc=GetUnitLoc(TheUnit)
+ set rb= RangeToLine(loc1,loc2,theLoc)<range2 and  RangeToLine(loc3,loc4,theLoc)<range2
+ set rb=rb and RangeToLine(loc2,loc3,theLoc)<range1 and  RangeToLine(loc1,loc4,theLoc)<range1
+ return rb
+endfunction
+
+
+
+function RangeToLoc takes unit TheUnit,location TheTarget returns real
+local real TheXRange
+local real TheYRange
+if(TheUnit!=null)and(IsAlive(TheUnit))then
+set TheXRange=GetLocationX(TheTarget)-GetUnitX(TheUnit)
+set TheXRange=TheXRange*TheXRange
+set TheYRange=GetLocationY(TheTarget)-GetUnitY(TheUnit)
+set TheYRange=TheYRange*TheYRange
+return(SquareRoot(TheXRange+TheYRange))
+endif
+return 0.
+endfunction
+function RangeTo takes unit TheUnit,unit TheTarget returns real
+local real TheXRange
+local real TheYRange
+if(TheUnit!=null)and(TheTarget!=null)and(IsAlive(TheUnit))and(IsAlive(TheTarget))then
+set TheXRange=GetUnitX(TheTarget)-GetUnitX(TheUnit)
+set TheXRange=TheXRange*TheXRange
+set TheYRange=GetUnitY(TheTarget)-GetUnitY(TheUnit)
+set TheYRange=TheYRange*TheYRange
+return(SquareRoot(TheXRange+TheYRange))
+endif
+return 0.
+endfunction
+function RangeToItem takes unit TheUnit,item TheTarget returns real
+local real TheXRange
+local real TheYRange
+if(TheUnit!=null)and(TheTarget!=null)and(IsAlive(TheUnit))then
+set TheXRange=GetItemX(TheTarget)-GetUnitX(TheUnit)
+set TheXRange=TheXRange*TheXRange
+set TheYRange=GetItemY(TheTarget)-GetUnitY(TheUnit)
+set TheYRange=TheYRange*TheYRange
+return(SquareRoot(TheXRange+TheYRange))
+endif
+return 0.
+endfunction
+function RangeItemToBase takes player ThePlayer,item TheItem returns real
+local real TheXRange
+local real TheYRange
+local location TheTarget
+if(TheItem!=null)and(IsItemVisible(TheItem))then
+
+set TheTarget=mBaseLoc
+
+set TheXRange=GetLocationX(TheTarget)-GetItemX(TheItem)
+set TheXRange=TheXRange*TheXRange
+set TheYRange=GetLocationY(TheTarget)-GetItemY(TheItem)
+set TheYRange=TheYRange*TheYRange
+return(SquareRoot(TheXRange+TheYRange))
+endif
+return 0.
+endfunction
+function RangeToBase takes unit TheUnit returns real
+local real TheXRange
+local real TheYRange
+local location TheTarget
+if(TheUnit!=null)and(IsAlive(TheUnit))then
+
+set TheTarget=mBaseLoc
+
+set TheXRange=GetLocationX(TheTarget)-GetUnitX(TheUnit)
+set TheXRange=TheXRange*TheXRange
+set TheYRange=GetLocationY(TheTarget)-GetUnitY(TheUnit)
+set TheYRange=TheYRange*TheYRange
+return(SquareRoot(TheXRange+TheYRange))
+endif
+return 0.
+endfunction
+function RangeToEnemyBase takes unit TheUnit returns real
+local real TheXRange=0
+local real TheYRange=0
+local location TheTarget
+if(TheUnit!=null)and(IsAlive(TheUnit))then
+set TheTarget=mEnemyBaseLoc
+
+set TheXRange=GetLocationX(TheTarget)-GetUnitX(TheUnit)
+set TheXRange=TheXRange*TheXRange
+set TheYRange=GetLocationY(TheTarget)-GetUnitY(TheUnit)
+set TheYRange=TheYRange*TheYRange
+return(SquareRoot(TheXRange+TheYRange))
+endif
+return 0.
+endfunction
+function GetAngleDelta takes real Angle1,real Angle2 returns real
+if Angle1<Angle2 then
+return(Angle2-Angle1)
+else
+return(Angle1-Angle2)
+endif
+endfunction
+function GetAngle takes location LocA,location LocB returns real
+local real TheAngle=AngleBetweenPoints(LocA,LocB)
+if TheAngle<0 then
+set TheAngle=TheAngle+360
+endif
+return TheAngle
+endfunction
+function AngleFromBase takes unit TheUnit returns real
+local real TheAngle
+local location TheTarget
+local location TheLoc
+if(TheUnit!=null)and(IsAlive(TheUnit))then
+set TheTarget=mBaseLoc
+set TheLoc=GetUnitLoc(TheUnit)
+set TheAngle=GetAngle(TheTarget,TheLoc)
+call RemoveLocation(TheLoc)
+return(TheAngle)
+endif
+return-0.001
+endfunction
+function AngleFromEnemyBase takes unit TheUnit returns real
+local real TheAngle
+local location TheTarget
+local location TheLoc
+if(TheUnit!=null)and(IsAlive(TheUnit))then
+set TheTarget=mEnemyBaseLoc
+
+set TheLoc=GetUnitLoc(TheUnit)
+set TheAngle=GetAngle(TheTarget,TheLoc)
+call RemoveLocation(TheLoc)
+return(TheAngle)
+endif
+return-0.001
+endfunction
+function GetUnitToOuterLocAngle takes unit TheUnit,unit TheTarget,real TheRange,real angle returns location
+local location TargetLoc
+local location UnitLoc
+local real TheDir
+if(TheUnit!=null)and(TheTarget!=null)and(IsAlive(TheUnit))and(IsAlive(TheTarget))then
+set TargetLoc=GetUnitLoc(TheTarget)
+set UnitLoc=GetUnitLoc(TheUnit)
+set TheDir=Deg2Rad(GetAngle(TargetLoc,UnitLoc)+angle)
+call RemoveLocation(UnitLoc)
+call RemoveLocation(TargetLoc)
+return(Location(TheRange*Cos(TheDir)+GetUnitX(TheTarget),TheRange*Sin(TheDir)+GetUnitY(TheTarget)))
+endif
+return null
+endfunction
+function GetLocToOuterLocAngle takes location loc1,location loc2,real TheRange,real angle returns location
+local real TheDir
+if loc1==null or loc2==null then
+return null
+endif
+set TheDir=Deg2Rad(GetAngle(loc2,loc1)+angle)
+
+return(Location(TheRange*Cos(TheDir)+GetLocationX(loc2),TheRange*Sin(TheDir)+GetLocationY(loc2)))
+endfunction
+function GetUnitBackLoc takes unit TheTarget,real TheRange returns location
+local real TheDir
+if(TheTarget!=null)and(IsAlive(TheTarget))then
+set TheDir=Deg2Rad(GetUnitFacing(TheTarget)+180)
+return(Location(TheRange*Cos(TheDir)+GetUnitX(TheTarget),TheRange*Sin(TheDir)+GetUnitY(TheTarget)))
+endif
+return null
+endfunction
+function GetUnitFrontLoc takes unit TheTarget,real TheRange returns location
+local real TheDir
+if(TheTarget!=null)and(IsAlive(TheTarget))then
+set TheDir=Deg2Rad(GetUnitFacing(TheTarget))
+return(Location(TheRange*Cos(TheDir)+GetUnitX(TheTarget),TheRange*Sin(TheDir)+GetUnitY(TheTarget)))
+endif
+return null
+endfunction
+function GetBaseUnitFrontLoc takes unit TheTarget,real TheRange returns location
+local real TheDir
+if(TheTarget!=null)and(IsAlive(TheTarget))then
+set TheDir=Deg2Rad(AngleFromBase(TheTarget))
+return(Location(TheRange*Cos(TheDir)+GetUnitX(TheTarget),TheRange*Sin(TheDir)+GetUnitY(TheTarget)))
+endif
+return null
+endfunction
+function GetBaseUnitBackLoc takes unit TheTarget,real TheRange returns location
+local real TheDir
+if(TheTarget!=null)and(IsAlive(TheTarget))then
+set TheDir=Deg2Rad(AngleFromBase(TheTarget)+180)
+return(Location(TheRange*Cos(TheDir)+GetUnitX(TheTarget),TheRange*Sin(TheDir)+GetUnitY(TheTarget)))
+endif
+return null
+endfunction
+
+ function GetLocBetweenTwoLocsRangeToFirst takes location TheLoc1,location TheLoc2,real TheRange returns location
+local real TheDir
+local real rdm=0
+set TheDir=Deg2Rad(GetAngle(TheLoc2,TheLoc1)+180)
+return(Location(TheRange*Cos(TheDir)+GetLocationX(TheLoc1),TheRange*Sin(TheDir)+GetLocationY(TheLoc1)))
+return null
+endfunction
+ function GetBaseUnitBackRandomLoc takes unit TheTarget,real TheRange returns location
+local real TheDir
+local real rdm=0
+set rdm=GetRandomReal(-zs_SafeLocRndParamDgree/2,zs_SafeLocRndParamDgree/2)
+if(TheTarget!=null)and(IsAlive(TheTarget))then
+set TheDir=Deg2Rad(AngleFromBase(TheTarget)+180+rdm)
+return(Location(TheRange*Cos(TheDir)+GetUnitX(TheTarget),TheRange*Sin(TheDir)+GetUnitY(TheTarget)))
+endif
+return null
+endfunction
+
+function setMiddleLineRect takes nothing returns nothing
+set zs_middleline_loc1=GetLocToOuterLocAngle(mEnemyBaseLoc,mBaseLoc,za_rect_range,90)
+set zs_middleline_loc2=GetLocToOuterLocAngle(mEnemyBaseLoc,mBaseLoc,za_rect_range,-90)
+set zs_middleline_loc3=GetLocToOuterLocAngle(mBaseLoc,mEnemyBaseLoc,za_rect_range,-90)
+set zs_middleline_loc4=GetLocToOuterLocAngle(mBaseLoc,mEnemyBaseLoc,za_rect_range,90)
+endfunction
+function isUnitInMiddleLine takes unit theUnit returns boolean
+
+ if theUnit==null or IsDead(theUnit) then
+ return false
+ endif
+  return isUnitInRect(theUnit,zs_middleline_loc1,zs_middleline_loc2,zs_middleline_loc3,zs_middleline_loc4)
+endfunction
+function isUnitInHeroFrontRect takes unit TheUnit,real rangefront,real rangewide returns boolean
+ local location tmp1=GetUnitLoc(mHero)
+ local location tmp2=GetLocToOuterLocAngle(mBaseLoc,tmp1,rangefront,0)
+ local location loc1=GetLocToOuterLocAngle(mBaseLoc,tmp1,rangewide/2,90)
+ local location loc2=GetLocToOuterLocAngle(mBaseLoc,tmp1,rangewide/2,-90)
+ local location loc3=GetLocToOuterLocAngle(mBaseLoc,tmp2,rangewide/2,-90)
+ local location loc4=GetLocToOuterLocAngle(mBaseLoc,tmp2,rangewide/2,90)
+  if mHero==null or IsDead(mHero) then
+ return false
+ endif
+  return isUnitInRect(TheUnit,loc1,loc2,loc3,loc4)
+endfunction
+
+
+function gotoLocation takes location loc,real stopRange returns boolean
+    if (RangeToLoc(mHero,loc) <=stopRange) then
+//    call debugstr("dao da")
+//     call debugstr(R2S(DistanceBetweenPoints(loc,GetUnitLoc(mHero))))
+
+ call IssueImmediateOrder( mHero, "stop")
+  return true
+  else 
+   call IssuePointOrderLoc( mHero, "move", loc )
+    return  false
+    endif
+endfunction
+
+function ariveLoc takes location loc,real bias returns nothing
+  
+loop
+    exitwhen  gotoLocation(loc,bias)
+    call Sleep(1)
+endloop
+    //return
+endfunction
+
+function GetItemLoc takes item whichItem returns location
+    return Location(GetItemX(whichItem), GetItemY(whichItem))
+endfunction
+function GetSparedItemByID takes unit TheUnit,integer TheItemID returns item
+local integer MaxSlot=UnitInventorySize(TheUnit)
+local integer TheSlot=0
+local integer nItems=0
+if(MaxSlot>0)then
+set TheSlot=0
+set nItems=0
+loop
+exitwhen(TheSlot>=MaxSlot)
+if(GetItemTypeId(UnitItemInSlot(TheUnit,TheSlot))==TheItemID)then
+set nItems=nItems+1
+endif
+exitwhen(nItems>1)
+set TheSlot=TheSlot+1
+endloop
+if(nItems>1)then
+return(UnitItemInSlot(TheUnit,TheSlot))
+endif
+endif
+return(null)
+endfunction
+function GetSparedItemByName takes unit TheUnit,string ItemName returns item
+local integer MaxSlot=UnitInventorySize(TheUnit)
+local integer TheSlot=0
+local integer nItems=0
+if(MaxSlot>0)then
+set TheSlot=0
+set nItems=0
+loop
+exitwhen(TheSlot>=MaxSlot)
+if(GetItemName(UnitItemInSlot(TheUnit,TheSlot))==ItemName)then
+set nItems=nItems+1
+endif
+exitwhen(nItems>1)
+set TheSlot=TheSlot+1
+endloop
+if(nItems>1)then
+return(UnitItemInSlot(TheUnit,TheSlot))
+endif
+endif
+return(null)
+endfunction
+function GetItemSlotByID takes unit TheUnit,integer TheItemID returns integer
+local integer MaxSlot=UnitInventorySize(TheUnit)
+local integer TheSlot=0
+if(MaxSlot>0)then
+set TheSlot=0
+loop
+exitwhen(TheSlot>=MaxSlot)or(GetItemTypeId(UnitItemInSlot(TheUnit,TheSlot))==TheItemID)
+set TheSlot=TheSlot+1
+endloop
+if(TheSlot<MaxSlot)then
+return(TheSlot)
+endif
+endif
+return(-1)
+endfunction
+function GetItemSlotByName takes unit TheUnit,string ItemName returns integer
+local integer MaxSlot=UnitInventorySize(TheUnit)
+local integer TheSlot=0
+if(MaxSlot>0)then
+set TheSlot=0
+loop
+exitwhen(TheSlot>=MaxSlot)or(GetItemName(UnitItemInSlot(TheUnit,TheSlot))==ItemName)
+set TheSlot=TheSlot+1
+endloop
+if(TheSlot<MaxSlot)then
+return(TheSlot)
+endif
+endif
+return(-1)
+endfunction
+function GetItemByID takes unit TheUnit,integer TheItemID returns item
+local integer MaxSlot=UnitInventorySize(TheUnit)
+local integer TheSlot=0
+if(MaxSlot>0)then
+set TheSlot=0
+loop
+exitwhen(TheSlot>=MaxSlot)or(GetItemTypeId(UnitItemInSlot(TheUnit,TheSlot))==TheItemID)
+set TheSlot=TheSlot+1
+endloop
+if(TheSlot<MaxSlot)then
+return(UnitItemInSlot(TheUnit,TheSlot))
+endif
+endif
+return(null)
+endfunction
+
+
+function GetItemChargesById takes  unit TheUnit,integer itemid returns integer
+ return GetItemCharges(GetItemByID(TheUnit,itemid))
+    //return
+endfunction
+function GetItemByName takes unit TheUnit,string ItemName returns item
+local integer MaxSlot=UnitInventorySize(TheUnit)
+local integer TheSlot=0
+if(MaxSlot>0)then
+set TheSlot=0
+loop
+exitwhen(TheSlot>=MaxSlot)or(GetItemName(UnitItemInSlot(TheUnit,TheSlot))==ItemName)
+set TheSlot=TheSlot+1
+endloop
+if(TheSlot<MaxSlot)then
+return(UnitItemInSlot(TheUnit,TheSlot))
+endif
+endif
+return(null)
+endfunction
+function GetNumberOfItemByID takes unit TheUnit,integer TheItemID returns integer
+local integer MaxSlot=UnitInventorySize(TheUnit)
+local integer TheSlot=0
+local integer TheResult=0
+if(MaxSlot>0)then
+set TheSlot=0
+loop
+exitwhen(TheSlot>=MaxSlot)
+if(GetItemTypeId(UnitItemInSlot(TheUnit,TheSlot))==TheItemID)then
+set TheResult=TheResult+1
+endif
+set TheSlot=TheSlot+1
+endloop
+endif
+return TheResult
+endfunction
+function DropItemByID takes unit TheUnit,integer ItemID,location TheLoc returns boolean
+local item TheItem=GetItemByID(TheUnit,ItemID)
+local boolean TheOK
+if TheItem!=null then
+set TheOK=UnitDropItemPoint(TheUnit,TheItem,GetLocationX(TheLoc),GetLocationY(TheLoc))
+if TheOK then
+call SetItemPlayer(TheItem,GetOwningPlayer(TheUnit),false)
+call SetItemDropID(TheItem,GetUnitTypeId(TheUnit))
+endif
+return(TheOK)
+endif
+return false
+endfunction
+
+function PickItem takes unit TheUnit,item Target returns boolean
+local boolean TheOK
+if Target==null then 
+return false
+endif
+call ariveLoc(GetItemLoc(Target),50)
+set TheOK= IssueTargetOrder(TheUnit,"smart",Target)
+call Sleep(0.6)
+return TheOK
+endfunction
+
+
+function DropItemByName takes unit TheUnit,string ItemName,location TheLoc returns boolean
+local item TheItem=GetItemByName(TheUnit,ItemName)
+local boolean TheOK
+if TheItem!=null then
+set TheOK=UnitDropItemPoint(TheUnit,TheItem,GetLocationX(TheLoc),GetLocationY(TheLoc))
+if TheOK then
+call SetItemPlayer(TheItem,GetOwningPlayer(TheUnit),false)
+call SetItemDropID(TheItem,GetUnitTypeId(TheUnit))
+endif
+return(TheOK)
+endif
+return false
+endfunction
+function GiveItemByID takes unit TheUnit,integer ItemID,unit TheTarget returns boolean
+local item TheItem=GetItemByID(TheUnit,ItemID)
+if TheItem!=null then
+return(UnitDropItemTarget(TheUnit,TheItem,TheTarget))
+endif
+return false
+endfunction
+function GiveItemByName takes unit TheUnit,string ItemName,unit TheTarget returns boolean
+local item TheItem=GetItemByName(TheUnit,ItemName)
+if TheItem!=null then
+return(UnitDropItemTarget(TheUnit,TheItem,TheTarget))
+endif
+return false
+endfunction
+function RemoveItemByID takes unit TheUnit,integer ItemID returns boolean
+local item TheItem=GetItemByID(TheUnit,ItemID)
+if TheItem!=null then
+return(RemoveItem(TheItem))
+endif
+return false
+endfunction
+function RemoveItemByName takes unit TheUnit,string ItemName returns boolean
+local item TheItem=GetItemByName(TheUnit,ItemName)
+if TheItem!=null then
+return(RemoveItem(TheItem))
+endif
+return false
+endfunction
+
+function SellItemToStore takes unit TheUnit,item TheItem,unit TheStore  returns boolean
+if(TheItem!=null)and(TheStore!=null)then
+if UnitDropItemTarget(TheUnit,TheItem,TheStore)then
+call Sleep(0.5)
+return true
+endif
+endif
+return false
+endfunction
+
+
+function setItemCanUse takes boolean flag returns nothing
+if flag then
+call SetUnitUserData(mHero,0)
+else
+call SetUnitUserData(mHero,11)
+endif
+endfunction
+
+function UseItemByID takes unit TheUnit,integer ItemID returns boolean
+local item TheItem=GetItemByID(TheUnit,ItemID)
+local boolean rb=false
+call setItemCanUse(true)
+set rb=(TheItem!=null)and(UnitUseItem(TheUnit,TheItem))
+call setItemCanUse(false)
+return rb
+endfunction
+function UnitUseItemPointLoc takes unit whichUnit, item whichItem, location loc returns boolean
+local boolean rb=false
+   call setItemCanUse(true)
+    set rb= UnitUseItemPoint(whichUnit, whichItem, GetLocationX(loc), GetLocationY(loc))
+    call setItemCanUse(false)
+     return rb
+endfunction
+
+function UseItemPointByID takes unit TheUnit,integer ItemID,location TheLoc returns boolean
+local item TheItem=GetItemByID(TheUnit,ItemID)
+return(TheItem!=null)and(UnitUseItemPointLoc(TheUnit,TheItem,TheLoc))
+endfunction
+function UseItemTargetByID takes unit TheUnit,integer ItemID,widget TheTarget returns boolean
+local item TheItem=GetItemByID(TheUnit,ItemID)
+
+local boolean rb=false
+
+if TheItem==null or TheTarget==null or  TheUnit==null then
+call debugstr("item----null")
+endif
+   call setItemCanUse(true)
+
+set rb=(TheItem!=null)and(UnitUseItemTarget(TheUnit,TheItem,TheTarget))
+//call Sleep(0.1)
+     call setItemCanUse(false)
+     if rb then
+     call debugstr("used")
+
+     endif
+     return rb
+endfunction
+
+function can_UseItemByID takes unit TheUnit,integer ItemID  returns boolean
+local item TheItem=GetItemByID(TheUnit,ItemID)
+local boolean rb=false
+if TheItem==null or  TheUnit==null then
+//call debugstr("item----null")
+endif
+   call setItemCanUse(true)
+
+set rb=(TheItem!=null)and(UnitUseItem(TheUnit,TheItem))
+//call Sleep(0.1)
+ call setItemCanUse(false)
+     if rb then
+     call HeroStop()
+//     call debugstr("used")
+     endif
+     return rb
+endfunction
+
+
+ function GetHP takes unit TheUnit returns real
+return(GetUnitState(TheUnit,UNIT_STATE_LIFE))
+endfunction
+function GetMaxHP takes unit TheUnit returns real
+return(GetUnitState(TheUnit,UNIT_STATE_MAX_LIFE))
+endfunction
+function GetHPVoided takes unit TheUnit returns real
+return(GetUnitState(TheUnit,UNIT_STATE_MAX_LIFE)-GetUnitState(TheUnit,UNIT_STATE_LIFE))
+endfunction
+function GetAcquRange takes unit TheUnit returns real
+return(GetUnitAcquireRange(TheUnit))
+endfunction
+function IsEntangled takes unit TheUnit returns boolean
+return(GetUnitAbilityLevel(TheUnit,'BEer')>0 )
+endfunction
+function IsJuFeng takes unit TheUnit returns boolean
+return(GetUnitAbilityLevel(TheUnit,'Bcy2')>0  or GetUnitAbilityLevel(TheUnit,'Bcyc')>0)
+endfunction
+
+function IsBianXing takes unit TheUnit returns boolean
+return(GetUnitAbilityLevel(TheUnit,'Bohx')>0)
+endfunction
+function IsStunned takes unit TheUnit returns boolean
+return(IsUnitType(TheUnit,UNIT_TYPE_STUNNED))or(GetUnitAbilityLevel(TheUnit,'BUim')>0)
+endfunction
+function IsLocked takes unit TheUnit returns boolean
+return(IsUnitType(TheUnit,UNIT_TYPE_STUNNED))or(IsUnitType(TheUnit,UNIT_TYPE_SNARED))
+endfunction
+function IsPoisoned takes unit TheUnit returns boolean
+return(IsUnitType(TheUnit,UNIT_TYPE_POISONED))or(GetUnitAbilityLevel(TheUnit,'B027')>0)or(GetUnitAbilityLevel(TheUnit,'B028')>0)
+endfunction
+function IsSlowed takes unit TheUnit returns boolean
+return(IsUnitType(TheUnit,UNIT_TYPE_POISONED))or(IsUnitType(TheUnit,UNIT_TYPE_POLYMORPHED))or(IsUnitType(TheUnit,UNIT_TYPE_ETHEREAL))or(IsUnitType(TheUnit,UNIT_TYPE_PLAGUED))
+endfunction
+function IsSlowStriked takes unit TheUnit returns boolean
+return(GetUnitAbilityLevel(TheUnit,'BEsh')>0)or(GetUnitAbilityLevel(TheUnit,'BEsi')>0)or(GetUnitAbilityLevel(TheUnit,'B001')>0)
+endfunction
+function IsRestoreHP takes unit TheUnit returns boolean
+return(GetUnitAbilityLevel(TheUnit,'BIrl')>0)
+endfunction
+function IsRestoreMP takes unit TheUnit returns boolean
+return(GetUnitAbilityLevel(TheUnit,'BIrm')>0)
+endfunction
+function GetMP takes unit TheUnit returns real
+return(GetUnitState(TheUnit,UNIT_STATE_MANA))
+endfunction
+function GetMaxMana takes unit TheUnit returns real
+return(GetUnitState(TheUnit,UNIT_STATE_MAX_MANA))
+endfunction
+function GetManaVoided takes unit TheUnit returns real
+return(GetUnitState(TheUnit,UNIT_STATE_MAX_MANA)-GetUnitState(TheUnit,UNIT_STATE_MANA))
+endfunction
+function GetUnitStatePercent takes unit whichUnit, unitstate whichState, unitstate whichMaxState returns real
+    local real value    = GetUnitState(whichUnit, whichState)
+    local real maxValue = GetUnitState(whichUnit, whichMaxState)
+    if (whichUnit == null) or (maxValue == 0) then
+        return 0.0
+    endif
+    return value / maxValue * 100.0
+endfunction
+function GetUnitManaPercent takes unit whichUnit returns real
+    return GetUnitStatePercent(whichUnit, UNIT_STATE_MANA, UNIT_STATE_MAX_MANA)
+endfunction
+function IsManaAlmostFull takes unit TheUnit returns boolean
+return((GetMP(TheUnit)>=1200)or(GetUnitManaPercent(TheUnit)>85))
+endfunction
+function GetUnitLifePercent takes unit whichUnit returns real
+    return GetUnitStatePercent(whichUnit, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE)
+endfunction
+function IsLifeAlmostFull takes unit TheUnit returns boolean
+return(GetUnitLifePercent(TheUnit)>85)
+endfunction
+function IsAlmostFullyRecovered takes unit TheUnit returns boolean
+return(GetUnitLifePercent(TheUnit)>85)and((GetMaxMana(TheUnit)==0)or(GetUnitManaPercent(TheUnit)>85))
+endfunction
+function IsAlmostDead takes unit TheUnit returns boolean
+return((GetUnitLifePercent(TheUnit)<=10)or(GetHP(TheUnit)<50))
+endfunction
+function IsLowLife takes unit TheUnit returns boolean
+local real MinHP=100
+if IsDead(TheUnit) then
+return false
+endif
+return((GetUnitLifePercent(TheUnit)<15)or(GetUnitState(TheUnit,UNIT_STATE_LIFE)<MinHP))
+endfunction
+function IsDying takes unit TheUnit returns boolean
+return((GetUnitLifePercent(TheUnit)<10))
+endfunction
+function IsNearDeath takes unit TheUnit returns boolean
+local real MinHP=100
+return(GetUnitState(TheUnit,UNIT_STATE_LIFE)<MinHP)
+endfunction
+function IsAboveDeath takes unit TheUnit returns boolean
+return(GetUnitLifePercent(TheUnit)>30)and(GetUnitState(TheUnit,UNIT_STATE_LIFE)>400)
+endfunction
+function IsHalfDead takes unit TheUnit returns boolean
+return((GetUnitLifePercent(TheUnit)<50))
+endfunction
+function IsLowMana takes unit TheUnit returns boolean
+return(((GetMaxMana(TheUnit)>0)and(GetUnitManaPercent(TheUnit)<35))or(GetUnitState(TheUnit,UNIT_STATE_MANA)<150+GetUnitLevel(TheUnit)*13))
+endfunction
+function IsStillOK takes unit TheUnit returns boolean
+return((GetUnitLifePercent(TheUnit)>60)and((GetMaxMana(TheUnit)==0)or(GetUnitManaPercent(TheUnit)>40)))
+endfunction
+function IsImmune takes unit TheUnit returns boolean
+return(IsUnitType(TheUnit,UNIT_TYPE_MAGIC_IMMUNE))
+endfunction
+function CanAttack takes unit TheUnit returns boolean
+return((GetUnitAbilityLevel(TheUnit,'Aatk')>0)or(IsUnitType(TheUnit,UNIT_TYPE_RANGED_ATTACKER))or(IsUnitType(TheUnit,UNIT_TYPE_MELEE_ATTACKER))or(IsUnitType(TheUnit,UNIT_TYPE_ATTACKS_GROUND))or(IsUnitType(TheUnit,UNIT_TYPE_ATTACKS_FLYING)))
+endfunction
+function CanNotAttack takes unit TheUnit returns boolean
+return(not(CanAttack(TheUnit)))
+endfunction
+function CanMove takes unit TheUnit returns boolean
+return(GetUnitAbilityLevel(TheUnit,'Amov')>0)
+endfunction
+function CanNotMove takes unit TheUnit returns boolean
+return(not(CanMove(TheUnit)))
+endfunction
+function IsSummoned takes unit TheUnit returns boolean
+return(IsUnitType(TheUnit,UNIT_TYPE_SUMMONED))
+endfunction
+function IsAncient takes unit TheUnit returns boolean
+return(IsUnitType(TheUnit,UNIT_TYPE_ANCIENT))
+endfunction
+function IsNotAncient takes unit TheUnit returns boolean
+return(not IsUnitType(TheUnit,UNIT_TYPE_ANCIENT))
+endfunction
+function IsStructure takes unit TheUnit returns boolean
+return(IsUnitType(TheUnit,UNIT_TYPE_STRUCTURE))
+endfunction
+function IsTower takes unit TheUnit returns boolean
+return((IsUnitType(TheUnit,UNIT_TYPE_STRUCTURE))and(CanAttack(TheUnit)))
+endfunction
+function IsNotStructure takes unit TheUnit returns boolean
+return(IsUnitType(TheUnit,UNIT_TYPE_STRUCTURE)==false)
+endfunction
+function IsAlsoHero takes unit TheUnit returns boolean
+return(IsUnitType(TheUnit,UNIT_TYPE_HERO))
+endfunction
+function IsUnitHero takes unit TheUnit returns boolean
+return((IsUnitType(TheUnit,UNIT_TYPE_HERO))and(IsUnitIllusion(TheUnit)==false))
+endfunction
+function IsNotHero takes unit TheUnit returns boolean
+return(IsUnitHero(TheUnit)==false)
+endfunction
+function IsFountain takes unit TheUnit returns boolean
+local string UnitName=GetUnitName(TheUnit)
+return(UnitName=="")or(UnitName=="")
+endfunction
+function IsEnemyBing takes unit TheUnit returns boolean
+return((IsUnitEnemy(TheUnit,ai_player))and(not IsUnitHero(TheUnit))and(not IsStructure(TheUnit))and(CanAttack(TheUnit))and(UnitAlive(TheUnit)))
+endfunction
+
+function IsEnemyTower takes unit TheUnit returns boolean
+return(IsUnitEnemy(TheUnit,ai_player)and(UnitAlive(TheUnit))and IsTower(TheUnit))
+endfunction
+function IsAllyTower takes unit TheUnit returns boolean
+return(IsUnitAlly(TheUnit,ai_player)and(UnitAlive(TheUnit))and IsTower(TheUnit))
+endfunction
+function IsAllyAttaker takes unit TheUnit returns boolean
+//return(IsUnitAlly(TheUnit,ai_player)and(UnitAlive(TheUnit))and(CanAttack(TheUnit))and IsNotAncient(TheUnit))
+if not CanAttack(TheUnit) then
+return false
+endif
+if mForceId==1 and GetPlayerId(GetOwningPlayer(TheUnit))==0 then 
+return true
+endif
+if mForceId==2 and GetPlayerId(GetOwningPlayer(TheUnit))==6 then 
+return true
+endif
+return false
+endfunction
+
+
+function isZhongLiEnemy takes unit u returns boolean
+  local integer i=0 
+  if not IsUnitEnemy(u,ai_player)  then
+    return false
+  endif
+  
+   
+loop
+    exitwhen i==12
+if IsUnitOwnedByPlayer(u,Player(i)) then
+return false
+endif    
+set i=i+1 
+endloop
+ return true   
+endfunction
+function IsEnemyAttaker takes unit TheUnit returns boolean
+
+return(IsUnitEnemy(TheUnit,ai_player)and(UnitAlive(TheUnit)))
+endfunction
+
+function IsAllyBing takes unit TheUnit returns boolean
+return((IsUnitAlly(TheUnit,ai_player))and(not IsUnitHero(TheUnit))and(not IsStructure(TheUnit))and(CanAttack(TheUnit))and(UnitAlive(TheUnit)))
+endfunction
+function TakePlayerGold takes player ThePlayer,integer GoldToTake returns nothing
+call SetPlayerState(ThePlayer,PLAYER_STATE_RESOURCE_GOLD,GetPlayerGold(ThePlayer)-GoldToTake)
+endfunction
+function GivePlayerGold takes player ThePlayer,integer GoldToGive returns nothing
+call SetPlayerState(ThePlayer,PLAYER_STATE_RESOURCE_GOLD,GetPlayerGold(ThePlayer)+GoldToGive)
+endfunction
+ function IsMoving2 takes unit TheUnit returns boolean
+local string TheOrder=OrderId2String(GetUnitCurrentOrder(TheUnit))
+return(TheOrder=="move")or(TheOrder=="AImove")or(TheOrder=="blink")
+endfunction
+ function IsMoving takes unit TheUnit returns boolean
+local integer TheOrder=GetUnitCurrentOrder(TheUnit)
+return(TheOrder==OrderId("move"))or(TheOrder==OrderId("AImove"))or(TheOrder==OrderId("blink"))or(TheOrder==OrderId("patrol"))or(TheOrder==OrderId("attack"))or(TheOrder==OrderId("smart"))    
+endfunction
+
+
+function IsNotMoving takes unit TheUnit returns boolean
+return(IsMoving(TheUnit)==false)
+endfunction
+
+
+
+function HasSkill takes unit TheUnit,integer abilcode returns boolean
+return(GetUnitAbilityLevel(TheUnit,abilcode)>0)
+endfunction
+function GetUnitAbilityLevelZs takes unit TheUnit,integer abilcode returns integer
+local integer ri=0
+local player ThePlayer=GetOwningPlayer(TheUnit)
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,true)
+set ri=GetUnitAbilityLevel(TheUnit,abilcode)
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+return ri
+endfunction
+function RaiseSkill takes unit TheUnit,integer abilcode returns boolean
+local integer LastPoint=GetHeroSkillPoints(TheUnit)
+local player ThePlayer=GetOwningPlayer(TheUnit)
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,true)
+call SelectHeroSkill(TheUnit,abilcode)
+
+if abilcode!='A03P' then
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+endif
+return(GetHeroSkillPoints(TheUnit)<LastPoint)
+endfunction
+
+function CanCastAbilityOrder takes unit TheUnit,integer abilcode,string order returns boolean
+local  boolean canCast=false
+local player ThePlayer=GetOwningPlayer(TheUnit)
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,true)
+//set canCast=IssuePointOrderLoc(TheUnit,order,Loc)
+set canCast=IssueImmediateOrder(TheUnit,order)
+ if  canCast  then
+ call IssueImmediateOrder( TheUnit, "stop" )
+ //call debugstr("can cast "+order)
+ else
+// call debugstr("can--------- not ---------------cast "+order)
+ endif
+
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+ return  canCast
+ endfunction
+ function CanCastAbilityOrderById takes unit TheUnit,integer abilcode,integer order returns boolean
+local  boolean canCast=false
+local player ThePlayer=GetOwningPlayer(TheUnit)
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,true)
+//set canCast=IssuePointOrderLoc(TheUnit,order,Loc)
+set canCast=IssueImmediateOrderById(TheUnit,order)
+ if  canCast  then
+ //call debugstr("can cast "+order)
+ 
+call IssueImmediateOrder( TheUnit, "stop" )
+
+ else
+// call debugstr("can--------- not ---------------cast "+order)
+ endif
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+ return  canCast
+ endfunction
+ function CanCastAbilityOrderByStr takes unit TheUnit,integer abilcode,string order returns boolean
+local  boolean canCast=false
+local player ThePlayer=GetOwningPlayer(TheUnit)
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,true)
+//set canCast=IssuePointOrderLoc(TheUnit,order,Loc)
+set canCast=IssueImmediateOrder(TheUnit,order)
+ if  canCast  then
+ //call debugstr("can cast "+order)
+ 
+call IssueImmediateOrder( TheUnit, "stop" )
+
+ else
+// call debugstr("can--------- not ---------------cast "+order)
+ endif
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+ return  canCast
+ endfunction
+ 
+ 
+ 
+function CastImmediateSkillByID takes unit TheUnit,integer abilcode returns boolean
+local player ThePlayer=GetOwningPlayer(TheUnit)
+local integer PlayerID=GetPlayerId(ThePlayer)
+local boolean Casted
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,true)
+set Casted=IssueImmediateOrderById(TheUnit,abilcode)
+if Casted then
+endif
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+return(Casted)
+endfunction
+
+function CastPointSkillByOderStr takes unit TheUnit,integer abilcode,string order ,location TheLoc returns boolean
+local player ThePlayer=GetOwningPlayer(TheUnit)
+local integer PlayerID=GetPlayerId(ThePlayer)
+local boolean Casted
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,true)
+
+set Casted=IssuePointOrderLoc(TheUnit,order,TheLoc)
+if Casted then
+
+endif
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+return(Casted)
+endfunction
+
+function CastTargetSkillByOderStrDelayed takes unit TheUnit,integer abilcode,string order ,location TheLoc,real delay returns boolean
+local player ThePlayer=GetOwningPlayer(TheUnit)
+local integer PlayerID=GetPlayerId(ThePlayer)
+local boolean Casted
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,true)
+set Casted=IssuePointOrderLoc(TheUnit,order,TheLoc)
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+return(Casted)
+endfunction
+
+function CastTargetSkillByOderIdDelayed takes unit TheUnit,integer abilcode,integer Order ,unit TheTaget,real delay returns boolean
+local player ThePlayer=GetOwningPlayer(TheUnit)
+local integer PlayerID=GetPlayerId(ThePlayer)
+local location Loc=null
+
+local boolean Casted
+set Loc=GetUnitLoc(TheTaget)
+
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,true)
+
+set Casted=IssuePointOrderByIdLoc(TheUnit,Order,Loc)
+call Sleep(delay-0.25)
+     if not IsUnitInRangeLoc(TheTaget,Loc,300) then
+    call IssueImmediateOrder(mHero,"stop")
+    call debugstr("stop dazhao sima==========================")
+    call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+    return false
+    endif
+call Sleep(0.55)
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+return(Casted)
+endfunction
+function CastTargetSkillByOderStr takes unit TheUnit,integer abilcode,string order ,unit TheTarget returns boolean
+local player ThePlayer=GetOwningPlayer(TheUnit)
+local integer PlayerID=GetPlayerId(ThePlayer)
+local boolean Casted
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,true)
+
+set Casted=IssueTargetOrder(TheUnit,order,TheTarget)
+if Casted then
+
+endif
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+return(Casted)
+endfunction
+function CastTargetSkillByOderId takes unit TheUnit,integer abilcode,integer order ,unit TheTarget returns boolean
+local player ThePlayer=GetOwningPlayer(TheUnit)
+local integer PlayerID=GetPlayerId(ThePlayer)
+local boolean Casted
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,true)
+
+set Casted=IssueTargetOrderById(TheUnit,order,TheTarget)
+if Casted then
+
+endif
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+return(Casted)
+endfunction
+
+function CastTargetSkillByID takes unit TheUnit,integer abilcode,widget TheTarget returns boolean
+local player ThePlayer=GetOwningPlayer(TheUnit)
+local integer PlayerID=GetPlayerId(ThePlayer)
+local boolean Casted
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,true)
+set Casted=IssueTargetOrderById(TheUnit,abilcode,TheTarget)
+if Casted then
+endif
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+return(Casted)
+endfunction
+
+ function CastImdSkillByID takes unit TheUnit,integer abilcode ,integer order returns boolean
+local player ThePlayer=GetOwningPlayer(TheUnit)
+local integer PlayerID=GetPlayerId(ThePlayer)
+local boolean Casted
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,true)
+set Casted=IssueImmediateOrderById(TheUnit,order)
+if Casted then
+endif
+call SetPlayerAbilityAvailable(ThePlayer,abilcode,false)
+return(Casted)
+endfunction
+
+
+
+
+
+
+
+
+
+
+
+
+
+function isZhuGeLiang takes nothing returns boolean
+  return  mHeroId=='H008'
+endfunction
+function isSiMaYi takes nothing returns boolean
+  return  mHeroId=='U00A'
+endfunction
+
+
+  
+function debugUnit takes unit u,integer id returns nothing
+call debugLoc(GetUnitLoc(u),id)
+//call SetUnitColor( u,ConvertPlayerColor(11))
+ 
+    //return
+endfunction
+
+  function BuyItem_im takes unit FromShop,integer TheItemID,unit ToUnit returns boolean
+//if(IssueNeutralTargetOrder(GetOwningPlayer(ToUnit),FromShop,"smart",ToUnit))or(IssueTargetOrder(FromShop,"smart",ToUnit))then
+return(IssueNeutralImmediateOrderById(GetOwningPlayer(ToUnit),FromShop,TheItemID))or(IssueImmediateOrderById(FromShop,TheItemID))
+//endif
+//return(false)
+endfunction
+
+//GetSlotsFreeOnUnit
+//  UnitItemInSlot
+
+
+
+function getForceId takes nothing returns integer
+        if(GetPlayerId(ai_player)<6) then
+      return  1
+      endif         
+     return   2
+    //return
+endfunction
+function getBaseLoc takes nothing returns location
+       if(mForceId==1) then
+      return  suguoBaseLoc
+      endif         
+    return   weiguoBaseLoc
+endfunction
+  
+
+function getEnemyBaseLoc takes nothing returns location
+       if(mForceId==2) then
+      return  suguoBaseLoc
+      endif         
+    return   weiguoBaseLoc
+endfunction
+
+function getDuBingLoc takes nothing returns location
+       if(mForceId==1) then
+      return  Location(-3900,-4800)
+      endif         
+    return   Location(3200,3800)
+endfunction
+
+
+
+function getUnitByid takes integer iunitid,location loc,real radius returns unit
+    local real TheRange
+local real nearestRange=999999
+
+      local unit u = null
+    local unit ru = null
+     local group g = CreateGroup()
+      call GroupEnumUnitsInRangeOfLoc(g,loc,radius, null)   
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+       
+       if (GetUnitTypeId(u) == iunitid) then
+
+set TheRange=RangeToLoc(u,loc)
+if TheRange<nearestRange then
+  set  nearestRange = TheRange
+        set ru=u
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+     if(ru==null) then
+      call debugstr("unit not found")
+      endif
+//     call Sleep(0.1)
+    return ru
+ endfunction
+ 
+ 
+ 
+ 
+function GetNearestEnemyHero takes unit TheUnit,real Radius,boolean includeInvisible returns unit
+local real TheRange
+local location Loc
+local real nearestRange=999999
+local unit u = null
+local unit ru = null
+local group g = CreateGroup()
+if(TheUnit==null)and(not IsAlive(TheUnit))then
+return null
+endif
+set Loc=GetUnitLoc(TheUnit)
+call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+call RemoveLocation(Loc)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+       
+ if((IsUnitEnemy(u,ai_player))and(IsUnitHero(u))and IsAlive(u))then
+if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
+set TheRange=RangeTo(TheUnit,u)
+if TheRange<nearestRange then
+  set  nearestRange = TheRange
+        set ru=u
+       endif
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+     if(ru!=null) then
+//      call debugstr("EnemyHero found")
+      endif
+//     call Sleep(0.3)
+    return ru
+endfunction
+
+function GetNearestEnemyTower takes unit TheUnit,real Radius,boolean includeInvisible returns unit
+local real TheRange
+local location Loc
+local real nearestRange=999999
+local unit u = null
+local unit ru = null
+local group g = CreateGroup()
+if(TheUnit==null)and(not IsAlive(TheUnit))then
+return null
+endif
+set Loc=GetUnitLoc(TheUnit)
+call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+call RemoveLocation(Loc)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+       
+ if(IsEnemyTower(u))then
+if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
+set TheRange=RangeTo(TheUnit,u)
+if TheRange<nearestRange then
+  set  nearestRange = TheRange
+        set ru=u
+       endif
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+     if(ru!=null) then
+//      call debugstr("EnemyHero found")
+      endif
+//     call Sleep(0.3)
+    return ru
+endfunction
+function GetNearestAllyTower takes unit TheUnit,real Radius,boolean includeInvisible returns unit
+local real TheRange
+local location Loc
+local real nearestRange=999999
+local unit u = null
+local unit ru = null
+local group g = CreateGroup()
+if(TheUnit==null)and(not IsAlive(TheUnit))then
+return null
+endif
+set Loc=GetUnitLoc(TheUnit)
+call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+call RemoveLocation(Loc)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+       
+ if(IsAllyTower(u))then
+if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
+set TheRange=RangeTo(TheUnit,u)
+if TheRange<nearestRange then
+  set  nearestRange = TheRange
+        set ru=u
+       endif
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+     if(ru!=null) then
+//      call debugstr("EnemyHero found")
+      endif
+//     call Sleep(0.3)
+    return ru
+endfunction
+
+   function GetEnemyHeroInRangeCount takes location Loc,real Radius,boolean includeInvisible returns integer
+local integer result=0
+local unit u = null
+local group g = CreateGroup()
+call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+       
+ if((IsUnitEnemy(u,ai_player))and(IsUnitHero(u))and IsAlive(u))then
+if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
+set  result=result+1
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+//     call Sleep(0.3)
+    return result
+endfunction
+    function GetEnemyBingInRangeCount takes location Loc,real Radius,boolean includeInvisible returns integer
+local integer result=0
+local unit u = null
+local group g = CreateGroup()
+call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+      
+ if(IsEnemyBing(u)and IsAlive(u))then
+if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
+set  result=result+1
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+//     call Sleep(0.3)
+    return result
+endfunction
+     function GetAllyBingInRangeCount takes location Loc,real Radius,boolean includeInvisible returns integer
+local integer result=0
+local unit u = null
+local group g = CreateGroup()
+call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+      
+ if(IsAllyBing(u)and IsAlive(u))then
+if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
+set  result=result+1
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+//     call Sleep(0.3)
+    return result
+endfunction
+    function GetEnemyTowerInRangeCount takes location Loc,real Radius,boolean includeInvisible returns integer
+local integer result=0
+local unit u = null
+local group g = CreateGroup()
+call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+      
+ if((IsUnitEnemy(u,ai_player))and(IsTower(u))and IsAlive(u))then
+if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
+set  result=result+1
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+//     call Sleep(0.3)
+    return result
+endfunction
+  function GetEnemyInRangeCount takes location Loc,real Radius,boolean includeInvisible returns integer
+local integer result=0
+local unit u = null
+local group g = CreateGroup()
+call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+      
+ if(IsUnitEnemy(u,ai_player)and IsAlive(u))then
+if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
+set  result=result+1
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+//     call Sleep(0.3)
+    return result
+endfunction
+
+
+function GetFarestAllyBubingNearHero takes unit TheUnit,real Radius,boolean includeInvisible returns unit
+local real TheRange
+local location Loc
+local real fareastRange=0
+local unit u = null
+local unit ru = null
+local group g = CreateGroup()
+if(TheUnit==null)or(not IsAlive(TheUnit))then
+call debugstr(" unit null")
+return null
+endif
+set Loc=GetUnitLoc(TheUnit)
+call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+call RemoveLocation(Loc)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+//  call debugstr(" GetNearestAllyNonHero running")    (IsUnitAlly(u,ai_player))and  
+ if(IsAllyBing(u) and IsMoving(u))then
+//  call debugstr(" bubing found!")
+if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then 
+
+set TheRange=RangeToLoc(u,mBaseLoc)
+if TheRange>fareastRange then
+  set  fareastRange = TheRange
+       set ru=u
+       endif
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+     if(ru!=null) then
+//      call debugstr("runing bubing found return")
+      endif
+//     call Sleep(0.3)
+    return ru
+endfunction
+
+  function GetNearestEnemyAttackerNearHeroFromBase takes unit TheUnit,real Radius,boolean includeInvisible returns unit
+local real TheRange
+local location Loc
+local real NearestRange=999999
+local unit u = null
+local unit ru = null
+local group g = CreateGroup()
+if(TheUnit==null)or(not IsAlive(TheUnit))then
+call debugstr("GetNearestEnemyAttackerNearHeroFromBase unit null")
+return null
+endif
+set Loc=GetUnitLoc(TheUnit)
+call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+call RemoveLocation(Loc)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+//  call debugstr(" GetNearestAllyNonHero running")    (IsUnitAlly(u,ai_player))and
+ if(IsAlive(u))then
+ endif
+ if(IsEnemyAttaker(u)and IsAlive(u))then
+ // call debugstr("GetNearestEnemyAttackerNearHeroFromBase enemy found found")
+if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then 
+// call  debugUnit(u,2)
+
+set TheRange=RangeToLoc(u,mBaseLoc)
+if TheRange<NearestRange then
+// call  debugUnit(u,1)
+
+  set  NearestRange = TheRange
+        set ru=u
+       endif
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+     if(ru==null) then
+//      call debugstr("GetNearestEnemyAttackerNearHeroFromBase null??????????????????") 
+      else
+//      call  debugUnit(ru,3)
+//      call debugstr(Int2Str(12345)) 
+//        call debugstr("ok ok ok") 
+       endif
+      
+       return ru
+endfunction
+
+function GetFarestAllyFromBaseInMiddleLine takes nothing returns unit
+local real TheRange
+local location Loc
+local real FarestRange=0
+local unit u = null
+local unit ru = null
+local group g = CreateGroup()
+
+call GroupEnumUnitsInRangeOfLoc(g,mBaseLoc,999999,null)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+
+ if(IsAllyAttaker(u) and isUnitInMiddleLine(u))then
+
+set TheRange=RangeToLoc(u,mBaseLoc)
+if TheRange>FarestRange then
+// call  debugUnit(u,1)
+
+  set  FarestRange = TheRange
+        set ru=u
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+     if(ru==null) then
+//      call debugstr("GetNearestEnemyAttackerNearHeroFromBase null??????????????????") 
+      else
+//      call  debugUnit(ru,3)
+//      call debugstr(Int2Str(12345)) 
+//        call debugstr("ok ok ok") 
+       endif
+      
+       return ru
+endfunction
+
+function GetNearestEnemyFromBaseInMiddleLine takes nothing returns unit
+local real TheRange
+local location Loc
+local real NearestRange=999999
+local unit u = null
+local unit ru = null
+local group g = CreateGroup()
+
+call GroupEnumUnitsInRangeOfLoc(g,mBaseLoc,999999,null)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+
+ if(IsEnemyAttaker(u) and isUnitInMiddleLine(u))then
+
+set TheRange=RangeToLoc(u,mBaseLoc)
+if TheRange<NearestRange then
+// call  debugUnit(u,1)
+
+  set  NearestRange = TheRange
+        set ru=u
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+     if(ru==null) then
+//      call debugstr("GetNearestEnemyAttackerNearHeroFromBase null??????????????????") 
+      else
+//      call  debugUnit(ru,3)
+//      call debugstr(Int2Str(12345)) 
+//        call debugstr("ok ok ok") 
+       endif
+      
+       return ru
+endfunction
+
+
+function getFireMiddleLineLoc takes nothing returns location
+local unit unit1
+local unit unit2
+local location rtloc=null 
+set unit1=GetFarestAllyFromBaseInMiddleLine()
+set unit2=GetNearestEnemyFromBaseInMiddleLine()
+ 
+if unit1==null or unit2==null then
+call debugstr("getFireMiddleLineLoc--unit-null") 
+return null
+endif
+//call debugUnit(unit1,1)
+//call debugstr("X:"+ITS(R2I(GetUnitX(unit1)))+"  --Y:"+ITS(R2I(GetUnitY(unit1))))
+//call debugUnit(unit2,1)
+set rtloc= Location((GetUnitX(unit1)+GetUnitX(unit2))/2,(GetUnitY(unit1)+GetUnitY(unit2))/2 )
+//call debugLoc(rtloc,2)
+return rtloc
+endfunction
+
+ function GetNearestTowerAttackerNearHeroFromBase takes unit TheUnit,real Radius,boolean includeInvisible returns unit
+local real TheRange
+local location Loc
+local real NearestRange=999999
+local unit u = null
+local unit ru = null
+local group g = CreateGroup()
+if(TheUnit==null)or(not IsAlive(TheUnit))then
+call debugstr("GetNearestEnemyAttackerNearHeroFromBase unit null")
+return null
+endif
+set Loc=GetUnitLoc(TheUnit)
+call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+call RemoveLocation(Loc)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+//  call debugstr(" GetNearestAllyNonHero running")    (IsUnitAlly(u,ai_player))and
+ if(IsEnemyTower(u))then
+ // call debugstr("GetNearestEnemyAttackerNearHeroFromBase enemy found found")
+if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then 
+// call  debugUnit(u,2)
+
+set TheRange=RangeToLoc(u,mBaseLoc)
+if TheRange<NearestRange then
+// call  debugUnit(u,1)
+
+  set  NearestRange = TheRange
+        set ru=u
+       endif
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+     if(ru==null) then
+ //     call debugstr("GetNearestTowerAttackerNearHeroFromBase null??????????????????") 
+      else
+//      call  debugUnit(ru,3)
+//      call debugstr(Int2Str(12345)) 
+//        call debugstr("ok ok ok") 
+       endif
+      
+       return ru
+endfunction
+
+function getFightSafeLoc takes nothing returns location
+   local unit u=null
+   local unit uTower=null
+    local location loc1=null
+    local location loc2=null
+    local location loc3=null
+   set u=GetNearestEnemyAttackerNearHeroFromBase(mHero,zs_gardRange,false)
+   set uTower=GetNearestTowerAttackerNearHeroFromBase(mHero,zs_gardRange,false)
+   if uTower!=null then
+//call    debugUnit(uTower,3)
+//    call debugstr("getFightSafeLoc---unit---not---found")
+   set loc1=GetBaseUnitBackRandomLoc(uTower,zs_SafeLocRangeToTower)
+ //  call debugLoc(loc1,1)
+   endif
+//   call debugUnit(u,2)
+if u!=null then
+  set  loc2=GetBaseUnitBackRandomLoc(u,zs_SafeLocRangeToEnemy)
+//    call debugLoc(loc2,2)
+
+  endif
+  //
+//   call debugstr("get safe location") GetBaseUnitBackLoc       GetBaseUnitBackRandomLoc
+//   call debugLoc(loc,2)
+if loc1==null then 
+set loc3= loc2
+return loc2
+endif
+if loc2==null then 
+set loc3=  loc1
+return loc1
+endif
+if(RangeLocToLoc(loc1,mBaseLoc)<=RangeLocToLoc(loc2,mBaseLoc)) then
+set loc3= loc1
+else 
+set loc3= loc2
+endif
+//call debugLoc(loc3,3)
+return loc3
+endfunction
+
+function getRetreatSafeLoc takes real range returns location
+   local unit u=null
+   local unit uTower=null
+    local location loc1=null
+    local location loc2=null
+    local location loc3=null
+   set u=GetNearestEnemyAttackerNearHeroFromBase(mHero,zs_gardRange,false)
+   set uTower=GetNearestTowerAttackerNearHeroFromBase(mHero,zs_gardRange,false)
+   if uTower!=null then
+//call    debugUnit(uTower,3)
+//    call debugstr("getFightSafeLoc---unit---not---found")
+   set loc1=GetBaseUnitBackLoc(uTower,range)
+ //  call debugLoc(loc1,1)
+   endif
+//   call debugUnit(u,2)
+if u!=null then
+  set  loc2=GetBaseUnitBackLoc(u,range)
+//    call debugLoc(loc2,2)
+
+  endif
+  //
+//   call debugstr("get safe location") GetBaseUnitBackLoc       GetBaseUnitBackRandomLoc
+//   call debugLoc(loc,2)
+if loc1==null then 
+set loc3= loc2
+return loc2
+endif
+if loc2==null then 
+set loc3=  loc1
+return loc1
+endif
+if(RangeLocToLoc(loc1,mBaseLoc)<=RangeLocToLoc(loc2,mBaseLoc)) then
+set loc3= loc1
+else 
+set loc3= loc2
+endif
+//call debugLoc(loc3,3)
+return loc3
+endfunction
+
+
+function GetEnemyNearestBubingNearHero takes unit TheUnit,real Radius,boolean includeInvisible returns unit
+local real TheRange
+local location Loc
+local real fareastRange=999999
+local unit u = null
+local unit ru = null
+local group g = CreateGroup()
+if(TheUnit==null)or(not IsAlive(TheUnit))then
+call debugstr(" unit null")
+return null
+endif
+set Loc=GetUnitLoc(TheUnit)
+call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+call RemoveLocation(Loc)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+//  call debugstr(" GetNearestAllyNonHero running")    (IsUnitAlly(u,ai_player))and  
+ if(IsEnemyBing(u)and IsAlive(u))then
+ // call debugstr("enemy bubing found!")
+if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then 
+set TheRange=GetHP(u)
+if TheRange<fareastRange then
+  set  fareastRange = TheRange
+        set ru=u
+       endif
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+     if(ru!=null) then
+      endif
+//     call Sleep(0.3)
+//     call debugstr("enemy bubing found return")
+    return ru
+endfunction
+
+  function GetEnemyBuDaoBubingNearHero takes unit TheUnit,real Radius,boolean includeInvisible returns unit
+  local unit u=GetEnemyNearestBubingNearHero(TheUnit,Radius,includeInvisible)
+  if  GetHP(u)<= zs_budaoXieLiangD  then
+  return u
+  endif
+  return null
+ endfunction
+   function GetAllyBuDaoBubingNearHero takes unit TheUnit,real Radius,boolean includeInvisible returns unit
+local real TheRange
+local location Loc
+local real fareastRange=999999
+local unit u = null
+local unit ru = null
+local group g = CreateGroup()
+if(TheUnit==null)or(not IsAlive(TheUnit))then
+call debugstr(" unit null")
+return null
+endif
+set Loc=GetUnitLoc(TheUnit)
+call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+call RemoveLocation(Loc)
+        loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null //todo
+//  call debugstr(" GetNearestAllyNonHero running")    (IsUnitAlly(u,ai_player))and  
+ if(IsAllyBing(u)and IsAlive(u))then
+//  call debugstr("ally bubing found!")
+if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then 
+set TheRange=GetHP(u)
+if TheRange<fareastRange then
+  set  fareastRange = TheRange
+        set ru=u
+       endif
+       endif
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+     if(ru!=null) then
+      endif
+     if(fareastRange<zs_budaoXieLiangW) then
+//    call debugstr("ally budao bubing found return")
+    return ru
+    endif
+    return null
+endfunction
+
+
+
+
+ 
+ 
+ 
+function HeroBuyItem takes unit whichHero,integer shopid,integer Itemid returns boolean
+ local boolean bbuyed=false
+ local boolean isnearby=false
+  local unit  shop
+  set shop= getUnitByid(shopid,mBaseLoc,8888)
+   
+  if shop!=null then 
+  set isnearby=gotoLocation(GetUnitLoc(shop),ShopNearbyRange)
+  if(isnearby) then
+  set bbuyed=  BuyItem_im(shop,Itemid,whichHero)
+ // set bbuyed= IssueNeutralImmediateOrderById(ai_player,shop,Itemid)
+  set shop=null
+  endif
+//   set bbuyed= IssueNeutralImmediateOrderById(ai_player,shop,Itemid)
+//    set bbuyed= IssueNeutralImmediateOrderById(ai_player,shop,Itemid)
+ //     call IssueImmediateOrderById(shop,Itemid)
+   else 
+//    call debugstr("no Itemshop found")
+   endif
+   if bbuyed then
+ //    call debugstr("buyed                 Yes ")
+    else
+//      call debugstr("Not  没有买到     buyed ")
+  
+    endif
+  return  bbuyed
+
+ endfunction
+ 
+function getfirstHero takes nothing returns unit
+      local unit u = null
+          local unit ru = null
+     local group g = CreateGroup()
+      call GroupEnumUnitsOfPlayer(g,ai_player, null)
+     loop
+       set u = FirstOfGroup(g)
+       exitwhen u == null  or ru!=null //todo
+       if (IsUnitType(u, UNIT_TYPE_HERO) == true) then
+        set ru=u
+       endif
+       call GroupRemoveUnit(g, u )
+     endloop
+     call DestroyGroup(g)
+     set g = null
+     if(ru!=null) then 
+     set mHero=ru
+     set mHeroId=GetUnitTypeId(mHero)
+//     call SetUnitUserData(mHero,11) //??
+     call setItemCanUse(false) 
+     call UnitRemoveAbility(mHero,'A088')
+
+//     call SetHeroLevel(mHero,25,false)
+     endif
+     
+    return ru
+ endfunction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function BuyHero takes integer shopid, integer heroid returns nothing
+  local unit shop= getUnitByid(shopid,Location(0,0),999999)
+  local boolean bgeted=false
+  if shop==null then
+ //   call debugstr("no Heroshop found")
+    return
+    endif
+   set bgeted= IssueNeutralImmediateOrderById(ai_player,shop,heroid)
+   if(bgeted) then
+   call getfirstHero()
+   endif
+ //     call IssueImmediateOrderById(shop,heroid)
+ //   call IssueNeutralImmediateOrderById(Player(1),shop,heroid)
+
+//    call debugstr("Player"+I2S( GetPlayerId(ai_player))+" select hero "+UnitId2String(heroid))
+    set shop=null
+ endfunction
+
+
+function buyDueNumberOfItem takes integer shopid,integer itemid,integer num returns nothing
+   local integer itmp=0
+   local boolean b=false
+    loop
+    exitwhen itmp==num
+//    exitwhen (GetNumberOfItemByID(mHero,itemid)== num )
+     set b= HeroBuyItem(mHero,shopid, itemid)
+    if b  then
+     set itmp=itmp+1
+     call Sleep(1)
+    endif
+     call Sleep(0.3)
+    endloop
+endfunction
+
+function sellItemById takes integer shopid,integer itemid returns boolean
+local unit shop=null
+  set shop= getUnitByid(shopid,mBaseLoc,8888)
+  if shop==null then 
+  return false
+  endif
+  call ariveLoc(GetUnitLoc(shop),100)
+if GiveItemByID(mHero,itemid,shop) then
+call Sleep(0.8)
+set shop=null
+return true
+endif
+set shop=null
+return false
+    //return
+endfunction
+
+
+
+function dropItem takes integer slotIndex,unit Target returns item
+ local item item5=UnitItemInSlot(mHero,slotIndex)
+ local boolean rb=false
+ if item5==null then
+ return null
+ endif
+ set rb= UnitDropItemPoint(mHero,item5,GetLocationX(GetUnitLoc(Target)),GetLocationY(GetUnitLoc(Target)))
+ call Sleep(0.5)
+ if rb then
+call SetItemPlayer(item5,GetOwningPlayer(mHero),false)
+call SetItemDropID(item5,GetUnitTypeId(mHero))
+return item5
+endif 
+return null
+endfunction
+
+
+function dropAllItems takes unit Target returns nothing
+  local integer i=3
+  if Target==null then
+  return
+  endif
+  call ariveLoc(GetUnitLoc(Target),300)
+loop
+    exitwhen i==6
+    set HeroItems[i]=dropItem(i,mHero)
+    set i=i+1
+endloop
+    //return
+endfunction
+
+
+
+
+function PickAllItems takes nothing returns nothing
+  local integer i=3
+  
+loop
+    exitwhen i==6
+    call PickItem(mHero,HeroItems[i])
+    set i=i+1
+endloop
+    //return
+endfunction
+
+
+function sellLowPrice takes nothing returns nothing
+  if (not sellItemById('n00R','I01R')) or (not  sellItemById('n00R','pclr')) then
+   if (not sellItemById('n00R','I004')) then 
+   if (not sellItemById('n00R','hslv')) then 
+   call debugstr("no --slot--empty")
+  endif
+  endif
+  endif
+    //return
+endfunction
+
+
+
+
+function can_BuyItems takes nothing returns boolean
+local integer mGold=0
+local integer lumber=0
+
+local unit shop=null
+local item tempDroped=null
+local boolean rb=false
+if GetSlotsFreeOnUnit(mHero)==6 then 
+set rb=true
+endif
+
+ 
+  set mGold=GetPlayerGold(ai_player)
+  set lumber=GetPlayerWood(ai_player)
+
+   //Ь?Ь 
+  if mGold>=500 and GetNumberOfItemByID(mHero,'bspd')<1 and GetNumberOfItemByID(mHero,'desc')<1 then
+   set rb=true
+   endif
+
+ //hp 
+  if mGold>=55 and GetItemChargesById(mHero,'hslv')<4  then
+  set rb=true
+  call debugstr("can-buy- hp")
+  endif
+ 
+  //mp 
+  if mGold>=45 and GetNumberOfItemByID(mHero,'I01S')<1 and GetItemChargesById(mHero,'sneg')<1  and GetNumberOfItemByID(mHero,'ssan')<1  and GetItemChargesById(mHero,'pclr')<3 then
+  set rb=true
+   call debugstr("can-buy- mp")
+
+   endif
+
+  // 
+  if mGold>=505 and GetNumberOfItemByID(mHero,'I004')<2  and (GetNumberOfItemByID(mHero,'sneg')>0 or GetNumberOfItemByID(mHero,'ssan')>0 ) then
+   if GetSlotsFreeOnUnit(mHero)<1 then 
+   if  GetNumberOfItemByID(mHero,'I01R')>0 or  GetNumberOfItemByID(mHero,'pclr')>0  then
+  set rb=true
+      call debugstr("can-buy- liliang")
+  endif
+  endif
+   if GetSlotsFreeOnUnit(mHero)>0 then 
+      call debugstr("can-buy- liliang")
+      set rb=true
+  endif
+  
+
+endif
+
+ 
+  //? 
+  if mGold>=1050 and GetNumberOfItemByID(mHero,'wneg')<1 and GetNumberOfItemByID(mHero,'sneg')<1  and GetNumberOfItemByID(mHero,'ssan')<1 then  
+  set rb=true
+      call debugstr("can-buy- fujue")
+
+   endif
+
+  //?? 
+  if mGold>=950 and GetNumberOfItemByID(mHero,'I01S')<1 and GetNumberOfItemByID(mHero,'sneg')<1  and GetNumberOfItemByID(mHero,'ssan')<1 then  
+  set rb=true
+        call debugstr("can-buy- huodan")
+
+  endif
+
+  // 
+  if mGold>=450 and GetNumberOfItemByID(mHero,'I01S')>0 and GetNumberOfItemByID(mHero,'wneg')>0 then  
+          call debugstr("can-buy- fengzhang")
+
+ set rb=true
+
+  endif
+  //Ь 
+  if mGold>=2350 and GetNumberOfItemByID(mHero,'bspd')>0 and GetNumberOfItemByID(mHero,'desc')<1 then
+    call debugstr("can-buy- feixie")
+
+set rb=true
+
+  endif
+
+  //?
+  if mGold>=1100 and GetNumberOfItemByID(mHero,'I00F')<1 and GetNumberOfItemByID(mHero,'sneg')>0  and GetNumberOfItemByID(mHero,'ssan')<1 then  
+   set rb=true
+       call debugstr("can-buy- zhuanshi")
+
+   endif
+
+  //? 
+  if mGold>=950 and GetNumberOfItemByID(mHero,'I01S')<1 and GetNumberOfItemByID(mHero,'I00F')>0 and GetNumberOfItemByID(mHero,'sneg')>0  and GetNumberOfItemByID(mHero,'ssan')<1 then  
+set rb=true
+         call debugstr("can-buy- huodan2")
+
+  endif
+ 
+  // 
+  if mGold>=900 and GetNumberOfItemByID(mHero,'I01S')>0 and GetNumberOfItemByID(mHero,'I00F')>0 and GetNumberOfItemByID(mHero,'sneg')>0 then  
+          call debugstr("can-buy- bianyang")
+
+set rb=true
+  endif
+
+   //?? 
+  if mGold>=1700 and GetNumberOfItemByID(mHero,'I00U')<1 and GetNumberOfItemByID(mHero,'I010')<1 then  
+ set rb=true
+        call debugstr("can-buy- 1700")
+
+  endif
+
+  if mGold>=3200 and GetNumberOfItemByID(mHero,'I001')<1 and GetNumberOfItemByID(mHero,'I010')<1 then  
+  set rb=true
+         call debugstr("can-buy- 3200")
+
+  endif
+
+  if mGold>=1350 and GetNumberOfItemByID(mHero,'I001')>0 and GetNumberOfItemByID(mHero,'I00U')>0 then  
+           call debugstr("can-buy- 1350")
+
+  set rb=true
+  endif
+
+  return rb    
+    
+endfunction
+
+
+
+
+function zs_buyItems_Action takes integer index returns nothing
+local integer mGold=0
+local integer lumber=0
+
+local unit shop=null
+local item tempDroped=null
+
+if index!=80 then
+return
+endif
+call debugstr("buy --start")
+//call Sleep(3)
+if GetSlotsFreeOnUnit(mHero)==6 then 
+    call buyDueNumberOfItem('n013','hslv',1)   //?? 
+    call buyDueNumberOfItem('n013','pclr',1)    //?? 
+    call buyDueNumberOfItem('n00R','I01R',4)    //? 
+endif
+
+ 
+   
+   //Ь?Ь 
+  set mGold=GetPlayerGold(ai_player)
+  if mGold>=500 and GetNumberOfItemByID(mHero,'bspd')<1 and GetNumberOfItemByID(mHero,'desc')<1 then
+  if GetSlotsFreeOnUnit(mHero)<1 then
+  call sellItemById('n00S','I01R')
+  endif
+  
+  if GetSlotsFreeOnUnit(mHero)>0 then
+  call buyDueNumberOfItem('n00S','bspd',1)
+  endif
+  endif
+  
+  
+ //hp 
+   set mGold=GetPlayerGold(ai_player)
+  if mGold>=55 and GetItemChargesById(mHero,'hslv')<4  then
+    if GetSlotsFreeOnUnit(mHero)>0 then
+    call buyDueNumberOfItem('n013','hslv',1)   //?? 
+    else
+
+  if GetSlotsFreeOnUnit(mHero)<1 and GetNumberOfItemByID(mHero,'hslv')>0 then
+  set shop= getUnitByid('n013',mBaseLoc,8888)
+  call ariveLoc(GetUnitLoc(shop),300)
+  call UnitDropItemSlot(mHero,GetItemByID(mHero,'hslv'),4)
+  set tempDroped= dropItem(5,mHero)
+  call buyDueNumberOfItem('n013','hslv',1)   //?? 
+  endif
+  if GetSlotsFreeOnUnit(mHero)<1 and GetNumberOfItemByID(mHero,'hslv')<1 then
+  if sellItemById('n00S','I01R') or sellItemById('n00S','pclr') then
+  call buyDueNumberOfItem('n013','hslv',1)   //?? 
+  endif
+  endif
+  
+  if  tempDroped!=null then
+  call PickItem(mHero,tempDroped)
+  endif
+  endif
+  endif
+  //mp
+   set mGold=GetPlayerGold(ai_player)
+  if mGold>=45 and GetNumberOfItemByID(mHero,'I01S')<1 and GetItemChargesById(mHero,'sneg')<1  and GetNumberOfItemByID(mHero,'ssan')<1  and GetItemChargesById(mHero,'pclr')<3 then
+  if GetSlotsFreeOnUnit(mHero)<1 and GetNumberOfItemByID(mHero,'pclr')>0 then
+  set shop= getUnitByid('n013',mBaseLoc,8888)
+  call ariveLoc(GetUnitLoc(shop),300)
+  call UnitDropItemSlot(mHero,GetItemByID(mHero,'pclr'),4)
+   set tempDroped= dropItem(5,mHero)
+  call buyDueNumberOfItem('n013','pclr',1)   //Lan 
+  endif
+
+  if GetSlotsFreeOnUnit(mHero)<1 and GetNumberOfItemByID(mHero,'pclr')<1 then
+  if sellItemById('n00S','I01R') then
+   call buyDueNumberOfItem('n013','pclr',1)   //Lan 
+   endif
+   endif
+  
+
+    if GetSlotsFreeOnUnit(mHero)>0 then
+    call buyDueNumberOfItem('n013','pclr',1)   //lan 
+    endif
+
+  
+  if  tempDroped!=null then
+  call PickItem(mHero,tempDroped)
+  endif
+  endif
+
+  //
+   set mGold=GetPlayerGold(ai_player)
+  if mGold>=505 and GetNumberOfItemByID(mHero,'I004')<2  and (GetNumberOfItemByID(mHero,'sneg')>0 or GetNumberOfItemByID(mHero,'ssan')>0 ) then
+  if GetSlotsFreeOnUnit(mHero)<1 then
+  call sellItemById('n007','I01R')
+  call sellItemById('n007','pclr')
+  endif
+  if GetSlotsFreeOnUnit(mHero)>0 then
+  set shop= getUnitByid('n007',mBaseLoc,8888)
+  call dropAllItems(shop)
+ call buyDueNumberOfItem('n007','sor2',1)   // 
+ call buyDueNumberOfItem('n003','rde1',1)   // 
+ call buyDueNumberOfItem('n00R','rst1',1)   //? 
+ call PickAllItems()
+endif
+endif
+  
+
+
+ 
+  //?
+   set mGold=GetPlayerGold(ai_player)
+ 
+  if mGold>=1050 and GetNumberOfItemByID(mHero,'wneg')<1 and GetNumberOfItemByID(mHero,'sneg')<1  and GetNumberOfItemByID(mHero,'ssan')<1 then  
+  if GetSlotsFreeOnUnit(mHero)<1 then
+  call sellLowPrice()
+  endif
+  if GetSlotsFreeOnUnit(mHero)>0 then
+  call buyDueNumberOfItem('n00R','wneg',1)
+  call UnitDropItemSlot(mHero,GetItemByID(mHero,'wneg'),0)
+  endif
+  endif
+
+  //?? 
+   set mGold=GetPlayerGold(ai_player)
+
+  if mGold>=950 and GetNumberOfItemByID(mHero,'I01S')<1 and GetNumberOfItemByID(mHero,'sneg')<1  and GetNumberOfItemByID(mHero,'ssan')<1 then  
+  if GetSlotsFreeOnUnit(mHero)<1 then
+  call sellLowPrice()
+  endif
+  if GetSlotsFreeOnUnit(mHero)>0 then
+  call buyDueNumberOfItem('n00S','I01S',1)
+  call UnitDropItemSlot(mHero,GetItemByID(mHero,'I01S'),1)
+
+  endif
+  endif
+
+  // 
+   set mGold=GetPlayerGold(ai_player)
+
+  if mGold>=450 and GetNumberOfItemByID(mHero,'I01S')>0 and GetNumberOfItemByID(mHero,'wneg')>0 then  
+  set shop= getUnitByid('n014',mBaseLoc,8888)
+   call debugstr("feng--zhang--fengzhangkaishi")
+
+   call UnitDropItemSlot(mHero,GetItemByID(mHero,'wneg'),0)
+   call UnitDropItemSlot(mHero,GetItemByID(mHero,'I01S'),1)
+
+  call dropAllItems(shop)
+ call buyDueNumberOfItem('n014','glsk',1)
+ call PickAllItems()
+ call debugstr("feng--zhang--jieshu")
+
+  endif
+  //Ь 
+   set mGold=GetPlayerGold(ai_player)
+
+  if mGold>=2350 and GetNumberOfItemByID(mHero,'bspd')>0 and GetNumberOfItemByID(mHero,'desc')<1 then
+  call debugstr("fei ---xie")
+  if GetSlotsFreeOnUnit(mHero)<1 then
+  set shop= getUnitByid('n014',mBaseLoc,8888)
+  call ariveLoc(GetUnitLoc(shop),200)
+  call UnitDropItemSlot(mHero,GetItemByID(mHero,'bspd'),4)
+
+   set tempDroped= dropItem(5,mHero)
+  endif
+  
+  if GetSlotsFreeOnUnit(mHero)>0 then
+  call buyDueNumberOfItem('n014','ktrm',1)
+  endif
+   if  tempDroped!=null then
+  call PickItem(mHero,tempDroped)
+  endif
+  endif
+
+  //?
+   set mGold=GetPlayerGold(ai_player)
+
+  if mGold>=1100 and GetNumberOfItemByID(mHero,'I00F')<1 and GetNumberOfItemByID(mHero,'sneg')>0  and GetNumberOfItemByID(mHero,'ssan')<1 then  
+  if GetSlotsFreeOnUnit(mHero)<1 then
+  call sellLowPrice()
+  endif
+  if GetSlotsFreeOnUnit(mHero)>0 then
+  call buyDueNumberOfItem('n013','I00F',1)
+  call UnitDropItemSlot(mHero,GetItemByID(mHero,'I00F'),0)
+
+  endif
+  endif
+
+  //? 
+   set mGold=GetPlayerGold(ai_player)
+
+  if mGold>=950 and GetNumberOfItemByID(mHero,'I01S')<1 and GetNumberOfItemByID(mHero,'I00F')>0 and GetNumberOfItemByID(mHero,'sneg')>0  and GetNumberOfItemByID(mHero,'ssan')<1 then  
+  if GetSlotsFreeOnUnit(mHero)<1 then
+  call sellLowPrice()
+  endif
+  if GetSlotsFreeOnUnit(mHero)>0 then
+  call buyDueNumberOfItem('n00S','I01S',1)
+  call UnitDropItemSlot(mHero,GetItemByID(mHero,'I01S'),1)
+  call UnitDropItemSlot(mHero,GetItemByID(mHero,'sneg'),2)
+  endif
+  endif
+ 
+  //
+   set mGold=GetPlayerGold(ai_player)
+
+  if mGold>=900 and GetNumberOfItemByID(mHero,'I01S')>0 and GetNumberOfItemByID(mHero,'I00F')>0 and GetNumberOfItemByID(mHero,'sneg')>0 then  
+
+    set shop= getUnitByid('n008',mBaseLoc,8888)
+    call UnitDropItemSlot(mHero,GetItemByID(mHero,'I00F'),0)
+    call UnitDropItemSlot(mHero,GetItemByID(mHero,'I01S'),1)
+  call UnitDropItemSlot(mHero,GetItemByID(mHero,'sneg'),2)
+
+    
+    
+    call dropAllItems(shop)
+  call debugstr("kaishi-mai-bianyang")
+  call buyDueNumberOfItem('n008','cnhn',1)
+  call debugstr("jieshu--bianyang")
+  call PickAllItems()
+  endif
+
+   //??
+  set mGold=GetPlayerGold(ai_player)
+ 
+  if mGold>=1700 and GetNumberOfItemByID(mHero,'I00U')<1 and GetNumberOfItemByID(mHero,'I010')<1 then  
+  if GetSlotsFreeOnUnit(mHero)<1 then
+   call sellLowPrice()
+  endif
+  if GetSlotsFreeOnUnit(mHero)>0 then
+  call buyDueNumberOfItem('n013','I00U',1)
+  call UnitDropItemSlot(mHero,GetItemByID(mHero,'I00U'),0)
+  endif
+  endif
+  set mGold=GetPlayerGold(ai_player)
+
+  if mGold>=3200 and GetNumberOfItemByID(mHero,'I001')<1 and GetNumberOfItemByID(mHero,'I010')<1 then  
+  if GetSlotsFreeOnUnit(mHero)<1 then
+   call sellLowPrice()
+   endif
+  if GetSlotsFreeOnUnit(mHero)>0 then
+  call buyDueNumberOfItem('n00R','I001',1)
+  call UnitDropItemSlot(mHero,GetItemByID(mHero,'I001'),1)
+  endif
+  endif
+  
+  
+  set mGold=GetPlayerGold(ai_player)
+
+  if mGold>=1350 and GetNumberOfItemByID(mHero,'I001')>0 and GetNumberOfItemByID(mHero,'I00U')>0 then  
+
+   set shop= getUnitByid('n008',mBaseLoc,8888)
+    call UnitDropItemSlot(mHero,GetItemByID(mHero,'I00U'),0)
+    call UnitDropItemSlot(mHero,GetItemByID(mHero,'I001'),1)
+
+    call dropAllItems(shop)
+   call buyDueNumberOfItem('n008','dphe',1)
+   call PickAllItems()
+
+  endif
+  //· 
+
+
+  
+  
+  
+   set shop=null
+    //return
+endfunction
+
+function zs_buyItems_condition takes nothing returns nothing
+if RangeToLoc(mHero,mBaseLoc)<1600 and can_BuyItems() then 
+
+set zs_action_prioty_arry[80]=89
+//call debugstr("do----------------------------------------buying")
+endif
+//set zs_action_prioty_arry[80]=200
+
+    //return
+endfunction
+
+
+function zs_buyunit_condition takes nothing returns nothing
+local integer mGold=0
+local integer lumber=0
+   set mGold=GetPlayerGold(ai_player)
+  set lumber=GetPlayerWood(ai_player)
+
+   if GetNumberOfItemByID(mHero,'I010')>0  and   mGold>=960 and lumber>=80  then
+    set zs_action_prioty_arry[81]=91
+    endif
+
+endfunction
+function zs_buyunit_action takes integer index returns nothing  
+local integer mGold=0
+local integer lumber=0
+local unit shop=null
+if index!=81 then
+return
+endif
+   set mGold=GetPlayerGold(ai_player)
+  set lumber=GetPlayerWood(ai_player)
+  
+
+  if mForceId==1 then
+   set shop= getUnitByid('h00S',mBaseLoc,6666)
+   if shop!=null then
+
+   call IssueNeutralImmediateOrderById(ai_player,shop,'h019')
+   call IssueNeutralImmediateOrderById(ai_player,shop,'nfot')
+   call IssueNeutralImmediateOrderById(ai_player,shop,'nbdo')
+
+   endif
+   endif
+  if mForceId==2 then
+   set shop= getUnitByid('h00Z',mBaseLoc,6666)
+   if shop!=null then
+
+   call IssueNeutralImmediateOrderById(ai_player,shop,'h01C')
+   call IssueNeutralImmediateOrderById(ai_player,shop,'nfot')
+   call IssueNeutralImmediateOrderById(ai_player,shop,'nbdo')
+
+   endif
+   endif
+ 
+ 
+endfunction
+function dubing takes location Loc returns boolean
+local integer enemyCount=0
+local unit utmp=null
+local location tmploc=null
+
+
+set enemyCount=GetEnemyInRangeCount(GetUnitLoc(mHero),800,false)
+if  enemyCount>0 then 
+return true
+endif
+ //    call debugstr("dubing runing")
+    set utmp=GetFarestAllyBubingNearHero(mHero,600,false)
+    if utmp==null then 
+       call gotoLocation(Loc,20)
+       call Sleep(0.5)
+    endif
+    if utmp!=null then
+ //   call debugstr("doFight runing")
+    set tmploc=GetUnitFrontLoc(utmp,zs_dubingParam)
+    call IssuePointOrderLoc( mHero, "move", tmploc )
+    call Sleep(0.3)
+    endif
+  
+return false
+ 
+endfunction
+
+
+function dubing2 takes location Loc returns nothing
+local integer enemyCount=0
+local unit utmp=null
+local location tmploc=null
+
+call ariveLoc(Loc,20)
+loop
+set enemyCount=GetEnemyInRangeCount(GetUnitLoc(mHero),800,false)
+    exitwhen  enemyCount>0
+ //    call debugstr("dubing runing")
+    set utmp=GetFarestAllyBubingNearHero(mHero,600,false)
+    if utmp!=null then
+ //   call debugstr("doFight runing")
+    set tmploc=GetUnitFrontLoc(utmp,zs_dubingParam)
+    call IssuePointOrderLoc( mHero, "move", tmploc )
+    call Sleep(0.6)
+
+    endif
+    call Sleep(0.05)
+// call test()   
+   
+endloop
+call debugstr("dubing end-----------------------------------------------")    
+endfunction
+ 
+function LearnSkill takes nothing returns nothing
+ local integer pt=0
+ set pt=GetHeroSkillPoints(mHero)
+  if pt<1 then 
+  return
+  endif
+call   RaiseSkill(mHero,mSkillArray[GetHeroLevel(mHero)-pt])
+//call SetPlayerAbilityAvailable(ai_player,mSkillArray[GetHeroLevel(mHero)-pt],false)
+
+ if  GetUnitTypeId(mHero)=='H008' then
+//  call SetPlayerAbilityAvailable(ai_player,'A088',false)
+//    call UnitRemoveAbility(mHero,'A088')
+ endif
+  
+endfunction
+
+function isHeroBuchongIng takes nothing returns boolean
+
+    return false
+endfunction
+
+
+
+function getFeiZhangCharges takes unit theunit returns integer
+
+    return  GetItemChargesById(theunit,'sneg')
+
+endfunction
+function isHeroHasFengZhang takes unit TheHero returns boolean
+return  GetNumberOfItemByID(TheHero,'sneg')>0
+    //return
+endfunction
+function can_UseFengZhang takes unit theUnit returns boolean
+local boolean result=false
+set result= can_UseItemByID (theUnit,'sneg')
+if result then
+call HeroStop()
+endif
+return result
+endfunction
+
+function UseFengZhang takes unit Target returns boolean
+local boolean result=false
+//call debugstr("begin-- using-- fengzheng")
+set result= UseItemTargetByID (mHero,'sneg',Target)
+//call debugstr("end-- using-- fengzheng")
+call Sleep(0.5)
+return result
+endfunction
+function isHeroHasBianYang takes unit TheHero returns boolean
+return  GetNumberOfItemByID(TheHero,'ssan')>0
+    //return
+endfunction
+function can_UseBianXing takes unit theUnit returns boolean
+local boolean result=false
+set result= can_UseItemByID (theUnit,'ssan')
+if result then
+call HeroStop()
+endif
+return result
+endfunction
+function UseBianXing takes unit Target returns boolean
+local boolean result=false
+set result= UseItemTargetByID (mHero,'ssan',Target)
+call Sleep(0.5)
+return result
+endfunction
+  function isHeroHasFeiXie takes unit TheHero returns boolean
+return  GetNumberOfItemByID(TheHero,'desc')>0
+    //return
+endfunction
+
+function can_UseFeiXie takes unit theUnit returns boolean
+local boolean result=false
+set result= can_UseItemByID(theUnit,'desc')
+call HeroStop()
+
+return result
+endfunction
+
+function UseFeiXie takes location Target returns boolean
+local boolean result=false
+set result= UseItemPointByID (mHero,'desc',Target)
+call Sleep(0.4)
+return result
+endfunction
+
+
+
+
+function HeroAttack takes unit TheUnit returns boolean
+   return  IssueTargetOrder( mHero, "attack", TheUnit)
+endfunction
+function HeroAttackLoc takes location Loc returns boolean
+   return  IssuePointOrderLoc( mHero, "attack", Loc)
+endfunction
+
+
+
+function can_sima_cast_ef takes nothing returns boolean
+local boolean b1=CanCastAbilityOrder(mHero,'A07A',"impale")
+local boolean b2=CanCastAbilityOrder(mHero,'A03O',"rainoffire")
+    if(b1 ==false or b2==false) then
+ return false
+ endif
+ return true
+endfunction
+function can_sima_cast_e takes nothing returns boolean
+ return CanCastAbilityOrder(mHero,'A07A',"impale")
+endfunction
+function sima_cast_e takes unit TheTarget returns boolean
+   local boolean rb=false
+     set rb=CastTargetSkillByOderStr(mHero,'A07A',"impale",TheTarget)
+     call Sleep(0.85)
+    return rb  
+endfunction
+function can_sima_cast_f takes nothing returns boolean
+ return CanCastAbilityOrder(mHero,'A03O',"rainoffire")
+endfunction 
+function sima_cast_f takes location Loc returns boolean
+     local boolean rb=false
+     set rb=CastPointSkillByOderStr(mHero,'A03O',"rainoffire",Loc)
+     call Sleep(0.8)
+    return rb  
+endfunction
+
+
+function can_sima_cast_n takes nothing returns boolean
+ return CanCastAbilityOrderById(mHero,'A041',852224)
+    //return
+endfunction
+
+function sima_cast_n takes unit TheUnit returns boolean
+     local boolean rb=false
+     local location Loc=null
+//     852224
+      set Loc=GetUnitLoc(TheUnit)
+     set rb=CastTargetSkillByOderIdDelayed(mHero,'A041',852224,TheUnit,2.00)
+    call Sleep(0.30) 
+    return rb  
+endfunction
+function sima_cast_ef takes unit TheTarget returns boolean
+if    not can_sima_cast_ef() then
+return false
+endif
+     call  sima_cast_e(TheTarget)
+     call  sima_cast_f(GetUnitLoc(TheTarget))
+    return true  
+endfunction
+
+function can_sima_cast_n_ef takes nothing returns boolean
+ if  can_sima_cast_n() and  can_sima_cast_ef() and MyHeroMP>800 then
+ return true
+ endif
+ return false
+endfunction
+
+function sima_cast_n_ef takes unit Target returns nothing
+local location loc=null
+if not can_sima_cast_n()  then
+return 
+endif
+    call sima_cast_n(Target)
+    call sima_cast_ef(Target)
+endfunction
+
+
+function can_sima_cast_feng_n_ef takes nothing returns boolean
+ if getFeiZhangCharges(mHero)>0 and can_sima_cast_n() and  can_sima_cast_ef() and MyHeroMP>800 then
+ return true
+ endif
+ return false
+endfunction
+
+function sima_cast_feng_n_ef takes unit Target returns nothing
+local location loc=null
+if Target==null then 
+return
+endif
+if (not isHeroHasFengZhang(mHero)) or (not can_sima_cast_n())  then
+return 
+endif
+set loc=GetLocBetweenTwoLocsRangeToFirst(GetUnitLoc(Target),GetUnitLoc(mHero),900)
+   if UseFengZhang(Target) then
+   call gotoLocation(loc,20)
+   call Sleep(2.3)
+   
+    call sima_cast_n(Target)
+    call gotoLocation(GetUnitLoc(Target),20)
+    call Sleep(0.5)
+    call sima_cast_ef(Target)
+    endif
+endfunction
+
+function can_sima_cast_bian_n_ef takes nothing returns boolean
+ if isHeroHasBianYang(mHero) and can_sima_cast_n() and  can_sima_cast_ef() and MyHeroMP>700 then
+ return true
+ endif
+ return false
+endfunction
+function sima_cast_bian_n_ef takes unit Target returns nothing
+local location loc=null
+if (not isHeroHasBianYang(mHero)) or (not can_sima_cast_n())  then
+return 
+endif
+set loc=GetLocBetweenTwoLocsRangeToFirst(GetUnitLoc(Target),GetUnitLoc(mHero),700)
+   if UseBianXing(Target) then
+   call gotoLocation(loc,20)
+    call sima_cast_n(Target)
+    call sima_cast_ef(Target)
+    endif
+endfunction
+
+function can_sima_cast_ef_feng_n_feng_fe takes nothing returns boolean
+ if getFeiZhangCharges(mHero)>1 and can_sima_cast_n() and  can_sima_cast_ef() and MyHeroMP>950 then
+ return true
+ endif
+ return false
+endfunction
+function sima_cast_ef_feng_n_feng_fe takes unit Target returns nothing
+local location loc=null
+if Target==null then
+ call debugstr("sima_cast_ef_feng_n_feng_fe ??????????Target null")
+return
+endif
+if (not can_sima_cast_ef_feng_n_feng_fe())  then
+return 
+endif
+call debugstr("sima_cast_ef_feng_n_feng_fe =========================================begin")
+set loc=GetLocBetweenTwoLocsRangeToFirst(GetUnitLoc(Target),GetUnitLoc(mHero),900)
+//call debugLoc(loc,1)
+   call sima_cast_ef(Target)
+//    call debugstr("ef-- ed")
+    call Sleep(0.46)
+   if UseFengZhang(Target) then
+   call debugstr("UseFengZhang-- ed")
+   call gotoLocation(loc,20)
+   call Sleep(2.1)
+    call sima_cast_n(Target)
+    call HeroAttack(Target)
+    call Sleep(0.8)
+    if UseFengZhang(Target) then
+    call Sleep(4.3)
+    call sima_cast_f(GetUnitLoc(Target)) 
+    call sima_cast_e(Target)
+    endif
+    endif
+    
+endfunction
+
+function can_zhuge_cast_g takes nothing returns boolean
+ return CanCastAbilityOrderById(mHero,'A087',852119)
+    //return
+endfunction
+function zhuge_cast_g takes unit TheTarget returns nothing
+   if mHeroId== 'H008' then
+    call CastTargetSkillByOderId(mHero,'A087',852119,TheTarget)
+     call Sleep(0.5)
+  endif
+  //852127
+endfunction
+ 
+function can_zhuge_cast_e takes nothing returns boolean
+ return CanCastAbilityOrder(mHero,'A085',"silence")
+    //return
+endfunction
+function zhuge_cast_e takes unit TheTarget returns nothing
+   if mHeroId== 'H008' then
+     call  CastPointSkillByOderStr(mHero,'A085',"silence",GetUnitLoc(TheTarget))
+     call Sleep(0.5)
+  endif
+endfunction
+
+function can_zhuge_cast_eg takes nothing returns boolean
+ return can_zhuge_cast_e() and can_zhuge_cast_g()
+    //return
+endfunction
+
+function can_zhuge_cast_x takes nothing returns boolean
+
+   return CanCastAbilityOrderById(mHero,'A083',852127)
+    //return
+endfunction
+  function zhuge_cast_x takes unit Target returns nothing
+   if mHeroId== 'H008' then
+     call SetUnitLookAt(mHero,"head",Target,0,0,0)
+     call  CastImdSkillByID(mHero,'A083',852127)
+     call Sleep(0.3)
+  endif
+endfunction
+
+ function zhuge_cast_x_move takes unit Target returns nothing
+ local location loc=null
+
+   if mHeroId== 'H008' then
+     call SetUnitLookAt(mHero,"head",Target,0,0,0)
+     call  CastImdSkillByID(mHero,'A083',852127)
+     call Sleep(0.3)
+    set loc=GetLocBetweenTwoLocsRangeToFirst(GetUnitLoc(Target),GetUnitLoc(mHero),100)
+    call gotoLocation(loc,10)
+    call Sleep(1.5)
+    call HeroAttack(Target)
+    call Sleep(0.8)
+  endif
+endfunction
+
+function can_zhuge_cast_x_move_g takes nothing returns boolean
+
+   return  can_zhuge_cast_x() and  can_zhuge_cast_g()
+    //return
+endfunction
+
+function zhuge_cast_x_move_g takes unit Target returns nothing
+ local location loc=null
+
+   if mHeroId== 'H008' then
+     call SetUnitLookAt(mHero,"head",Target,0,0,0)
+     call  CastImdSkillByID(mHero,'A083',852127)
+     call Sleep(0.3)
+    set loc=GetLocBetweenTwoLocsRangeToFirst(GetUnitLoc(Target),GetUnitLoc(mHero),100)
+    call gotoLocation(loc,10)
+    call Sleep(1.5)
+    call zhuge_cast_x(Target)
+    call HeroAttack(Target)
+    call Sleep(0.8)
+
+  endif
+endfunction
+
+function can_zhuge_cast_fei_e_x_g takes nothing returns boolean
+if can_UseFeiXie(mHero) and can_zhuge_cast_x()  and can_zhuge_cast_e()   and can_zhuge_cast_g() and MyHeroMP>700 then
+return true
+endif
+return false
+endfunction
+
+ function zhuge_cast_fei_e_x_g takes unit Target returns nothing
+
+ local location loc=null
+  if (not isHeroHasFeiXie(mHero)) or (not can_zhuge_cast_x())  then
+return 
+endif
+
+
+   if mHeroId== 'H008' then
+  set loc=GetLocBetweenTwoLocsRangeToFirst(GetUnitLoc(Target),GetUnitLoc(mHero),100)
+    call UseBianXing(Target)
+     if  can_UseFeiXie(mHero) then
+     call UseFeiXie(loc)
+     call  debugstr("fei xie ---used")
+     call  zhuge_cast_e(Target)
+     call zhuge_cast_x(Target)
+     call zhuge_cast_g(Target)
+     call HeroAttack(Target)
+     call Sleep(1)
+//     call Sleep(5)
+//else
+       call  debugstr("fei xie not ---nnnnnnnnnnnnnn---------used")
+
+     endif
+  endif
+endfunction
+
+ function can_zhuge_cast_feng_e_x_g takes nothing returns boolean
+if getFeiZhangCharges(mHero)>0 and can_zhuge_cast_x()  and can_zhuge_cast_e()   and can_zhuge_cast_g() and MyHeroMP>700 then
+return true
+endif
+return false
+endfunction
+
+ function zhuge_cast_feng_e_x_g takes unit Target returns nothing
+ local location loc=null
+   if (not isHeroHasFengZhang(mHero)) or(not can_zhuge_cast_x())  then
+return 
+endif
+
+   if mHeroId== 'H008' then
+  if   UseFengZhang(Target) then
+     set loc=GetLocBetweenTwoLocsRangeToFirst(GetUnitLoc(Target),GetUnitLoc(mHero),100)
+     call gotoLocation(loc,10)
+     call Sleep(4.5)
+     call  zhuge_cast_e(Target)
+     call zhuge_cast_x(Target)
+     call zhuge_cast_g(Target)
+     call HeroAttack(Target)
+     call Sleep(1)
+
+    endif
+    endif
+endfunction
+
+
+function can_zhuge_cast_bian_e_x_g takes nothing returns boolean
+if isHeroHasBianYang(mHero) and can_zhuge_cast_x()  and can_zhuge_cast_e()   and can_zhuge_cast_g() and MyHeroMP>700 then
+return true
+endif
+return false
+endfunction
+ function zhuge_cast_bian_e_x_g takes unit Target returns nothing
+ local location loc=null
+    if (not isHeroHasBianYang(mHero)) or (not can_zhuge_cast_x())  then
+return 
+endif
+
+   if mHeroId== 'H008' then
+    call UseBianXing(Target)
+//     if  UseFeiXie(loc) then
+     call  debugstr("fei xie ---used")
+     set loc=GetLocBetweenTwoLocsRangeToFirst(GetUnitLoc(Target),GetUnitLoc(mHero),100)
+     call gotoLocation(loc,10)
+      call Sleep(1)
+     call  zhuge_cast_e(Target)
+     call zhuge_cast_x(Target)
+     set loc=GetLocBetweenTwoLocsRangeToFirst(GetUnitLoc(Target),GetUnitLoc(mHero),100)
+     call gotoLocation(loc,10)
+     set loc=GetLocBetweenTwoLocsRangeToFirst(GetUnitLoc(Target),GetUnitLoc(mHero),100)
+     call zhuge_cast_g(Target)
+     call gotoLocation(loc,10)
+     call Sleep(0.5)
+      call HeroAttack(Target)
+     call Sleep(1)
+
+//     call Sleep(5)
+//else
+       call  debugstr("fei xie not ---nnnnnnnnnnnnnn---------used")
+
+//     endif
+  endif
+endfunction
+function intoUnitRange takes unit Target,real range returns boolean
+   local location loc
+   local boolean rb=false
+   local real rl=999999
+   if Target==null then 
+   return false
+   endif
+ 
+   set loc=GetLocBetweenTwoLocsRangeToFirst(GetUnitLoc(Target),GetUnitLoc(mHero),range-100)
+   call  gotoLocation(loc,18)
+   call Sleep(0.2)
+   set rl=RangeLocToLoc(GetUnitLoc(mHero),GetUnitLoc(Target))
+   if rl<range-10 then
+   return true
+   endif
+   return false
+endfunction
+
+function MoveAttackUnit takes unit Target returns boolean
+   local location loc
+   local boolean rb=false
+   if Target==null then 
+   return false
+   endif
+if  intoUnitRange(Target,590) then
+   call HeroAttack(Target)
+  call Sleep(0.8)
+  set loc=GetBaseUnitBackRandomLoc(mHero,300)
+  call  gotoLocation(loc,10)
+   call Sleep(1)
+   endif
+   return true
+endfunction
+
+function ChaseAttackUnit takes unit Target returns boolean
+   local location loc
+   local boolean rb=false
+   if Target==null then 
+   return false
+   endif
+  set loc=GetLocBetweenTwoLocsRangeToFirst(GetUnitLoc(mHero),GetUnitLoc(Target),300)
+  call gotoLocation(loc,10)
+  call Sleep(0.8)
+if  intoUnitRange(Target,590) then
+   call HeroAttack(Target)
+  call Sleep(0.5)
+   endif
+   return true
+endfunction
+
+function AlterDefendRange takes nothing returns nothing
+  if IsRestoreHP(mHero) or   IsRestoreMP(mHero)   then
+   set zs_SafeLocRangeToEnemy =zs_chiyaoSafeRangetoEnemy
+   else
+   set zs_SafeLocRangeToEnemy=zs_SafeLocRangeToEnemyA
+   endif
+endfunction
+
+
+
+
+function RefreshParam takes nothing returns nothing
+   call  LearnSkill()
+   set EnemyHeroLevel=GetHeroLevel(HeroD)
+   set mHeroLevel=GetHeroLevel(mHero)
+
+   set safeLoc=getFightSafeLoc()
+   set zs_budaoXieLiangD=zs_budaoXieLiangBaseD+mHeroLevel*2
+   set zs_budaoXieLiangW=zs_budaoXieLiangBaseW+mHeroLevel*2
+   set zs_kickoff=false 
+   set  budaobingW=GetAllyBuDaoBubingNearHero(mHero,zs_gardRange,false)
+   set  budaobingD=GetEnemyBuDaoBubingNearHero(mHero,zs_gardRange,false)
+   set  HeroD=GetNearestEnemyHero(mHero,1300,false)
+   set EnemyCount=GetEnemyBingInRangeCount(GetUnitLoc(mHero),900,false)
+   set AllyCount=GetAllyBingInRangeCount(GetUnitLoc(mHero),900,false)
+   set zs_ToNearestHeroRange=RangeLocToLoc(GetUnitLoc(mHero),GetUnitLoc(HeroD))
+   if HeroD!=null then
+   set EnemyHeroHP=GetHP(HeroD)
+   set EnemyHeroMP=GetMP(HeroD)
+   set rangeToHeroD=RangeTo(mHero,HeroD)
+   else 
+   set EnemyHeroHP=0
+   set EnemyHeroMP=999999
+   set rangeToHeroD=999999
+   endif
+set MyHeroHP=GetHP(mHero)
+set MyHeroMP=GetMP(mHero)
+set TowerD=GetNearestEnemyTower(mHero,1600,false) 
+set TowerW=GetNearestAllyTower(mHero,1600,false)
+ 
+if  TowerD!=null then
+set rangeToTowerD=RangeTo(mHero,TowerD)
+//call debugUnit(TowerD,1)
+else
+set rangeToTowerD=99999
+endif 
+if  TowerW!=null then
+set rangeToTowerW=RangeTo(mHero,TowerW)
+else
+set rangeToTowerW=99999
+endif 
+set NearestEnemyBubing=GetEnemyNearestBubingNearHero(mHero,1200,false)
+set FarestAllyBubing=GetFarestAllyBubingNearHero(mHero,1200,false)
+set za_middle_fireLoc=null
+
+if NearestEnemyBubing!=null and FarestAllyBubing!=null then
+ set za_middle_fireLoc=middleLocBetweenTwoLoc(GetUnitLoc(NearestEnemyBubing),GetUnitLoc(FarestAllyBubing))
+endif
+
+if za_middle_fireLoc!=null then
+set rangeToFireLine=RangeToLoc(mHero,mBaseLoc)-RangeLocToLoc(za_middle_fireLoc,mBaseLoc)  
+//call debugLoc(za_middle_fireLoc,2)
+else
+set rangeToFireLine=-1000
+endif
+
+set crEnemyHeroOrder=GetUnitCurrentOrder(HeroD)
+//call debugstr(ITS(R2I(rangeToFireLine)))
+
+
+
+endfunction
+function HeroGotoSafeLoc takes unit u returns nothing
+    if(safeLoc==null) then
+//    call debugstr("no safe Loc found")
+     call HeroAttackLoc( mEnemyBaseLoc )
+//     call debugLoc(mEnemyBaseLoc,1)
+     call Sleep(0.5)
+    else 
+    if  isZhongLiEnemy(NearestEnemyBubing) then
+      call HeroAttack( NearestEnemyBubing )
+      else
+//    call debugLoc(safeLoc,2)
+   call gotoLocation(safeLoc,50)
+   call Sleep(0.5)
+   endif
+   endif
+endfunction
+
+ function HeroRetreat takes integer range returns nothing
+local location safeLoc=getRetreatSafeLoc(range)
+    if(safeLoc==null) then
+//    call debugstr("no safe Loc found")
+     call HeroAttackLoc( mEnemyBaseLoc )
+     call Sleep(1)
+    else 
+        if  (GetPlayerId(GetOwningPlayer(uTmp))>11 or GetPlayerId(GetOwningPlayer(uTmp))<0) and  GetUnitLevel(uTmp)<=8 then
+        call HeroAttack( uTmp )
+    endif
+    if GetPlayerId(GetOwningPlayer(uTmp))<=11 and GetPlayerId(GetOwningPlayer(uTmp))>=0 then
+//    call debugLoc(safeLoc,2)
+   set bArived= gotoLocation(safeLoc,50)
+   call Sleep(0.3)
+   endif
+   endif
+endfunction
+
+function ComputeActionPrioty takes nothing returns nothing
+
+
+
+
+
+
+
+
+endfunction
+
+
+
+
+
+
+
+function zs_budao_d_condition takes nothing returns nothing
+
+if budaobingD==null then
+ set zs_action_prioty_arry[0]=0
+ else
+ set zs_action_prioty_arry[0]=50
+ endif    
+endfunction
+function zs_budao_d_action takes integer index returns nothing
+ if index!=0 then
+return 
+endif
+if budaobingD==null then
+ return
+ else
+// call debugstr("zs_budao_d_action ")
+ call HeroAttack(budaobingD)
+ call Sleep(0.8)
+ endif    
+endfunction
+
+
+
+
+
+
+function zs_budao_w_condition takes nothing returns nothing
+
+if budaobingW==null or HeroD==null then
+ set zs_action_prioty_arry[1]=0
+ else
+ set zs_action_prioty_arry[1]=49
+ endif    
+endfunction
+function zs_budao_w_action takes integer index returns nothing
+if index!=1 then
+return
+endif
+if budaobingW==null then
+ return
+ else
+// call debugstr("zs_budao_w_action ") 
+ call HeroAttack(budaobingW)
+  call Sleep(0.8)
+
+ endif    
+endfunction
+
+
+
+
+
+
+function zs_buchonghp_condition takes nothing returns nothing
+if GetNumberOfItemByID(mHero,'hslv')<1 then
+ set zs_action_prioty_arry[2]=0
+ return
+endif
+if IsRestoreHP(mHero) then 
+ set zs_action_prioty_arry[2]=0
+ return
+endif
+ if GetHPVoided(mHero)>500 then
+ set zs_action_prioty_arry[2]=48
+ endif
+ if MyHeroHP<300 then
+ set zs_action_prioty_arry[2]=60
+ endif
+  if MyHeroHP<500 and EnemyHeroMP>320 and EnemyHeroLevel>5 then
+ set zs_action_prioty_arry[2]=62
+ endif
+
+
+endfunction
+
+function zs_buchonghp_action takes integer index returns nothing
+  if index!=2 then
+return 
+endif
+//call debugstr("zs_buchonghp_action ")
+ call HeroRetreat(1600)
+ call Sleep(2)
+ if NearestEnemyBubing==null or RangeTo(mHero,NearestEnemyBubing)>300 then
+ call UseItemTargetByID (mHero,'hslv',mHero)
+ endif
+endfunction
+
+
+
+
+
+
+
+function zs_buchongmp_condition takes nothing returns nothing
+if GetNumberOfItemByID(mHero,'pclr')<1 then
+ set zs_action_prioty_arry[3]=0
+ return
+endif
+
+if IsRestoreMP(mHero) then 
+ set zs_action_prioty_arry[3]=0
+ return
+endif
+ if GetManaVoided(mHero)>180 then
+ set zs_action_prioty_arry[3]=31
+ endif
+ 
+ 
+ 
+endfunction
+
+function zs_buchongmp_action takes integer index returns nothing
+  if index!=3 then
+return 
+endif
+//call debugstr("zs_buchongmp_action ")
+ call HeroRetreat(1600)
+ call Sleep(2)
+  if NearestEnemyBubing==null or RangeTo(mHero,NearestEnemyBubing)>300 then
+ call UseItemByID (mHero,'pclr')
+ endif
+
+endfunction
+
+
+
+function zs_move_condition takes nothing returns nothing
+local unit utmp=null
+  set zs_action_prioty_arry[4]=10
+  
+   if EnemyCount>AllyCount+2 and AllyCount<2 then
+   set zs_action_prioty_arry[4]=45
+   endif
+   if AllyCount==0 and EnemyCount>0 then
+   set zs_action_prioty_arry[5]=58
+   endif
+   if HeroD!=null and NearestEnemyBubing!=null and RangeTo(mHero,NearestEnemyBubing)<120 then
+      set zs_action_prioty_arry[5]=57
+   endif
+    if TowerD!=null then
+    if rangeToTowerD<900 and (FarestAllyBubing==null or RangeTo(FarestAllyBubing,TowerD)> RangeTo(mHero,TowerD)) then
+   set zs_action_prioty_arry[4]=61
+   endif
+    endif
+     if EnemyCount>AllyCount+4 then
+   set zs_action_prioty_arry[5]=40
+   endif
+    if rangeToFireLine>0 and safeLoc!=null then
+   set zs_action_prioty_arry[4]=71
+   endif 
+   if MyHeroHP<400 and rangeToTowerD<900   then
+     set zs_action_prioty_arry[5]=55
+   endif
+
+    if MyHeroHP<500  and HeroD!=null and EnemyHeroMP>350 and EnemyHeroLevel>5 then
+     set zs_action_prioty_arry[5]=46
+   endif
+    if IsLowLife(mHero) and HeroD!=null then
+     set zs_action_prioty_arry[5]=82
+   endif
+
+ 
+    if MyHeroHP<300 and GetNumberOfItemByID(mHero,'hslv')<1 and EnemyHeroLevel>4 then
+     set zs_action_prioty_arry[6]=83
+   endif
+    if MyHeroHP<500 and GetNumberOfItemByID(mHero,'hslv')<1   and EnemyHeroMP>350 and EnemyHeroLevel>7 then
+     set zs_action_prioty_arry[6]=84
+   endif
+
+    if (not IsLifeAlmostFull(mHero) or not IsManaAlmostFull(mHero)) and RangeToLoc(mHero,mBaseLoc)<1600 then
+     set zs_action_prioty_arry[6]=61
+   endif
+   if GetPlayerGold(ai_player)>=3200 and GetNumberOfItemByID(mHero,'I010')<1 then
+    set zs_action_prioty_arry[6]=26
+   endif
+     if rangeToTowerD<900 and HeroD!=null then
+   set zs_action_prioty_arry[8]=100
+   endif
+   if IsRestoreHP(mHero) or IsRestoreMP(mHero) and (HeroD!=null or rangeToTowerD<900) then 
+ set zs_action_prioty_arry[9]=52
+ endif
+
+//   call debugstr(ITS(EnemyCount))
+   if EnemyCount==0 then
+   set utmp=GetFarestAllyBubingNearHero(mHero,20000,false)
+
+   if utmp==null or RangeToLoc(utmp,mBaseLoc)-RangeToLoc(mHero,mBaseLoc)<1600 then
+   set zs_action_prioty_arry[11]=33
+   endif
+   endif
+
+   if   HeroD!=null and za_middle_fireLoc!=null and(EnemyCount>AllyCount+2 or AllyCount<3) and RangeLocToLoc(za_middle_fireLoc,zs_dubing_cdt_loc)<360 then
+   set zs_action_prioty_arry[12]=57
+   endif
+
+endfunction
+
+function zs_move_action takes integer index returns nothing
+   if index==4 then
+    call HeroGotoSafeLoc(mHero)
+ //  call debugstr("HeroGotoSafeLoc ") 
+   endif
+   if index==5 then
+   if can_UseFeiXie(mHero) then
+   call  UseFeiXie(mBaseLoc)
+   endif 
+  call HeroRetreat(1200)
+ // call debugstr("HeroRetreat ")
+  endif
+   if index==6 then
+  if can_UseFeiXie(mHero) and RangeToLoc(mHero,mBaseLoc)>1800 then
+   call  UseFeiXie(mBaseLoc)
+   endif 
+ 
+  call ariveLoc(mBaseLoc,1000)
+//  call Sleep(0.6)
+ // call debugstr("HeroRetreat ")
+  endif
+
+  if index==8 then 
+  call HeroRetreat(1600)
+  call Sleep(2)
+ // call debugstr("HeroRetreat ")
+  endif
+     if index==9 then
+
+  call HeroRetreat(1200)
+ // call debugstr("HeroRetreat ")
+  endif
+
+  
+     if index==11 then 
+    call dubing(mdubingLoc)
+ // call debugstr("HeroRetreat ")
+  endif
+   if index==12 then
+   call HeroRetreat(1800)
+   call Sleep(3)
+loop
+    exitwhen dubing(mdubingLoc)
+    call Sleep(0.2)
+endloop 
+ // call debugstr("HeroRetreat ")
+  endif
+
+    //return
+endfunction
+
+
+function zs_attack_condition takes nothing returns nothing
+ if HeroD!=null then
+ 
+   if (EnemyHeroHP<600 or  IsLifeAlmostFull(mHero))  then
+   set zs_action_prioty_arry[40]=19
+   endif
+   if EnemyHeroHP<300 and IsLifeAlmostFull(mHero) then
+   set zs_action_prioty_arry[41]=53  
+   endif
+
+   if IsLowLife(HeroD) then
+   set zs_action_prioty_arry[41]=81  
+   endif
+      if TowerD!=null and GetHP(TowerD)<120 and MyHeroHP>300 then
+   set zs_action_prioty_arry[42]=101  
+   endif
+     if    IsBianXing(HeroD) then
+   set zs_action_prioty_arry[43]=56  
+   endif
+
+endif
+if TowerD!=null and MyHeroHP>300  and  (FarestAllyBubing!=null and RangeTo(FarestAllyBubing,TowerD)< 560) then
+if(HeroD==null or rangeToHeroD>1000) then
+set zs_action_prioty_arry[44]=47  
+endif
+endif
+endfunction
+
+function zs_attack_action takes integer index returns nothing
+   if index==40 then
+//   call debugstr("MoveAttackUnit ")
+   call MoveAttackUnit(HeroD)
+  endif
+  
+  if index==41 then
+     if can_UseFeiXie(mHero)  then
+  call UseFeiXie(GetUnitLoc(HeroD))
+  endif
+    if can_UseBianXing(mHero)  then
+  call UseBianXing(HeroD)
+  endif
+
+   call ChaseAttackUnit(HeroD)
+   call Sleep(0.8)
+  endif
+  if index==42 then
+    call debugstr("HeroAttack --TowerD")
+   call HeroAttack(TowerD)
+   call Sleep(0.8)
+  endif
+    if index==43 then
+   call HeroAttack(HeroD)
+   call Sleep(1)
+  endif
+    if index==44 then
+   call HeroAttack(TowerD)
+   call Sleep(0.8)
+  endif
+
+endfunction
+
+
+function isEnemyHeroCastDaZhao takes nothing returns boolean
+    if crEnemyHeroOrder==852127 or crEnemyHeroOrder==852224  then
+    return true
+    endif
+    return  false
+endfunction
+
+
+function zs_useitem_condition takes nothing returns nothing
+ if HeroD!=null then
+        if IsBianXing(mHero) then
+    call debugstr("IsBianXing+++++++++++++++++++++++++++++++++++++++++++++++++")
+    endif
+   if isEnemyHeroCastDaZhao() or (IsJuFeng(mHero) and EnemyHeroMP>550)  then
+   if can_UseFeiXie(mHero) then
+   set zs_action_prioty_arry[20]=77
+   endif
+   
+    if can_UseFengZhang(mHero) then
+    set zs_action_prioty_arry[21]=76
+   endif
+      if can_UseBianXing(mHero) then
+   set zs_action_prioty_arry[23]=75  
+   endif
+
+   endif
+
+    if not can_sima_cast_n() or  not can_zhuge_cast_x()   then
+   if can_UseBianXing(mHero) then
+   set zs_action_prioty_arry[23]=55  
+   endif
+   endif 
+   if EnemyHeroHP>1800 or IsLifeAlmostFull(HeroD)  then
+   if can_UseBianXing(mHero) then
+   set zs_action_prioty_arry[23]=56  
+   endif
+   endif 
+
+  
+  
+   if EnemyHeroHP<600   then
+   if can_UseBianXing(mHero) then
+   set zs_action_prioty_arry[23]=55  
+   endif
+   endif 
+   if IsLowLife(HeroD) or EnemyHeroHP<500 then
+   if can_UseFeiXie(mHero) then
+   set zs_action_prioty_arry[24]=97  
+   endif
+   endif
+   if EnemyHeroHP>1000 and not can_sima_cast_n() and not can_zhuge_cast_x() then
+   if can_UseBianXing(mHero) then
+   set zs_action_prioty_arry[23]=54  
+   endif
+   endif
+
+endif
+
+endfunction
+
+function zs_useitem_action takes integer index returns nothing
+   local location loc=null
+   
+   if index==20 and HeroD!=null then
+set loc=GetLocBetweenTwoLocsRangeToFirst(GetUnitLoc(mHero),mBaseLoc,1200)
+call Sleep(5.6)
+call UseFeiXie(mBaseLoc)
+
+call Sleep(0.3)
+
+call HeroRetreat(1200)
+call Sleep(2)
+//call UseFeiXie(loc)
+endif
+  
+  if index==21 and  HeroD!=null  then
+//   call UseFengZhang(HeroD)
+   call Sleep(5.6)
+   call UseFengZhang(HeroD)
+   call Sleep(0.3)
+   call HeroRetreat(1200)
+   call Sleep(3)
+  endif
+  if index==23 and HeroD!=null then
+   call UseBianXing(HeroD)
+  endif
+  
+     if index==24 and HeroD!=null then
+call UseFeiXie(GetUnitLoc(HeroD))
+endif
+
+endfunction
+function zs_get_sima_e_damage takes nothing returns integer
+ local integer level=1
+  set level= GetUnitAbilityLevelZs(mHero,'A07A')
+  if level==1 then
+  return 75
+  endif
+  if level==2 then
+  return 125
+  endif
+  if level==3 then
+  return 175
+  endif
+  if level==4 then
+  return 275
+  endif
+  return 0
+endfunction
+
+function zs_get_sima_f_damage takes nothing returns integer
+ local integer level= GetUnitAbilityLevelZs(mHero,'A03O')
+ 
+  if level==1 then
+  return 90
+  endif
+  if level==2 then
+  return 150
+  endif
+  if level==3 then
+  return 200
+  endif
+  if level==4 then
+  return 250
+  endif
+    return 0 
+endfunction
+function zs_get_sima_ef_damage takes nothing returns integer
+    return zs_get_sima_e_damage()+zs_get_sima_f_damage() 
+endfunction
+
+function zs_get_sima_n_damage takes nothing returns integer
+ local integer level= GetUnitAbilityLevelZs(mHero,'A041')
+  if level==1 then
+  return 400
+  endif
+  if level==2 then
+  return 500
+  endif
+  if level==3 then
+  return 600
+  endif
+    return 0 
+endfunction
+ function zs_get_sima_nef_damage takes nothing returns integer
+    return zs_get_sima_e_damage()+zs_get_sima_f_damage()+zs_get_sima_n_damage() 
+endfunction
+  function zs_get_sima_nefef_damage takes nothing returns integer
+    return zs_get_sima_nef_damage()+zs_get_sima_ef_damage() 
+endfunction
+
+
+
+
+
+
+function zs_get_zhuge_g_damage takes nothing returns integer
+ local integer level=1
+  set level= GetUnitAbilityLevelZs(mHero,'A087')
+  if level==1 then
+  return 80
+  endif
+  if level==2 then
+  return 145
+  endif
+  if level==3 then
+  return 205
+  endif
+  if level==4 then
+  return 265
+  endif
+  return 0
+endfunction
+
+function zs_get_zhuge_e_damage takes nothing returns integer
+ local integer level=1
+  set level= GetUnitAbilityLevelZs(mHero,'A085')
+  if level==1 then
+  return 70
+  endif
+  if level==2 then
+  return 120
+  endif
+  if level==3 then
+  return 170
+  endif
+  if level==4 then
+  return 220
+  endif
+  return 0
+endfunction
+
+function zs_get_zhuge_x_damage takes nothing returns integer
+ local integer level=1
+  set level= GetUnitAbilityLevelZs(mHero,'A083')
+  if level==1 then
+  return 400
+  endif
+  if level==2 then
+  return 640
+  endif
+  if level==3 then
+  return 880
+  endif
+  return 0
+endfunction
+
+
+function set_spell_damage takes nothing returns nothing
+local integer i=0
+loop
+    exitwhen i==10
+    set spell_damage_m[i]=0
+    set i=i+1
+endloop
+
+if isSiMaYi() then
+   if can_sima_cast_e() then
+    set  spell_damage_m[0]=zs_get_sima_e_damage()
+    endif
+   if can_sima_cast_f() then
+    set  spell_damage_m[1]=zs_get_sima_f_damage()
+    endif
+   if can_sima_cast_ef() then
+    set  spell_damage_m[2]=zs_get_sima_ef_damage()
+    endif
+   if can_sima_cast_feng_n_ef() then
+    set  spell_damage_m[3]=zs_get_sima_nef_damage()
+    endif
+   if can_sima_cast_bian_n_ef() then
+    set  spell_damage_m[4]=zs_get_sima_nef_damage()
+    endif
+    
+   if can_sima_cast_n_ef() then
+    set  spell_damage_m[5]=zs_get_sima_nef_damage()
+    endif
+    
+    
+    
+  if can_sima_cast_ef_feng_n_feng_fe() then
+    set  spell_damage_m[6]=zs_get_sima_nefef_damage()
+    endif
+endif
+
+if isZhuGeLiang() then
+   if can_zhuge_cast_g() then
+    set  spell_damage_m[0]=zs_get_zhuge_g_damage()
+    endif
+   if can_zhuge_cast_eg() then
+    set  spell_damage_m[1]=zs_get_zhuge_e_damage()+zs_get_zhuge_g_damage()
+    endif
+   if can_zhuge_cast_feng_e_x_g() then
+    set  spell_damage_m[2]= zs_get_zhuge_g_damage()+zs_get_zhuge_e_damage()+ R2I(zs_get_zhuge_x_damage()*1.5)
+    endif
+  if can_zhuge_cast_fei_e_x_g() then
+    set  spell_damage_m[3]=zs_get_zhuge_g_damage()+zs_get_zhuge_e_damage()+ R2I(zs_get_zhuge_x_damage()*1.5)
+    endif
+    
+      if can_zhuge_cast_bian_e_x_g() then
+    set  spell_damage_m[4]=zs_get_zhuge_g_damage()+zs_get_zhuge_e_damage()+ R2I(zs_get_zhuge_x_damage()*1.2)
+    endif
+       if can_zhuge_cast_x() then
+    set  spell_damage_m[5]=zs_get_zhuge_x_damage()
+    endif
+     if can_zhuge_cast_x_move_g()  then
+    set  spell_damage_m[6]=zs_get_zhuge_x_damage()+zs_get_zhuge_g_damage()
+    endif
+
+endif
+
+endfunction
+
+
+function getSpellOffDamageIndex takes nothing returns integer
+ local integer i=0
+// local integer ri=0
+// local integer damage=0
+ call set_spell_damage()
+loop
+    exitwhen  i==10
+    if isZhuGeLiang() then
+//    call debugstr(ITS(spell_damage_m[i]))
+    endif
+      if spell_damage_m[i]>EnemyHeroHP then
+        return  i
+      endif
+
+      set i=i+1
+endloop
+
+  return -1
+
+    //return
+endfunction
+
+
+
+
+
+
+function sima_spell_condition takes nothing returns nothing
+   
+local integer index=-1
+//call debugstr("sima-spell--end  -index:"+ITS(index))   
+
+if not isSiMaYi() then 
+return
+endif
+
+if HeroD!=null then
+set index=getSpellOffDamageIndex()
+
+ if IsLifeAlmostFull(HeroD) and can_sima_cast_ef() and MyHeroMP>400 and rangeToTowerD>1100 and rangeToHeroD<700 then 
+  set zs_action_prioty_arry[52]=59
+  endif
+  
+  if EnemyHeroHP>600 and can_sima_cast_e()  and rangeToTowerD>1100  and MyHeroMP>400  and rangeToHeroD<700  then 
+  set zs_action_prioty_arry[50]=52
+  endif
+  
+    if  index>=0 then
+    set zs_kickoff=true  
+    set zs_action_prioty_arry[50+index]=99
+    call debugstr("find")
+   endif
+   
+endif
+// set zs_action_prioty_arry[55]=99
+
+if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>2 and can_sima_cast_ef() and mHeroLevel>6 then
+    if MyHeroMP>1200 or IsManaAlmostFull(mHero) then
+    set zs_action_prioty_arry[59]=58
+    endif
+endif
+
+
+  if TowerD!=null and GetHP(TowerD)<260 and MyHeroHP>200 and can_sima_cast_f() then
+   set zs_action_prioty_arry[60]=102  
+   endif
+  if TowerD!=null and GetHP(TowerD)>600 and MyHeroHP>600 and rangeToHeroD>1100  and can_sima_cast_f()  then
+   set zs_action_prioty_arry[61]=101  
+   endif
+
+
+endfunction
+
+ function sima_spell_action takes integer index returns nothing
+
+if not isSiMaYi() then 
+return
+endif
+ 
+  if index==50 then
+  if zs_kickoff then 
+  if can_UseFeiXie(mHero)  then
+  call UseFeiXie(GetUnitLoc(HeroD))
+  endif
+    if can_UseBianXing(mHero)  then
+  call UseBianXing(HeroD)
+  endif
+  endif
+  call sima_cast_e(HeroD)
+  call debugstr("sima_cast_e ")
+  endif
+  
+  if index==51 then
+    if zs_kickoff then 
+    if can_UseFeiXie(mHero)  then
+  call UseFeiXie(GetUnitLoc(HeroD))
+  endif
+    if can_UseBianXing(mHero)  then
+  call UseBianXing(HeroD)
+  endif
+   endif
+  call sima_cast_f(GetUnitLoc(HeroD))
+  call debugstr("sima_cast_f ")
+  endif
+  
+  if index==52 then
+  if  intoUnitRange(HeroD,650) then
+   if zs_kickoff then 
+
+    if can_UseFeiXie(mHero)  then
+  call UseFeiXie(GetUnitLoc(HeroD))
+  endif
+    if can_UseBianXing(mHero)  then
+  call UseBianXing(HeroD)
+  endif
+  endif
+  call sima_cast_ef(HeroD)
+  call debugstr("sima_cast_ef ")
+  endif
+  endif
+  
+   if index==53 then
+   if  intoUnitRange(HeroD,700) then
+  if can_sima_cast_feng_n_ef() then 
+  call sima_cast_feng_n_ef(HeroD)
+  call debugstr("sima_cast_feng_n_ef ")
+  endif
+  endif
+  endif
+  
+  if index==54 then 
+  if  intoUnitRange(HeroD,700) and can_sima_cast_bian_n_ef() then
+  call sima_cast_bian_n_ef(HeroD)
+  call debugstr("sima_cast_bian_n_ef ")
+  endif
+  endif
+  
+  
+  if index==55 then
+    if  intoUnitRange(HeroD,800) then
+    call debugstr("sima_cast_n_ef ")
+    call sima_cast_n_ef(HeroD)
+  endif
+  endif
+ 
+   if index==56 then
+    if  intoUnitRange(HeroD,650) then
+    call debugstr("sima_cast_ef_feng_n_feng_fe ")
+    call sima_cast_ef_feng_n_feng_fe(HeroD)
+  endif
+  endif
+
+  
+    if index==59 and NearestEnemyBubing!=null then
+     call debugstr("ef--NearestEnemyBubing ")
+   if  intoUnitRange(NearestEnemyBubing,650) then
+    call sima_cast_ef(NearestEnemyBubing)
+    endif
+    endif
+    if index==60 then
+    call debugstr("sima---fire-----TowerD ")
+
+    call sima_cast_f(GetUnitLoc(TowerD))
+    endif
+    if index==61 then
+    call debugstr("sima---fire-----TowerD ")
+
+    call sima_cast_f(GetUnitLoc(TowerD))
+    endif                                                  
+
+ endfunction
+
+
+
+
+function zhuge_spell_condition takes nothing returns nothing
+   
+local integer index=-1
+
+   
+if not isZhuGeLiang() then 
+return
+endif
+
+if HeroD!=null then
+set index=getSpellOffDamageIndex()
+//call debugstr("zhuge-spell-index:"+ITS(index))   
+  
+if IsLifeAlmostFull(HeroD) and can_zhuge_cast_g() and can_zhuge_cast_e()  and MyHeroMP>500   and rangeToTowerD>1100  and rangeToHeroD<700  then 
+  set zs_action_prioty_arry[51]=59
+  endif
+  
+  if can_zhuge_cast_g()  and MyHeroMP>300   and rangeToTowerD>1100  and rangeToHeroD<700  then 
+  set zs_action_prioty_arry[50]=52
+  endif
+  
+    if  index>=0 then
+    set zs_kickoff =true 
+ 
+    set zs_action_prioty_arry[50+index]=99
+    call debugstr("find============================")
+   endif
+endif
+// set zs_action_prioty_arry[55]=99
+
+if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>2 and can_zhuge_cast_g() and can_zhuge_cast_e() and mHeroLevel>7 then
+    if MyHeroMP>1200 or IsManaAlmostFull(mHero) then
+    set zs_action_prioty_arry[59]=58
+    endif
+endif
+endfunction
+
+ function zhuge_spell_action takes integer index returns nothing
+
+if not isZhuGeLiang() then 
+return
+endif
+  
+  if index==50 then
+     if zs_kickoff then 
+
+       if can_UseFeiXie(mHero)  then
+  call UseFeiXie(GetUnitLoc(HeroD))
+  endif
+    if can_UseBianXing(mHero)  then
+  call UseBianXing(HeroD)
+  endif
+  endif
+  call zhuge_cast_g(HeroD)
+  call debugstr("zhuge_cast_g ")
+  endif
+  
+  if index==51 then
+     if zs_kickoff then 
+
+       if can_UseFeiXie(mHero)  then
+  call UseFeiXie(GetUnitLoc(HeroD))
+  endif
+    if can_UseBianXing(mHero)  then
+  call UseBianXing(HeroD)
+  endif
+  endif
+   if  intoUnitRange(HeroD,650) then
+
+  call zhuge_cast_e(HeroD)
+  call zhuge_cast_g(HeroD)
+   endif
+  call debugstr("zhuge_cast_eg ")
+  endif
+  
+    if index==52 then 
+  if  intoUnitRange(HeroD,700) then
+  call zhuge_cast_feng_e_x_g(HeroD)
+  call debugstr("can_zhuge_cast_feng_e_x_g ")
+  endif
+  endif
+  
+  
+  if index==53 then
+    if  intoUnitRange(HeroD,650) then
+    call debugstr("zhuge_cast_fei_e_x_g ")
+    call zhuge_cast_fei_e_x_g(HeroD)
+  endif
+  endif
+
+  if index==54 then
+    if  intoUnitRange(HeroD,650) then
+    call debugstr("zhuge_cast_bian_e_x_g ")
+    call zhuge_cast_bian_e_x_g(HeroD)
+  endif
+  endif
+
+  
+  if index==55 then
+  if  intoUnitRange(HeroD,650) then
+  call debugstr("zhuge_cast_x_move ")
+ call zhuge_cast_x_move(HeroD)
+  endif
+  endif
+  
+   if index==56 then
+   if  intoUnitRange(HeroD,700) then
+   call debugstr("zhuge_cast_x_move_g ")
+  call zhuge_cast_x_move_g(HeroD)
+  endif
+  endif
+  
+ 
+  
+    if index==59 and NearestEnemyBubing!=null then
+    call debugstr("NearestBubing --spell ")
+       if  intoUnitRange(NearestEnemyBubing,650) then
+
+    call zhuge_cast_g(NearestEnemyBubing)
+    call zhuge_cast_e(NearestEnemyBubing)
+    endif
+    endif
+ endfunction
+
+
+
+
+
+
+
+
+
+
+function isToLoop takes nothing returns boolean
+      if(mHero==null) then
+        call BuyHero('n001',mHeroId)
+        call BuyHero('n000',mHeroId)
+      return false
+      endif
+      if(not UnitAlive(mHero)) then
+       call      Sleep(1)
+       return false
+      endif
+    return  true
+endfunction 
+
+
+function initPriotArray takes nothing returns nothing
+ local integer index=0
+loop
+    exitwhen index==100
+    set zs_action_prioty_arry[index]=0
+    set index=index+1
+endloop
+endfunction  
+
+function getMaxPriotIndex takes nothing returns integer
+ local integer index=0
+ local integer itmp=0
+ local integer ri=5
+loop
+    exitwhen index==100
+    if zs_action_prioty_arry[index]>itmp then
+    set itmp=zs_action_prioty_arry[index]
+    set ri=index
+    endif
+
+//    set zs_action_prioty_arry[index]=0 
+    set index=index+1
+
+endloop
+ return ri
+endfunction 
+
+function duizhan takes nothing returns nothing
+
+call initPriotArray()
+
+call RefreshParam()
+
+call  zs_budao_d_condition()
+call  zs_budao_w_condition()
+call zs_buchonghp_condition()
+call zs_buchongmp_condition()
+call zs_move_condition()
+call zs_buyItems_condition()
+call zs_buyunit_condition()
+call zs_useitem_condition()
+call zs_attack_condition()
+
+if isZhuGeLiang() then
+call zhuge_spell_condition()
+endif
+if isSiMaYi() then 
+call sima_spell_condition()
+endif
+
+set zs_prioty_index=getMaxPriotIndex()
+//set zs_prioty_index=80
+
+
+call zs_attack_action(zs_prioty_index)
+call zs_move_action(zs_prioty_index) 
+call zs_budao_d_action(zs_prioty_index)
+call zs_budao_w_action(zs_prioty_index)
+call zs_buchonghp_action(zs_prioty_index)
+call zs_buchongmp_action(zs_prioty_index)
+call zs_buyunit_action(zs_prioty_index)
+call zs_useitem_action(zs_prioty_index)
+
+
+
+ if isSiMaYi() then 
+call sima_spell_action(zs_prioty_index)
+call zs_buyItems_Action(zs_prioty_index)
+//call debugstr("sima-index:"+ITS(zs_prioty_index)+" //prioty:"+ITS(zs_action_prioty_arry[zs_prioty_index]))
+endif
+
+
+if isZhuGeLiang() then
+
+call zs_buyItems_Action(zs_prioty_index)
+call zhuge_spell_action(zs_prioty_index)
+call debugstr("zhuge-index:"+ITS(zs_prioty_index)+"   -------//prioty:"+ITS(zs_action_prioty_arry[zs_prioty_index]))
+endif
+
+
+
+endfunction
+
+function doFight takes nothing returns nothing
+local boolean b=false
+
+//loop
+//    exitwhen  b
+//    call debugLoc(mdubingLoc,2)
+//    set b= gotoLocation(mdubingLoc,20)
+ //   call Sleep(0.3)
+//    call debugstr("gotoLocation running")
+//endloop
+//call debugstr("begin do fight")
+//  call IssuePointOrderLoc( mHero, "move", dubing )
+    //return
+//call dubing(mdubingLoc)
+call duizhan()
+
+
+ 
+endfunction
+
+ 
+function oneLoop takes nothing returns nothing
+//local real real1=0
+//local real real2=0
+
+
+//call TimerStart(testTimer,6000,true,null)
+//set real1=TimerGetElapsed(testTimer)
+//call getFireMiddleLineLoc()
+//set real2=TimerGetElapsed(testTimer)-real1
+//call debugstr("timer----"+ITS(R2I(real2*10000)))
+
+call doFight()
+
+endfunction
+
+  
+
+
+  function mainLoop takes nothing returns nothing
+ //   local boolean bb
+  loop
+   call Sleep(0.1)
+//    call debugstries(I2S(GetHeroNumber(0)))
+//       call IssueNeutralImmediateOrderById(ai_player, mshop, 'I01R' )
+//       call IssueNeutralImmediateOrderById(Player(1), mshop, 'I01R' )
+ 
+//    set bb= IssueImmediateOrderById( mshop, 'iwbr' )
+//        set bb= IssueImmediateOrderById( mshop, 'I01R' )
+//         call CreateItemLoc( 'texp', Location(-5500, -6500) )   
+ //        call CreateItemLoc( 'iwbr', Location(-6000, -5500) )   
+ //        call IssuePointOrderLoc( frhero, "move", Location(-500, -500) )
+    if isToLoop() then 
+    call oneLoop()
+    endif
+  endloop
+endfunction
+
+function adjustBaseLoc takes nothing returns nothing
+ local    unit  u=null
+ set u=getUnitByid('n002',suguoBaseLoc,2600)
+ if(u!=null) then
+// call  debugstr("suguoBaseLoc    found")
+ set suguoBaseLoc=GetUnitLoc(u)
+// call debugLoc(suguoBaseLoc,1)
+
+ endif
+  set u=getUnitByid('n002',weiguoBaseLoc,2600)
+ if(u!=null) then
+ set weiguoBaseLoc=GetUnitLoc(u)
+// call debugLoc(weiguoBaseLoc,1)
+// call  debugstr("weiguoBaseLoc    found  X:"+ITS(R2I(GetLocationX(weiguoBaseLoc)))+"Y:"+ITS(R2I(GetLocationY(weiguoBaseLoc))))
+ endif
+  
+endfunction
+
+
+
+
+function initSkillArry_zhugeliang takes nothing returns nothing
+set mSkillArray[0]='A087'
+set mSkillArray[1]='A085'
+set mSkillArray[2]='A087'  // 
+set mSkillArray[3]='A085'  // 
+set mSkillArray[4]='A087'
+set mSkillArray[5]='A083'     //6
+set mSkillArray[6]='A087'
+set mSkillArray[7]='A085'
+set mSkillArray[8]='A085'   
+set mSkillArray[9]='A08I'
+set mSkillArray[10]='A083'   //11
+set mSkillArray[11]='A08I'
+set mSkillArray[12]='A08I'
+set mSkillArray[13]='A08I'
+set mSkillArray[14]='A08I'
+set mSkillArray[15]='A083'  //16
+set mSkillArray[16]='A08I'
+set mSkillArray[17]='A08I'
+set mSkillArray[18]='A08I'
+set mSkillArray[19]='A08A'
+set mSkillArray[20]='A08A'
+set mSkillArray[21]='A08A'
+set mSkillArray[22]='A08A'
+set mSkillArray[23]='A08I'
+set mSkillArray[24]='A08I'
+    //return
+endfunction
+function initSkillArry_simayi takes nothing returns nothing
+set mSkillArray[0]='A07A'  //E
+set mSkillArray[1]='A03O'  //F
+set mSkillArray[2]='A07A'  // 
+set mSkillArray[3]='A03O'  // 
+set mSkillArray[4]='A07A'
+set mSkillArray[5]='A041'     //6
+set mSkillArray[6]='A07A'
+set mSkillArray[7]='A03O'
+set mSkillArray[8]='A03O'   
+set mSkillArray[9]='Aamk'
+set mSkillArray[10]='A041'   //11
+set mSkillArray[11]='Aamk'
+set mSkillArray[12]='Aamk'
+set mSkillArray[13]='Aamk'
+set mSkillArray[14]='Aamk'
+set mSkillArray[15]='A041'  //16
+set mSkillArray[16]='A03P'
+set mSkillArray[17]='A03P'
+set mSkillArray[18]='A03P'
+set mSkillArray[19]='A03P'
+set mSkillArray[20]='Aamk'
+set mSkillArray[21]='Aamk'
+set mSkillArray[22]='Aamk'
+set mSkillArray[23]='Aamk'
+set mSkillArray[24]='Aamk'
+    //return
+endfunction
+
+
+
+
+function initSkillArry takes nothing returns nothing
+ if  mHeroId=='H008' then
+    call  initSkillArry_zhugeliang()
+ endif
+ if  mHeroId=='U00A' then
+    call  initSkillArry_simayi()
+ endif
+
+
+  
+    //return
+endfunction
+
+function setAIPlayerName takes nothing returns nothing
+local string aistr=""
+ if GetAIDifficulty(ai_player)==AI_DIFFICULTY_NEWBIE then
+ set  aistr="Newbie"
+ endif
+ if GetAIDifficulty(ai_player)==AI_DIFFICULTY_NORMAL then
+ set  aistr="Normal"
+ endif
+ if GetAIDifficulty(ai_player)==AI_DIFFICULTY_INSANE then
+ set  aistr="Insane"
+ endif
+ 
+ call SetPlayerName(ai_player,"另一个AI电脑未知英雄")
+ 
+ if isZhuGeLiang() then
+ call SetPlayerName(ai_player,aistr+"诸葛亮")
+ endif
+ if isSiMaYi() then
+ call SetPlayerName(ai_player,aistr+"司马懿")
+ endif
+  
+    //return
+endfunction
+function setDubingCdtLoc takes nothing returns nothing
+    set zs_dubing_cdt_loc=GetLocBetweenTwoLocsRangeToFirst(zs_He_middle,mBaseLoc,-800)
+endfunction
+
+function InitmGlobals takes nothing returns nothing
+    local unit uHero=null
+    set mForceId=getForceId()
+    call adjustBaseLoc()
+
+    set mdubingLoc=getDuBingLoc()
+    set mBaseLoc=getBaseLoc()
+    set mEnemyBaseLoc=getEnemyBaseLoc()
+    call setMiddleLineRect()
+    call setDubingCdtLoc()
+    call intd_str()
+    if GetAiPlayer()==1 then
+       set mHeroId='H008'
+    endif
+    if GetAiPlayer()==2 then
+       set mHeroId='U00A'
+    endif
+    if GetAiPlayer()==3 then
+       set mHeroId='H008'
+    endif
+    if GetAiPlayer()==4 then
+       set mHeroId='U00A'
+    endif
+    if GetAiPlayer()==5 then
+       set mHeroId='H008'
+    endif
+    if GetAiPlayer()==7 then
+       set mHeroId='U00A'
+    endif
+    if GetAiPlayer()==8 then
+       set mHeroId='H008'
+    endif
+    if GetAiPlayer()==9 then
+       set mHeroId='U00A'
+    endif
+    if GetAiPlayer()==10 then
+       set mHeroId='H008'
+    endif
+    if GetAiPlayer()==11 then
+       set mHeroId='U00A'
+    endif
+    call getfirstHero()
+    call setAIPlayerName() 
+    call initSkillArry()
+endfunction
+
+
+
+
+function chubing takes nothing returns nothing
+local integer i=0
+local integer wave=0
+local unit u
+ call Sleep(5)
+ loop 
+ exitwhen wave==1000
+call GivePlayerGold(ai_player,2200)
+call SetPlayerWood(ai_player,9999) 
+ loop
+ exitwhen i==3
+// set u= CreateUnit(Player(0),'h01F',-500,-600,0)
+// call IssuePointOrderLoc(u,"attack",weiguoBaseLoc)
+ 
+// set u= CreateUnit(Player(6),'h01F',-500,-600,0)
+//  call IssuePointOrderLoc(u,"attack",suguoBaseLoc)
+
+ set i=i+1
+// call UnitAddItemById(mHero,'pclr')
+// call UnitAddItemById(mHero,'hslv')
+ endloop
+ call Sleep(5)
+ set i=0
+ set wave=wave+1
+ endloop 
+    //return
+endfunction
+
+  function PlayersAreCoAllied takes player playerA, player playerB returns boolean
+    // Players are considered to be allied with themselves.
+    if (playerA == playerB) then
+        return true
+    endif
+
+    // Co-allies are both allied with each other.
+    if GetPlayerAlliance(playerA, playerB, ALLIANCE_PASSIVE) then
+        if GetPlayerAlliance(playerB, playerA, ALLIANCE_PASSIVE) then
+            return true
+        endif
+    endif
+    return false
+endfunction
+ function ShareEverythingWithTeam takes player whichPlayer returns nothing
+    local integer playerIndex
+    local player  indexPlayer
+
+    set playerIndex = 0
+    loop
+        set indexPlayer = Player(playerIndex)
+//        if (PlayersAreCoAllied(whichPlayer, indexPlayer) and whichPlayer != indexPlayer) then
+            call SetPlayerAlliance(whichPlayer, indexPlayer, ALLIANCE_SHARED_VISION, true)
+            call SetPlayerAlliance(whichPlayer, indexPlayer, ALLIANCE_SHARED_CONTROL, true)
+            call SetPlayerAlliance(indexPlayer, whichPlayer, ALLIANCE_SHARED_CONTROL, true)
+            call SetPlayerAlliance(whichPlayer, indexPlayer, ALLIANCE_SHARED_ADVANCED_CONTROL, true)
+//        endif
+
+        set playerIndex = playerIndex + 1
+        exitwhen playerIndex == 11
+    endloop
+endfunction
+function main takes nothing returns nothing
+    set ai_player = Player(GetAiPlayer())
+    call InitmGlobals()
+//    call FogEnable(false)
+//    call FogMaskEnable(false)
+//    call ShareEverythingWithTeam(ai_player)
+//    call SetMeleeAI()
+//    call SetPlayerController(ai_player,MAP_CONTROL_USER)
+ //   call Sleep(5)
+//    call RemovePlayer( ai_player, PLAYER_GAME_RESULT_DEFEAT )
+
+//    call debugstr("Playing Game")	
+//    set frhero=CreateUnit(Player(1),'U002',-6500.0,-7500.0,270.000)
+//    set frhero=CreateUnit(ai_player,'U002',-6500.0,-7500.0,270.000)
+// call  CreateUnit(ai_player,'H008',GetLocationX(mBaseLoc),GetLocationY(mBaseLoc),270.000)
+
+//set mshop= CreateUnit(ai_player,'n00R',-6500.0,-7500.0,270.000)
+//set mshop= CreateUnit(ai_player,'n00R',-6000.0,-7500.0,270.000)
+//     call CreateUnit(Player(1),'n00R',-6000.0,-7500.0,270.000)
+
+
+    call StartThread( function mainLoop)
+//    call StartThread( function chubing )
+
+endfunction
