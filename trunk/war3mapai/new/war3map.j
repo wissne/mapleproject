@@ -5217,12 +5217,12 @@ function main takes nothing returns nothing
     call TriggerAddCondition(gg_trg_Change_Hero_Caocao,Condition(function Trig_Change_Hero_Caocao_Conditions))
     call TriggerAddAction(gg_trg_Change_Hero_Caocao,function Trig_Change_Hero_Caocao_Actions)
     set gg_trg_SU_Win=CreateTrigger()
-	// gg_unit_hcas_0020 to gg_rct_SU_Center_Barrack
-	call TriggerRegisterUnitEvent(gg_trg_SU_Win,gg_rct_SU_Center_Barrack,EVENT_UNIT_DEATH)
+	// gg_unit_hcas_0020 to gg_unit_hbar_0064
+	call TriggerRegisterUnitEvent(gg_trg_SU_Win,gg_unit_hbar_0064,EVENT_UNIT_DEATH)
     call TriggerAddAction(gg_trg_SU_Win,function Trig_SU_Win_Actions)
     set gg_trg_WEI_Win=CreateTrigger()
-	//gg_unit_hcas_0007 to gg_rct_WEI_Center_Barrac
-    call TriggerRegisterUnitEvent(gg_trg_WEI_Win,gg_rct_WEI_Center_Barrac,EVENT_UNIT_DEATH) 
+	//gg_unit_hcas_0007 to gg_unit_hbar_0022
+    call TriggerRegisterUnitEvent(gg_trg_WEI_Win,gg_unit_hbar_0022,EVENT_UNIT_DEATH) 
     call TriggerAddAction(gg_trg_WEI_Win,function Trig_WEI_Win_Actions)
     set gg_trg_Leaves=CreateTrigger()
     call TriggerRegisterPlayerEventLeave(gg_trg_Leaves,Player(1))
