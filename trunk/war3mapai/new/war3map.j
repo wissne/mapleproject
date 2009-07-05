@@ -4045,7 +4045,7 @@ function Trig_SU_Add_Gold_Func002Func006C takes nothing returns boolean
     return((GetPlayerSlotState(Player(5))!=PLAYER_SLOT_STATE_PLAYING))
 endfunction
 function Trig_SU_Add_Gold_Func002A takes nothing returns nothing
-    call AdjustPlayerStateBJ(1,GetEnumPlayer(),PLAYER_STATE_RESOURCE_GOLD)
+    call AdjustPlayerStateBJ(12,GetEnumPlayer(),PLAYER_STATE_RESOURCE_GOLD)
 endfunction
 function Trig_SU_Add_Gold_Actions takes nothing returns nothing
     set bj_wantDestroyGroup=true
@@ -4067,7 +4067,7 @@ function Trig_WEI_Add_Gold_Func002Func006C takes nothing returns boolean
     return((GetPlayerSlotState(Player(11))!=PLAYER_SLOT_STATE_PLAYING))
 endfunction
 function Trig_WEI_Add_Gold_Func002A takes nothing returns nothing
-    call AdjustPlayerStateBJ(1,GetEnumPlayer(),PLAYER_STATE_RESOURCE_GOLD)
+    call AdjustPlayerStateBJ(12,GetEnumPlayer(),PLAYER_STATE_RESOURCE_GOLD)
 endfunction
 function Trig_WEI_Add_Gold_Actions takes nothing returns nothing
     set bj_wantDestroyGroup=true
@@ -5875,7 +5875,7 @@ function main takes nothing returns nothing
 endfunction
 function config takes nothing returns nothing
     call SetMapName("真．三国无双 V3.9d")
-    call SetMapDescription("原作者:lovemoon03 \n模组制作:Black_Stan. Shockwave\nU9简体中文版制作:ZWS\n中法1v1-AI:wonder,maple")
+    call SetMapDescription("原作者:lovemoon03 \n模组制作:Black_Stan. Shockwave\nU9简体中文版制作:ZWS\n群法中法-AI:wonder,modify by maple")
     call SetPlayers(12)
     call SetTeams(12)
     call SetGamePlacement(MAP_PLACEMENT_TEAMS_TOGETHER)
