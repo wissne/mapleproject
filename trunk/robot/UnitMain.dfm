@@ -311,7 +311,7 @@ object frmLogin: TfrmLogin
         Top = 0
         Width = 620
         Height = 361
-        ActivePage = stbsht5
+        ActivePage = stbsht4
         Align = alClient
         TabOrder = 0
         SkinData.SkinSection = 'PAGECONTROL'
@@ -323,27 +323,90 @@ object frmLogin: TfrmLogin
             Left = 0
             Top = 0
             Width = 612
-            Height = 33
+            Height = 22
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 0
             SkinData.SkinSection = 'PANEL'
-            object btnLogin: TsButton
-              Left = 8
+            object spnl8: TsPanel
+              Left = 0
               Top = 0
-              Width = 75
-              Height = 21
-              Caption = 'Login'
+              Width = 89
+              Height = 22
+              Align = alLeft
+              BevelOuter = bvNone
               TabOrder = 0
-              OnClick = btnLoginClick
-              SkinData.SkinSection = 'BUTTON'
+              SkinData.SkinSection = 'PANEL'
+              object btnLogin: TsButton
+                Left = 8
+                Top = 0
+                Width = 75
+                Height = 21
+                Caption = 'Login'
+                TabOrder = 0
+                OnClick = btnLoginClick
+                SkinData.SkinSection = 'BUTTON'
+              end
+            end
+            object sPanel1: TsPanel
+              Left = 89
+              Top = 0
+              Width = 523
+              Height = 22
+              Align = alClient
+              BevelOuter = bvNone
+              TabOrder = 1
+              SkinData.SkinSection = 'PANEL'
+              object cbbIHURL: TsComboBox
+                Left = 0
+                Top = 0
+                Width = 458
+                Height = 21
+                Align = alClient
+                Alignment = taLeftJustify
+                BoundLabel.Indent = 0
+                BoundLabel.Font.Charset = DEFAULT_CHARSET
+                BoundLabel.Font.Color = clWindowText
+                BoundLabel.Font.Height = -11
+                BoundLabel.Font.Name = 'MS Sans Serif'
+                BoundLabel.Font.Style = []
+                BoundLabel.Layout = sclLeft
+                BoundLabel.MaxWidth = 0
+                BoundLabel.UseSkinColor = True
+                SkinData.SkinSection = 'COMBOBOX'
+                ItemHeight = 13
+                ItemIndex = -1
+                TabOrder = 0
+                Text = 'http://'
+                OnKeyDown = cbbIHURLKeyDown
+              end
+              object sPanel2: TsPanel
+                Left = 458
+                Top = 0
+                Width = 65
+                Height = 22
+                Align = alRight
+                BevelOuter = bvNone
+                TabOrder = 1
+                SkinData.SkinSection = 'PANEL'
+                object btnIHLoop: TsButton
+                  Left = 6
+                  Top = 0
+                  Width = 57
+                  Height = 21
+                  Caption = 'Loop'
+                  TabOrder = 0
+                  OnClick = btnIHLoopClick
+                  SkinData.SkinSection = 'BUTTON'
+                end
+              end
             end
           end
           object spnl2: TsPanel
             Left = 0
-            Top = 33
+            Top = 22
             Width = 73
-            Height = 300
+            Height = 311
             Align = alLeft
             BevelOuter = bvNone
             TabOrder = 1
@@ -355,12 +418,68 @@ object frmLogin: TfrmLogin
               Height = 13
               Caption = 'Result:'
             end
+            object edtIHCount: TsSpinEdit
+              Left = 8
+              Top = 29
+              Width = 57
+              Height = 21
+              Hint = 'Total Count'
+              TabOrder = 0
+              Text = '10'
+              SkinData.SkinSection = 'EDIT'
+              BoundLabel.Indent = 0
+              BoundLabel.Font.Charset = DEFAULT_CHARSET
+              BoundLabel.Font.Color = clWindowText
+              BoundLabel.Font.Height = -11
+              BoundLabel.Font.Name = 'MS Sans Serif'
+              BoundLabel.Font.Style = []
+              BoundLabel.Layout = sclLeft
+              BoundLabel.MaxWidth = 0
+              BoundLabel.UseSkinColor = True
+              Increment = 10
+              MaxValue = 10000
+              MinValue = 0
+              Value = 10
+            end
+            object edtIHInterval: TsSpinEdit
+              Left = 8
+              Top = 54
+              Width = 57
+              Height = 21
+              Hint = 'Interval'
+              TabOrder = 1
+              Text = '1000'
+              SkinData.SkinSection = 'EDIT'
+              BoundLabel.Indent = 0
+              BoundLabel.Font.Charset = DEFAULT_CHARSET
+              BoundLabel.Font.Color = clWindowText
+              BoundLabel.Font.Height = -11
+              BoundLabel.Font.Name = 'MS Sans Serif'
+              BoundLabel.Font.Style = []
+              BoundLabel.Layout = sclLeft
+              BoundLabel.MaxWidth = 0
+              BoundLabel.UseSkinColor = True
+              Increment = 1000
+              MaxValue = 10000000
+              MinValue = 1
+              Value = 1000
+            end
+            object btnIHStop: TsButton
+              Left = 8
+              Top = 79
+              Width = 57
+              Height = 21
+              Caption = 'Stop'
+              TabOrder = 2
+              OnClick = btnIHStopClick
+              SkinData.SkinSection = 'BUTTON'
+            end
           end
           object mmoRes: TsMemo
             Left = 73
-            Top = 33
+            Top = 22
             Width = 539
-            Height = 300
+            Height = 311
             Align = alClient
             ScrollBars = ssVertical
             TabOrder = 2
@@ -508,7 +627,7 @@ object frmLogin: TfrmLogin
               BoundLabel.MaxWidth = 0
               BoundLabel.UseSkinColor = True
               Increment = 10
-              MaxValue = 10000
+              MaxValue = 10000000
               MinValue = 0
               Value = 10
             end
@@ -519,7 +638,7 @@ object frmLogin: TfrmLogin
               Height = 21
               Hint = 'Interval'
               TabOrder = 1
-              Text = '5'
+              Text = '1000'
               SkinData.SkinSection = 'EDIT'
               BoundLabel.Indent = 0
               BoundLabel.Font.Charset = DEFAULT_CHARSET
@@ -530,9 +649,10 @@ object frmLogin: TfrmLogin
               BoundLabel.Layout = sclLeft
               BoundLabel.MaxWidth = 0
               BoundLabel.UseSkinColor = True
-              MaxValue = 100
+              Increment = 1000
+              MaxValue = 10000000
               MinValue = 1
-              Value = 5
+              Value = 1000
             end
             object btnStop: TsButton
               Left = 8
@@ -563,7 +683,7 @@ object frmLogin: TfrmLogin
       end
     end
     object stbsht2: TsTabSheet
-      Caption = 'Loop'
+      Caption = 'Other'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
     end
@@ -621,9 +741,9 @@ object frmLogin: TfrmLogin
     Left = 572
     Top = 320
   end
-  object tmrMain: TTimer
+  object tmrWBMain: TTimer
     Enabled = False
-    OnTimer = tmrMainTimer
+    OnTimer = tmrWBMainTimer
     Left = 576
     Top = 232
   end
@@ -638,5 +758,11 @@ object frmLogin: TfrmLogin
       Caption = 'E&xit'
       OnClick = Exit1Click
     end
+  end
+  object tmrIHMain: TTimer
+    Enabled = False
+    OnTimer = tmrIHMainTimer
+    Left = 576
+    Top = 152
   end
 end
