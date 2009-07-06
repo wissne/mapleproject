@@ -36,7 +36,6 @@ type
     spgcntrl2: TsPageControl;
     stbsht4: TsTabSheet;
     spnl1: TsPanel;
-    btnLogin: TsButton;
     spnl2: TsPanel;
     lbl6: TsLabel;
     mmoRes: TsMemo;
@@ -56,13 +55,23 @@ type
     btnOpen: TsButton;
     btnWBLogin: TsButton;
     edtInterval: TsSpinEdit;
-    tmrMain: TTimer;
+    tmrWBMain: TTimer;
     btnStop: TsButton;
     spnl7: TsPanel;
     btnLoop: TsButton;
     pmTray: TPopupMenu;
     Exit1: TMenuItem;
     odo1: TMenuItem;
+    spnl8: TsPanel;
+    btnLogin: TsButton;
+    sPanel1: TsPanel;
+    cbbIHURL: TsComboBox;
+    sPanel2: TsPanel;
+    btnIHLoop: TsButton;
+    edtIHCount: TsSpinEdit;
+    edtIHInterval: TsSpinEdit;
+    btnIHStop: TsButton;
+    tmrIHMain: TTimer;
     procedure btnLoginClick(Sender: TObject);
     procedure enter2Tab(Sender: TObject; var Key: Word;
       Shift: TShiftState);
@@ -77,11 +86,16 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure cbbLoopURLKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure tmrMainTimer(Sender: TObject);
+    procedure tmrWBMainTimer(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
     procedure btnLoopClick(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
     procedure Show1Click(Sender: TObject);
+    procedure cbbIHURLKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure tmrIHMainTimer(Sender: TObject);
+    procedure btnIHLoopClick(Sender: TObject);
+    procedure btnIHStopClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -138,6 +152,7 @@ begin
   end;
   try
 //    getHTML := idhtpMain.Get(getURL);
+		idhtpMain.ReadTimeout:= 30000;
 		idhtpMain.Request.Referer := getURL;
     idhtpMain.Request.ContentType := 'application/x-www-form-urlencoded';
     idhtpMain.HandleRedirects := True;
@@ -150,7 +165,8 @@ begin
   
   aParam.Free;
   aStream.Free;
-
+  idhtpMain.Free;
+  
   btnLogin.Enabled := True;
 end;
 
@@ -237,7 +253,7 @@ end;
 
 procedure TfrmLogin.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-	idhtpMain.Free;
+//	idhtpMain.Free;
 end;
 
 procedure TfrmLogin.cbbLoopURLKeyDown(Sender: TObject; var Key: Word;
@@ -249,11 +265,11 @@ begin
   btnLoop.Click;
 end;
 
-procedure TfrmLogin.tmrMainTimer(Sender: TObject);
+procedure TfrmLogin.tmrWBMainTimer(Sender: TObject);
 begin
   if (edtCount.Value = 0) then
   begin
-    tmrMain.Enabled := False;
+    tmrWBMain.Enabled := False;
     Exit;
   end;  
   wbPage.Navigate(cbbLoopURL.Text);
@@ -262,13 +278,13 @@ end;
 
 procedure TfrmLogin.btnStopClick(Sender: TObject);
 begin
-	tmrMain.Enabled := False;
+	tmrWBMain.Enabled := False;
 end;
 
 procedure TfrmLogin.btnLoopClick(Sender: TObject);
 begin
-  tmrMain.Interval := 1000 * edtInterval.Value;
-  tmrMain.Enabled := True;
+  tmrWBMain.Interval := edtInterval.Value;
+  tmrWBMain.Enabled := True;
 end;
 
 procedure TfrmLogin.Exit1Click(Sender: TObject);
@@ -279,6 +295,65 @@ end;
 procedure TfrmLogin.Show1Click(Sender: TObject);
 begin
 	Self.Visible := True;
+end;
+
+procedure TfrmLogin.cbbIHURLKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+	if Key <> 13 then exit; { 判断是按执行键}
+  btnIHLoop.Click;
+end;
+
+procedure TfrmLogin.tmrIHMainTimer(Sender: TObject);
+var
+  aParam: TStrings;
+  aStream: TStringStream;
+begin
+  try
+    if (edtIHCount.Value = 0) then
+    begin
+      tmrIHMain.Enabled := False;
+      Exit;
+    end; 
+    idhtpMain := TIdHTTP.Create(nil);
+    aParam := TStringList.Create;
+    aStream := TStringStream.Create(''); 
+    idhtpMain.Request.Referer := cbbIHURL.Text;
+    idhtpMain.ReadTimeout:= 30000;
+    idhtpMain.Request.ContentType := 'application/x-www-form-urlencoded';
+    idhtpMain.HandleRedirects := True;  
+    idhtpMain.Post(cbbIHURL.Text, aParam, aStream); 
+    if (tmrIHMain.Tag = 1) then
+      begin    
+        mmoRes.Lines.Clear;
+        mmoRes.Lines.Add(aStream.DataString);
+        tmrIHMain.Tag := 0;
+      end;        
+    aParam.Free;
+    aStream.Free;
+    idhtpMain.Free;
+    edtIHCount.Value := edtIHCount.Value - 1;
+//    tmrIHMain.Enabled := False;
+  except
+    on E : Exception do
+    begin    
+      tmrIHMain.Enabled := False;
+      ShowMessage('连接失败' + E.Message);
+    end;      
+  end;
+end;
+
+procedure TfrmLogin.btnIHLoopClick(Sender: TObject);
+begin
+  tmrIHMain.Interval := edtIHInterval.Value;
+  tmrIHMain.Enabled := True;
+  tmrIHMain.Tag := 1;
+//	tmrIHMainTimer(nil);
+end;
+
+procedure TfrmLogin.btnIHStopClick(Sender: TObject);
+begin
+  tmrIHMain.Enabled := False;
 end;
 
 end.
