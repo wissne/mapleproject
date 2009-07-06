@@ -4287,11 +4287,11 @@ endfunction
 function Trig_Create_On_Actions takes nothing returns nothing
     call DisableTrigger(GetTriggeringTrigger())
     call EnableTrigger(gg_trg_SU_Center_Create)
-    call EnableTrigger(gg_trg_SU_Right_Create)
-    call EnableTrigger(gg_trg_SU_Left_Create)
+//    call EnableTrigger(gg_trg_SU_Right_Create)
+//    call EnableTrigger(gg_trg_SU_Left_Create)
     call EnableTrigger(gg_trg_WEI_Center_Create)
-    call EnableTrigger(gg_trg_WEI_Right_Create)
-    call EnableTrigger(gg_trg_WEI_Left_Create)
+//    call EnableTrigger(gg_trg_WEI_Right_Create)
+//    call EnableTrigger(gg_trg_WEI_Left_Create)
 endfunction
 function Trig____________________001_Actions takes nothing returns nothing
     set udg_Units[1]=(udg_Units[1]+1)
@@ -5217,10 +5217,12 @@ function main takes nothing returns nothing
     call TriggerAddCondition(gg_trg_Change_Hero_Caocao,Condition(function Trig_Change_Hero_Caocao_Conditions))
     call TriggerAddAction(gg_trg_Change_Hero_Caocao,function Trig_Change_Hero_Caocao_Actions)
     set gg_trg_SU_Win=CreateTrigger()
-    call TriggerRegisterUnitEvent(gg_trg_SU_Win,gg_unit_hcas_0020,EVENT_UNIT_DEATH)
+	// gg_unit_hcas_0020 to gg_unit_hbar_0064
+	call TriggerRegisterUnitEvent(gg_trg_SU_Win,gg_unit_hbar_0064,EVENT_UNIT_DEATH)
     call TriggerAddAction(gg_trg_SU_Win,function Trig_SU_Win_Actions)
     set gg_trg_WEI_Win=CreateTrigger()
-    call TriggerRegisterUnitEvent(gg_trg_WEI_Win,gg_unit_hcas_0007,EVENT_UNIT_DEATH)
+	//gg_unit_hcas_0007 to gg_unit_hbar_0021
+    call TriggerRegisterUnitEvent(gg_trg_WEI_Win,gg_unit_hbar_0021,EVENT_UNIT_DEATH) 
     call TriggerAddAction(gg_trg_WEI_Win,function Trig_WEI_Win_Actions)
     set gg_trg_Leaves=CreateTrigger()
     call TriggerRegisterPlayerEventLeave(gg_trg_Leaves,Player(1))
