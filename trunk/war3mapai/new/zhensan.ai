@@ -4282,28 +4282,37 @@ function sima_spell_condition takes nothing returns nothing
     if HeroD!=null then
         set index=getSpellOffDamageIndex()
         
-        if (IsLifeAlmostFull(HeroD) or EnemyHeroHP>1500) and can_sima_cast_ef() and MyHeroMP>300 and rangeToTowerD>1100 and rangeToHeroD<700 then
-            set zs_action_prioty_arry[52]=59
-        endif
-        
-        if EnemyHeroHP>600 and can_sima_cast_e()  and rangeToTowerD>1100  and MyHeroMP>300  and rangeToHeroD<700  then
-            set zs_action_prioty_arry[50]=56
-        endif
+		if MyHeroMP > 300 and mHeroLevel < 10 and can_sima_cast_e() and rangeToTowerD > 1100 and rangeToHeroD < 700 then
+			set zs_action_prioty_arry[50] = 56	// 10级前E磨血
+		endif
+		
+		if MyHeroMP > 300 and mHeroLevel >= 10 and can_sima_cast_ef() and rangeToTowerD > 1100 and rangeToHeroD < 700 then
+			set zs_action_prioty_arry[52] = 59  // 10级后EF磨血
+		endif
+
+		if MyHeroMP < 100 and can_sima_cast_e() and rangeToHeroD < 700 then
+			set zs_action_prioty_arry[50] = 98	// E逃命
+		endif	
         
         if  index>=0 then
             set zs_kickoff=true
             set zs_action_prioty_arry[50+index]=99
-            call debugstr("find")
+            call debugstr("find")				// 必杀
         endif
         
     endif
     // set zs_action_prioty_arry[55]=99
     
     if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>2 and can_sima_cast_ef() and mHeroLevel>6 then
-        if MyHeroMP>1200 or IsManaAlmostFull(mHero) then
-            set zs_action_prioty_arry[59]=58
+        if MyHeroMP>500 or IsManaAlmostFull(mHero) then
+            set zs_action_prioty_arry[59]=58	// EF清兵
         endif
     endif
+    if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>2 and can_sima_cast_ef() and MyHeroHP < 200 and mHeroLevel>6 then
+        if MyHeroMP>300 or IsManaAlmostFull(mHero) then
+            set zs_action_prioty_arry[59]=59	// EF清兵回家
+        endif
+    endif	
     
     
     if TowerD!=null and GetHP(TowerD)<260 and MyHeroHP>200 and can_sima_cast_f() then
@@ -4332,7 +4341,7 @@ function sima_spell_action takes integer index returns nothing
             endif
         endif
         call sima_cast_e(HeroD)
-        call debugstr("sima_cast_e ")
+        call debugstr("sima_cast_e ")	
     endif
     
     if index==51 then
@@ -4431,7 +4440,7 @@ function zhuge_spell_condition takes nothing returns nothing
         set index=getSpellOffDamageIndex()
         //call debugstr("zhuge-spell-index:"+ITS(index))
         
-        if (IsLifeAlmostFull(HeroD) or EnemyHeroHP>1500)  and can_zhuge_cast_g() and can_zhuge_cast_e()  and MyHeroMP>300   and rangeToTowerD>1100  and rangeToHeroD<700  then
+        if can_zhuge_cast_g() and can_zhuge_cast_e() and mHeroLevel > 10  and MyHeroMP>300   and rangeToTowerD>1100  and rangeToHeroD<700  then
             set zs_action_prioty_arry[51]=59
         endif
         if IsBianXing(HeroD)  and can_zhuge_cast_e() then
@@ -4440,7 +4449,7 @@ function zhuge_spell_condition takes nothing returns nothing
         if EnemyHeroHP<300 and  can_zhuge_cast_e() then
             set zs_action_prioty_arry[57]=61
         endif
-        if can_zhuge_cast_g()  and MyHeroMP>300   and rangeToTowerD>1100  and rangeToHeroD<700  then
+        if can_zhuge_cast_g()  and MyHeroMP>300 and rangeToTowerD>1100  and rangeToHeroD<700  then
             set zs_action_prioty_arry[50]=56
         endif
         
