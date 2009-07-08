@@ -4945,21 +4945,43 @@ function guojia_spell_action takes integer index returns nothing
     
 endfunction
 function buyHeros takes nothing returns nothing
-    call BuyHero('n001',hid_zhugeliang)
-    call BuyHero('n001',hid_zhugeliang)
-    call BuyHero('n001',hid_zhugeliang)
-    call BuyHero('n001',hid_zhugeliang)
+	local integer rs=0
+	local integer lp = 0
+	set lp = 5
+	loop
+		exitwhen lp == 1
+		set rs = GetRandomInt(0,9)
+		if rs > 4 then
+			call BuyHero('n001',hid_zhugeliang)
+		else
+			call BuyHero('n001',hid_simayi)
+		endif
+		set lp = lp - 1
+	endloop
+    // call BuyHero('n001',hid_zhugeliang)
+    // call BuyHero('n001',hid_zhugeliang)
+    // call BuyHero('n001',hid_zhugeliang)
     //suguo
     //      call BuyHero('n001',hid_zhaoyun)  //suguo
     
     //      call BuyHero('n001',hid_guanyu)  //suguo
     //      call BuyHero('n001',hid_zhangfei)  //suguo
     //       call BuyHero('n001',hid_weiyan)  //suguo
-    
-    call BuyHero('n000',hid_simayi)   //weiguo
-    call BuyHero('n000',hid_simayi)
-    call BuyHero('n000',hid_simayi)
-    call BuyHero('n000',hid_simayi)
+	set lp = 5
+	loop
+		exitwhen lp == 1
+		set rs = GetRandomInt(0,9)
+		if rs > 4 then
+			call BuyHero('n000',hid_zhugeliang)
+		else
+			call BuyHero('n000',hid_simayi)
+		endif
+		set lp = lp - 1
+	endloop    
+    //call BuyHero('n000',hid_simayi)   //weiguo
+    // call BuyHero('n000',hid_simayi)
+    // call BuyHero('n000',hid_simayi)
+    // call BuyHero('n000',hid_simayi)
     
     //       call BuyHero('n000',hid_zhangliao)   //weiguo
     //      call BuyHero('n000',hid_dianwei)   //weiguo
@@ -4968,7 +4990,6 @@ function buyHeros takes nothing returns nothing
     //       call BuyHero('n000',hid_caoren)   //weiguo
     
     //       call BuyHero('n00Y',hid_xun)   //weiguo
-    
     
 endfunction
 
