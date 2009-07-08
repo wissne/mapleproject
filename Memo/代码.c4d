@@ -1,0 +1,388 @@
+<codes>
+
+	<code name = "获取汉字首字母">
+		// 获取汉字首字母 ImCode
+		function MakeSpellCode(stText: string; iMode, iCount: Integer): string;
+	</code>
+
+	<code name = "获取服务器时间">
+		获取服务器时间GetServerDate()
+	</code>
+
+	<code name = "Excel公式">
+		=IF(MOD(ROW(),2) = 1,H5,I5)
+	</code>
+
+	<code name = "回车变Tab">
+		if key <> 13 then exit; { 判断是按执行键}
+		   perform(WM_NEXTDLGCTL,0,0);   //移动到下一个控件
+	</code>
+
+	<code name = "表格排序">
+		前提:确定使用的是EhGrid
+		1.Uses Unit_Gkrong;
+		2.在TitleClick事件中加入以下代码
+			DBGridEhTitleSort(Column);
+	</code>
+
+	<code name = "Length(中文)">
+		Length('公交公') = 6
+	</code>
+
+	<code name = "模糊查找">
+		var
+		  tmp, filterStr, resStr: string;
+		  tslst: TStringList;
+		  i: integer;
+		begin
+		  if not Cds_Tree1.Active then Exit;
+
+		  tmp := Trim(edtCon.Text);
+
+		  if Length(tmp) <> 0 then
+		  begin
+			filterStr := ' and (tjs3601 like ''%_%'' or tjs3602 like ''%_%'' or tjs3608 like ''%_%'') ';
+
+			tslst := TStringList.Create;
+			tslst.Delimiter := ' ';
+			tslst.DelimitedText := tmp;
+
+			for i := 0 to tslst.Count - 1 do
+			begin
+			   resStr := resStr + StringReplace(filterStr, '_', tslst.Strings[i], [rfReplaceAll]);
+			end;
+		  end;
+		  Cds_Tree1.Close;
+		  resStr := 'Select * From TJS36 where 1 = 1 ' + resStr;
+		  Cds_Tree1.sql.Text := resStr;
+		  Cds_Tree1.Open;
+		end;
+	</code>
+
+	<code name = "获取菜单栏">
+		select D.S0602 一,
+			   C.S0602 二,
+			   B.S0602 三,
+			   A.S0602 四,
+			   A.S0605 名,
+			   A.S0601 序
+		from   S06 A,
+			   S06 B,
+			   S06 C,
+			   S06 D
+		where  (A.S0602 like '%退货%'
+				 or A.S0605 like '%formname%')
+			   and A.S0606 = B.S0600
+			   and B.S0606 = C.S0600
+			   and C.S0606 = D.S0600;
+	</code>
+
+	<code name = "序号生成">
+	  if (DataSet.RecNo=-1) and (DataSet.Bof) then
+		DataSet.FieldByName('序号').Value:=1
+	  else if (DataSet.RecNo=-1) and (DataSet.Eof) then
+		DataSet.FieldByName('序号').Value:=DataSet.RecordCount+1
+	  else
+		DataSet.FieldByName('序号').Value:=DataSet.RecNo;
+	</code>
+
+	<code name = "ListBox 自拖与互拖通用代码">
+		procedure TForm1.listbox1DragDrop(Sender, Source: TObject; X, Y: Integer);
+		var
+		  aPoint: TPoint;
+		  st: string;
+		  p: integer;
+		  i, num: integer;
+		  MYlBox: TStrings;
+		begin
+		  aPoint.x := x;
+		  aPoint.y := y;
+		  p := (sender as Tlistbox).itematpos(aPoint, true);
+		  MYlBox := Tstringlist.Create;
+		  try
+			Num := (source as Tlistbox).Items.Count;
+			for i := num - 1 downto 0 do
+			begin
+			  if (source as Tlistbox).Selected[i] then
+			  begin
+				st := (source as Tlistbox).Items[i];
+				MYlBox.Add(st)
+			  end;
+			end;
+			if p > -1 then
+			begin
+			  for i := 0 to Mylbox.Count - 1 do
+			  begin
+				(sender as Tlistbox).Items.Insert(p, mylbox[i])
+			  end;
+			end
+			else
+			begin
+			  for i := Mylbox.Count - 1 downto 0 do
+			  begin
+				(sender as Tlistbox).Items.Add(mylbox[i])
+			  end;
+			end;
+			(source as Tlistbox).DeleteSelected;
+			if P > -1 then
+			  (sender as Tlistbox).Selected[p] := true;
+		  finally
+			mylbox.Free;
+		  end;
+		end;
+		procedure TForm1.listbox1DragOver(Sender, Source: TObject; X, Y: Integer;
+		  State: TDragState; var Accept: Boolean);
+		var
+		  aPoint: TPoint;
+		begin
+		  aPoint.x := x;
+		  aPoint.y := y;
+		  if (source is Tlistbox) then
+		  if ((source as Tlistbox).SelCount > 0) and
+		   ((sender as Tlistbox).ItemAtPos(apoint, true) <> -1)
+		   and ((sender as Tlistbox).itematpos(apoint, true) <> (sender as Tlistbox).itemindex) then
+		  begin
+			accept := true;
+		  end;
+		end;
+		procedure TForm1.FormCreate(Sender: TObject);
+		begin
+		  listbox2.OnDragDrop := listbox1.OnDragDrop;
+		  listbox2.OnDragOver := listbox1.OnDragOver;
+		  listbox1.MultiSelect := true;
+		  listbox2.MultiSelect := true;
+		  listbox1.DragMode := dmAutomatic;
+		  listbox2.DragMode := dmAutomatic;
+		end;
+
+		procedure TForm1.listbox1KeyDown(Sender: TObject; var Key: Word;
+			Shift: TShiftState);
+		var
+			n, i: integer;
+			s: String;
+		begin
+			n := (sender as Tlistbox).Items.Count;
+			if (Key = VK_DOWN) then
+			begin
+				for i := n - 2 downto 0 do
+					begin
+						if ((sender as Tlistbox).Selected[i]) then
+						begin
+							s := (sender as Tlistbox).Items[i];
+							(sender as Tlistbox).Items[i] := (sender as Tlistbox).Items[i + 1];
+							(sender as Tlistbox).Items[i + 1] := s;
+							(sender as Tlistbox).Selected[i + 1] := True;
+						end;
+					end;
+			end
+			else if (Key = VK_UP) then
+				begin
+					for i := 1 to n - 1 do
+					begin
+					if ((sender as Tlistbox).Selected[i]) then
+						begin
+							s := (sender as Tlistbox).Items[i];
+							(sender as Tlistbox).Items[i] := (sender as Tlistbox).Items[i - 1];
+							(sender as Tlistbox).Items[i - 1] := s;
+							(sender as Tlistbox).Selected[i - 1] := True;
+						end;
+					end;
+				end;
+		end;
+	</code>
+
+	<code name = "Delphi线程">
+		function MyThreadFunc(P:pointer):Longint;stdcall;
+		var
+			i:longint;
+			DC:HDC;
+			S:string;
+		begin
+			DC:=GetDC(Form1.Handle);
+			for i:=0 to 500000 do begin
+				S:=Inttostr(i);
+				Textout(DC,10,10,Pchar(S),length(S));
+			end;
+			ReleaseDC(Form1.Handle,DC);
+		end;
+
+		procedure TForm1.UsedThreadClick(Sender: TObject);
+		var
+			hThread:Thandle;//定义一个句柄
+			ThreadID:DWord;
+		begin
+			//创建线程，同时线程函数被调用
+			hthread:=CreateThread(nil,0,@MyThreadfunc,nil,0,ThreadID);
+			if hThread=0 then
+			messagebox(Handle,'Didn’tCreateaThread',nil,MB_OK);
+		end;
+	</code>
+	
+	<code name = "Loading">
+		1. Uses Unit_loading
+		2. Add code below 
+		procedure showLoading(visabled: Boolean);
+		begin
+			if visabled then
+			begin
+				Form_loading.Show;
+				Form_loading.Label1.Caption := '正在查询，请稍等...';
+				Form_loading.Refresh;
+			end
+			else
+				Form_loading.Close;
+		end;		
+	</code>
+	
+	<code name = "打印报表">
+		1. 加入TRMReport,TRMDBDataSet各一个
+		RMVariables['xh'] := '123';	//传变量,接收时，直接[xh]即可
+		RMDBDataSet1.DataSet := ClientDataSet1;
+		RMReport1.DataSet := RMDBDataSet1;
+		RMReport1.LoadFromFile('Unit_input_bxpb.rmf');
+		RMReport1.ShowReport;		
+	</code>
+
+	<code name = "ShowModal窗口">
+		Application.CreateForm(TForm_get_dw, Form_get_dw);
+		if Form_get_dw.ShowModal <> mrOK then Exit;
+	</code>
+	
+	<code name = "添加表字段">
+		ALTER TABLE TJS19 ADD COLUMN TJS1943 numeric(12,2) NOT NULL DEFAULT 0
+	</code>
+
+	<code name = "得到所有单位">
+		请参见Form_query_clxxcx
+	</code>
+	
+	<code name = "默认日期">
+		dtpBegin.Date := StrToDate(FormatDateTime('YYYY-MM-01',GetServerDate()));
+		dtpEnd.Date := GetServerDate;		
+	</code>
+	
+	<code name = "序号">
+		 if (DataSet.RecNo=-1) and (DataSet.Bof) then DataSet.FieldByName('序号').Value:=1
+		 else if (DataSet.RecNo=-1) and (DataSet.Eof) then DataSet.FieldByName('序号').Value:=DataSet.RecordCount+1
+		 else DataSet.FieldByName('序号').Value:=DataSet.RecNo;
+	</code>
+	
+	<code name = "导出数据">
+		if (cdsMain.Active) and (cdsMain.RecordCount > 0) then
+			ExportDBGridEh(grdMain);		
+	</code>
+
+	<code name = "连接泸州">
+		连接泸州 192.168.11.101 
+		连接自贡 218.200.190.22 密码 zggj@1111111111
+	</code>
+	
+	<code name = "取得所有表信息">
+		select   A.NAME as 表名,
+				 B.NAME as 字段名,
+				 B.LENGTH as 字段长度,
+				 C.NAME 字段类型,
+				 B.ISNULLABLE 非空
+		from     (select *
+				  from   SYSOBJECTS
+				  where  XTYPE = 'u'
+						 and NAME like 'T%') A
+				 join SYSCOLUMNS B
+				   on A.ID = B.ID
+				 left join SYSTYPES C
+				   on B.XUSERTYPE = C.XUSERTYPE
+		order by 表名,
+				 字段名
+	</code>
+	
+	<code name = "是/否">
+		IF MessageBox(handle, PChar('是否确认调整成本金额?'), '询问', MB_ICONQUESTION + MB_YESNO + MB_DEFBUTTON2) = IDNO THEN
+			Exit;
+	</code>
+
+	<code name = "AfterPost">
+		(DataSet as TAstaClientDataSet).ApplyUpdates(usmServerTransaction);
+	</code>
+
+	<code name = "表格颜色">
+		procedure TForm_Input_Wxpg2.DBGridEh1DrawColumnCell(Sender: TObject;
+		   const Rect: TRect; DataCol: Integer; Column: TColumnEh;
+		   State: TGridDrawState);
+		begin
+		   if [gdSelected, gdFocused] <= State then
+		   begin
+			  DBGridEh1.Canvas.Font.Color := DBGridEh1.Color;
+		   end else
+		   begin
+			  if (CDS_TJS66.FieldByName('tjs6622').AsInteger = 29) or (CDS_TJS66.FieldByName('tjs6622').AsInteger = 30) then
+			  begin
+				 DBGridEh1.Canvas.Font.Color := clRed;
+			  end
+			  else if CDS_TJS66.FieldByName('pg').AsInteger <> 0 then //未派工或派工未完全的车辆
+			  begin
+				 DBGridEh1.Canvas.Font.Color := clPurple;
+			  end
+			  else
+			  begin
+				 //if Cds_TJS63.IsEmpty then
+				 //begin
+				 //   DBGridEh1.Canvas.Font.Color := clPurple;
+				 //end else
+				 //begin
+				 DBGridEh1.Canvas.Font.Color := clBlack;
+				 //end;
+			  end;
+		   end;
+		   DBGridEh1.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+		end;	
+	</code>
+
+	<code name = "交替颜色">
+		1.
+		procedure TForm_query_wxbyxs.DBGridEh1GetCellParams(Sender: TObject;
+		  Column: TColumnEh; AFont: TFont; var Background: TColor;
+		  State: TGridDrawState);
+		begin
+		if DBGridEh1.SumList.RecNo mod 2 = 1 then
+		   Background := $00FFF6F6
+		else
+		Background := $00FFFFFF;
+		end;	
+		2.
+	   if ((Sender as TDBGridEh).DataSource.DataSet.RecNo mod 2 )=0 then
+		 (Sender as TDBGridEh).Canvas.Brush.Color:=rgb(100,100,100)
+	   else
+		 (Sender as TDBGridEh).Canvas.Brush.Color:=rgb(100,200,100);
+		 (Sender as TDBGridEh).DefaultDrawColumnCell(rect,datacol,column,state);
+		
+	</code>
+	
+	<code name = "显式插入数据">
+		set identity_insert  tjs265 on
+		INSERT INTO dbo.TJS265 (TJS26500, TJS26501, TJS26502, TJS26503, TJS26504, TJS26505)
+		VALUES (41, '', '发动机总成大修', NULL, 1, 1)
+		GO	
+	</code>
+	
+	<code name = "显示隐藏">
+		见 unit_query_bcrr
+	</code>
+
+	<code name = "SQL 注释">
+/*******************************************************
+author	:	maple
+date	:	2009-6-6
+summary	:	Write ur summary here 
+*******************************************************/	
+	</code>
+	
+	<code name = "日期加减">
+		StrToDate(FormatDateTime('yyyy-mm-01', IncMonth(edt1.Value, 1)))
+	</code>
+	
+	<code name = "导入一表至另一表">
+		set identity_insert  tjs329 on
+		insert into tjs329 (TJS32900, TJS32901, TJS32902, TJS32903)(SELECT TJS2700,TJS2701,TJS2702,TJS2703 FROM TJS27)
+		set identity_insert  tjs329 off	
+	</code>
+</codes>
