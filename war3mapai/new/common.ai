@@ -1859,14 +1859,14 @@ endfunction
 
 
 function initSkillArry_zhugeliang takes nothing returns nothing
-    set mSkillArray[0]='A08I'  //+
-    set mSkillArray[1]='A087'  //G
+    set mSkillArray[0]='A087'  //G
+    set mSkillArray[1]='A085'  //E
     set mSkillArray[2]='A087'  //G
     set mSkillArray[3]='A08I'  //+
     set mSkillArray[4]='A087'  //G
     set mSkillArray[5]='A083'  //X
     set mSkillArray[6]='A087'  //G
-    set mSkillArray[7]='A085'  //E
+    set mSkillArray[7]='A08I'  //+
     set mSkillArray[8]='A08I'  //+
     set mSkillArray[9]='A08I'  //+
     set mSkillArray[10]='A083'  //X
