@@ -4287,11 +4287,11 @@ function sima_spell_condition takes nothing returns nothing
     if HeroD!=null then
         set index=getSpellOffDamageIndex()
         
-		if MyHeroMP > 300 and mHeroLevel < 10 and can_sima_cast_e() and rangeToTowerD > 1100 and rangeToHeroD < 700 then
+		if MyHeroMP > 300 and can_sima_cast_e() and rangeToTowerD > 1100 and rangeToHeroD < 700 then
 			set zs_action_prioty_arry[50] = 56	// 10级前E磨血
 		endif
 		
-		if MyHeroMP > 300 and mHeroLevel >= 10 and can_sima_cast_ef() and rangeToTowerD > 1100 and rangeToHeroD < 700 then
+		if MyHeroMP > 500 and can_sima_cast_ef() and rangeToTowerD > 1100 and rangeToHeroD < 700 then
 			set zs_action_prioty_arry[52] = 59  // 10级后EF磨血
 		endif
 
