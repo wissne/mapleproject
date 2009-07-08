@@ -2485,6 +2485,8 @@ function sima_cast_ef takes unit TheTarget returns boolean
     set loc=GetUnitLoc(TheTarget)
     call  sima_cast_f(loc)
     call RemoveLocation(loc)
+	call HeroAttack(TheTarget)
+	call Sleep(0.8)
     set loc=null
     return true
 endfunction
@@ -2528,7 +2530,8 @@ function sima_cast_feng_n_ef takes unit Target returns nothing
         
         call sima_cast_n(Target)
         call gotoLocation2(mHero,Target,20)
-        call Sleep(0.5)
+		call HeroAttack(Target)
+        call Sleep(0.8)
         call sima_cast_ef(Target)
     endif
     call    RemoveLocation(loc)
@@ -2550,6 +2553,8 @@ function sima_cast_bian_n_ef takes unit Target returns nothing
     if UseBianXing(Target) then
         call gotoLocation(mHero,loc,20)
         call sima_cast_n(Target)
+		call HeroAttack(Target)
+		call Sleep(0.8)
         call sima_cast_ef(Target)
     endif
     call RemoveLocation(loc)
@@ -4290,11 +4295,11 @@ function sima_spell_condition takes nothing returns nothing
 			set zs_action_prioty_arry[52] = 59  // 10级后EF磨血
 		endif
 
-		if MyHeroMP < 100 and can_sima_cast_e() and rangeToHeroD < 700 then
+		if MyHeroMP < 300 and can_sima_cast_e() and rangeToHeroD < 700 then
 			set zs_action_prioty_arry[50] = 98	// E逃命
 		endif	
         
-        if  index>=0 then
+        if  index>=0 and MyHeroMP > 300 and (EnemyCount-AllyCount)<4 then
             set zs_kickoff=true
             set zs_action_prioty_arry[50+index]=99
             call debugstr("find")				// 必杀
@@ -4308,7 +4313,7 @@ function sima_spell_condition takes nothing returns nothing
             set zs_action_prioty_arry[59]=58	// EF清兵
         endif
     endif
-    if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>2 and can_sima_cast_ef() and MyHeroHP < 200 and mHeroLevel>6 then
+    if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>2 and can_sima_cast_ef() and MyHeroHP < 300 and mHeroLevel>6 then
         if MyHeroMP>300 or IsManaAlmostFull(mHero) then
             set zs_action_prioty_arry[59]=59	// EF清兵回家
         endif
