@@ -4287,11 +4287,11 @@ endfunction
 function Trig_Create_On_Actions takes nothing returns nothing
     call DisableTrigger(GetTriggeringTrigger())
     call EnableTrigger(gg_trg_SU_Center_Create)
-//    call EnableTrigger(gg_trg_SU_Right_Create)
-//    call EnableTrigger(gg_trg_SU_Left_Create)
+    //    call EnableTrigger(gg_trg_SU_Right_Create)
+    //    call EnableTrigger(gg_trg_SU_Left_Create)
     call EnableTrigger(gg_trg_WEI_Center_Create)
-//    call EnableTrigger(gg_trg_WEI_Right_Create)
-//    call EnableTrigger(gg_trg_WEI_Left_Create)
+    //    call EnableTrigger(gg_trg_WEI_Right_Create)
+    //    call EnableTrigger(gg_trg_WEI_Left_Create)
 endfunction
 function Trig____________________001_Actions takes nothing returns nothing
     set udg_Units[1]=(udg_Units[1]+1)
@@ -5217,12 +5217,12 @@ function main takes nothing returns nothing
     call TriggerAddCondition(gg_trg_Change_Hero_Caocao,Condition(function Trig_Change_Hero_Caocao_Conditions))
     call TriggerAddAction(gg_trg_Change_Hero_Caocao,function Trig_Change_Hero_Caocao_Actions)
     set gg_trg_SU_Win=CreateTrigger()
-	// gg_unit_hcas_0020 to gg_unit_hbar_0064
-	call TriggerRegisterUnitEvent(gg_trg_SU_Win,gg_unit_hbar_0064,EVENT_UNIT_DEATH)
+    // gg_unit_hcas_0020 to gg_unit_hbar_0064
+    call TriggerRegisterUnitEvent(gg_trg_SU_Win,gg_unit_hbar_0064,EVENT_UNIT_DEATH)
     call TriggerAddAction(gg_trg_SU_Win,function Trig_SU_Win_Actions)
     set gg_trg_WEI_Win=CreateTrigger()
-	//gg_unit_hcas_0007 to gg_unit_hbar_0021
-    call TriggerRegisterUnitEvent(gg_trg_WEI_Win,gg_unit_hbar_0021,EVENT_UNIT_DEATH) 
+    //gg_unit_hcas_0007 to gg_unit_hbar_0021
+    call TriggerRegisterUnitEvent(gg_trg_WEI_Win,gg_unit_hbar_0021,EVENT_UNIT_DEATH)
     call TriggerAddAction(gg_trg_WEI_Win,function Trig_WEI_Win_Actions)
     set gg_trg_Leaves=CreateTrigger()
     call TriggerRegisterPlayerEventLeave(gg_trg_Leaves,Player(1))
@@ -5252,12 +5252,12 @@ function main takes nothing returns nothing
     call TriggerRegisterPlayerChatEvent(gg_trg_Allrandom,Player(1),"-ar",true)
     call TriggerAddAction(gg_trg_Allrandom,function Trig_Allrandom_Actions)
     set gg_trg_No_Double_Hero=CreateTrigger()
-//    call TriggerRegisterEnterRectSimple(gg_trg_No_Double_Hero,gg_rct_SU_Hero)
-//    call TriggerRegisterEnterRectSimple(gg_trg_No_Double_Hero,gg_rct_WEI_Hero)
-//   call TriggerRegisterEnterRectSimple(gg_trg_No_Double_Hero,gg_rct_SU_Hero_Selection)
-//    call TriggerRegisterEnterRectSimple(gg_trg_No_Double_Hero,gg_rct_WEI_Hero_Selection)
-//    call TriggerAddCondition(gg_trg_No_Double_Hero,Condition(function Trig_No_Double_Hero_Conditions))
-//    call TriggerAddAction(gg_trg_No_Double_Hero,function Trig_No_Double_Hero_Actions)
+    //    call TriggerRegisterEnterRectSimple(gg_trg_No_Double_Hero,gg_rct_SU_Hero)
+    //    call TriggerRegisterEnterRectSimple(gg_trg_No_Double_Hero,gg_rct_WEI_Hero)
+    //   call TriggerRegisterEnterRectSimple(gg_trg_No_Double_Hero,gg_rct_SU_Hero_Selection)
+    //    call TriggerRegisterEnterRectSimple(gg_trg_No_Double_Hero,gg_rct_WEI_Hero_Selection)
+    //    call TriggerAddCondition(gg_trg_No_Double_Hero,Condition(function Trig_No_Double_Hero_Conditions))
+    //    call TriggerAddAction(gg_trg_No_Double_Hero,function Trig_No_Double_Hero_Actions)
     set gg_trg_Earthquake=CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(gg_trg_Earthquake,EVENT_PLAYER_UNIT_SPELL_EFFECT)
     call TriggerAddCondition(gg_trg_Earthquake,Condition(function Trig_Earthquake_Conditions))
