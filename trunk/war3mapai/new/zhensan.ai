@@ -4288,16 +4288,31 @@ function sima_spell_condition takes nothing returns nothing
         set index=getSpellOffDamageIndex()
         
 		if MyHeroMP > 300 and can_sima_cast_e() and rangeToTowerD > 1100 and rangeToHeroD < 700 then
-			set zs_action_prioty_arry[50] = 56	// 10级前E磨血
+			set zs_action_prioty_arry[50] = 56	// E磨血
 		endif
-		
 		if MyHeroMP > 500 and can_sima_cast_ef() and rangeToTowerD > 1100 and rangeToHeroD < 700 then
-			set zs_action_prioty_arry[52] = 59  // 10级后EF磨血
+			set zs_action_prioty_arry[52] = 59  // EF磨血
 		endif
-
-		if MyHeroMP < 300 and can_sima_cast_e() and rangeToHeroD < 700 then
-			set zs_action_prioty_arry[50] = 98	// E逃命
+	
+		if MyHeroMP > 150 and can_sima_cast_e() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 then
+			set zs_action_prioty_arry[50] = 60	// 有兵E
+		endif		
+		if MyHeroMP > 300 and can_sima_cast_ef() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 then
+			set zs_action_prioty_arry[52] = 61  // 有兵EF
 		endif	
+		
+		if MyHeroMP > 150 and can_sima_cast_e() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+			set zs_action_prioty_arry[50] = 62 // E助攻
+		endif
+		if MyHeroMP > 150 and can_sima_cast_f() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+			set zs_action_prioty_arry[51] = 63 // F助攻
+		endif		
+		if MyHeroMP > 300 and can_sima_cast_ef() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+			set zs_action_prioty_arry[52] = 64 // EF助攻
+		endif		
+		if MyHeroMP > 700 and can_sima_cast_n_ef() and rangeToHeroD < 800 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+			set zs_action_prioty_arry[55] = 65 // NEF助攻
+		endif		
         
         if  index>=0 and MyHeroMP > 300 and (EnemyCount-AllyCount)<4 then
             set zs_kickoff=true
@@ -4321,10 +4336,10 @@ function sima_spell_condition takes nothing returns nothing
     
     
     if TowerD!=null and GetHP(TowerD)<260 and MyHeroHP>200 and can_sima_cast_f() then
-        set zs_action_prioty_arry[60]=102
+        set zs_action_prioty_arry[60]=102		// 抢塔
     endif
     if TowerD!=null and GetHP(TowerD)>600 and MyHeroHP>600 and rangeToHeroD>1100  and can_sima_cast_f()  then
-        set zs_action_prioty_arry[61]=101
+        set zs_action_prioty_arry[61]=101		// 磨塔
     endif
     
     
@@ -4444,7 +4459,10 @@ function zhuge_spell_condition takes nothing returns nothing
     if HeroD!=null then
         set index=getSpellOffDamageIndex()
         //call debugstr("zhuge-spell-index:"+ITS(index))
-        
+        // G 磨血
+		if can_zhuge_cast_g()  and MyHeroMP>300 and rangeToTowerD>1100  and rangeToHeroD<700  then
+            set zs_action_prioty_arry[50]=56
+        endif        
         if can_zhuge_cast_g() and can_zhuge_cast_e() and mHeroLevel > 10  and MyHeroMP>300   and rangeToTowerD>1100  and rangeToHeroD<700  then
             set zs_action_prioty_arry[51]=59
         endif
@@ -4454,9 +4472,7 @@ function zhuge_spell_condition takes nothing returns nothing
         if EnemyHeroHP<300 and  can_zhuge_cast_e() then
             set zs_action_prioty_arry[57]=61
         endif
-        if can_zhuge_cast_g()  and MyHeroMP>300 and rangeToTowerD>1100  and rangeToHeroD<700  then
-            set zs_action_prioty_arry[50]=56
-        endif
+
         
         if  index>=0 then
             set zs_kickoff =true
