@@ -2561,6 +2561,29 @@ function sima_cast_bian_n_ef takes unit Target returns nothing
     set loc=null
 endfunction
 
+function can_sima_cast_bian_ef takes nothing returns boolean
+    if isHeroHasBianYang(mHero) and  can_sima_cast_ef() and MyHeroMP>700 then
+        return true
+    endif
+    return false
+endfunction
+function sima_cast_bian_ef takes unit Target returns nothing
+    local location loc=null
+    if (not isHeroHasBianYang(mHero)) or (not can_sima_cast_n())  then
+        return
+    endif
+    set loc=GetLocBetweenTwoUnitsRangeToFirst(Target,mHero,700)
+    if UseBianXing(Target) then
+		call HeroAttack(Target)
+		call Sleep(0.8)
+		call HeroAttack(Target)
+		call Sleep(0.8)		
+        call sima_cast_ef(Target)
+    endif
+    call RemoveLocation(loc)
+    set loc=null
+endfunction
+
 function can_sima_cast_ef_feng_n_feng_fe takes nothing returns boolean
     if getFeiZhangCharges(mHero)>1 and can_sima_cast_n() and  can_sima_cast_ef() and MyHeroMP>950 then
         return true
@@ -2677,6 +2700,20 @@ endfunction
 function zhuge_cast_x_move_g takes unit Target returns nothing
     call zhuge_cast_x_move(Target)
     call zhuge_cast_g(Target)
+endfunction
+
+function can_zhuge_cast_bian_eg takes nothing returns boolean
+    return  can_UseBianXing and (can_zhuge_cast_x() and  can_zhuge_cast_g())
+endfunction
+
+function zhuge_cast_bian_eg takes unit Target returns nothing
+    call UseBianXing(Target)
+	if can_zhuge_cast_g() then
+		call zhuge_cast_g(Target)
+	call HeroAttack(0.8)
+	call HeroAttack(0.8)
+	if can_zhuge_cast_e then
+		call zhuge_cast_e(Target)
 endfunction
 
 function can_zhuge_cast_fei_e_x_g takes nothing returns boolean
@@ -3532,8 +3569,8 @@ endfunction
 function zs_move_condition takes nothing returns nothing
     set zs_action_prioty_arry[4]=10
     
-    if EnemyCount>AllyCount+2 and AllyCount<2 then
-        set zs_action_prioty_arry[4]=45
+    if EnemyCount>AllyCount+2 and AllyCount<3 then
+        set zs_action_prioty_arry[4]=70
     endif
     if rangeToFireLine>300 and safeLoc!=null then
         set zs_action_prioty_arry[4]=71
@@ -3576,10 +3613,10 @@ function zs_move_condition takes nothing returns nothing
     endif
     
     
-    if MyHeroHP<300 and GetNumberOfItemByID(mHero,'hslv')<1 and not IsRestoreHP(mHero) and EnemyHeroLevel>4 then
+    if MyHeroHP<300 and GetNumberOfItemByID(mHero,'hslv')<1 and not IsRestoreHP(mHero) then
         set zs_action_prioty_arry[6]=83
     endif
-    if MyHeroHP<500 and GetNumberOfItemByID(mHero,'hslv')<1  and not IsRestoreHP(mHero)   and EnemyHeroMP>350 and EnemyHeroLevel>7 then
+    if MyHeroHP<500 and GetNumberOfItemByID(mHero,'hslv')<1  and not IsRestoreHP(mHero) and EnemyHeroMP>350 and EnemyHeroLevel>5 then
         set zs_action_prioty_arry[6]=84
     endif
     
@@ -4293,28 +4330,40 @@ function sima_spell_condition takes nothing returns nothing
 		if MyHeroMP > 500 and can_sima_cast_ef() and rangeToTowerD > 1100 and rangeToHeroD < 700 then
 			set zs_action_prioty_arry[52] = 59  // EF磨血
 		endif
-	
-		if MyHeroMP > 150 and can_sima_cast_e() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 then
+        if can_UseBianXing(mHero) and can_sima_cast_ef() then
+            set zs_action_prioty_arry[58]=60 // 变EF磨血
+        endif	
+		if can_sima_cast_e() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 then
 			set zs_action_prioty_arry[50] = 60	// 有兵E
 		endif		
-		if MyHeroMP > 300 and can_sima_cast_ef() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 then
+		if can_sima_cast_ef() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 then
 			set zs_action_prioty_arry[52] = 61  // 有兵EF
 		endif	
 		
-		if MyHeroMP > 150 and can_sima_cast_e() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+		if can_sima_cast_e() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[50] = 62 // E助攻
 		endif
-		if MyHeroMP > 150 and can_sima_cast_f() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+		if can_sima_cast_f() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[51] = 63 // F助攻
 		endif		
-		if MyHeroMP > 300 and can_sima_cast_ef() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+		if can_sima_cast_ef() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[52] = 64 // EF助攻
 		endif		
-		if MyHeroMP > 700 and can_sima_cast_n_ef() and rangeToHeroD < 800 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+		if can_sima_cast_n_ef() and rangeToHeroD < 800 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[55] = 65 // NEF助攻
+		endif	
+
+		if MyHeroHP < 150 and can_sima_cast_e() and rangeToHeroD < 700 then
+			set zs_action_prioty_arry[57] = 98 // E逃跑
 		endif		
         
-        if  index>=0 and MyHeroMP > 300 and (EnemyCount-AllyCount)<4 then
+		if NearestEnemyBubing!=null and EnemyCount>2 and can_sima_cast_ef() and mHeroLevel>6 then
+			if MyHeroMP>500 or IsManaAlmostFull(mHero) then
+				set zs_action_prioty_arry[59]=60	// 7级以上EF清兵
+			endif
+		endif
+		
+        if  index>=0 and MyHeroHP > 300 and (EnemyCount-AllyCount)<4 then
             set zs_kickoff=true
             set zs_action_prioty_arry[50+index]=99
             call debugstr("find")				// 必杀
@@ -4328,17 +4377,11 @@ function sima_spell_condition takes nothing returns nothing
             set zs_action_prioty_arry[59]=58	// EF清兵
         endif
     endif
-    if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>2 and can_sima_cast_ef() and MyHeroHP < 300 and mHeroLevel>6 then
-        if MyHeroMP>300 or IsManaAlmostFull(mHero) then
-            set zs_action_prioty_arry[59]=59	// EF清兵回家
-        endif
-    endif	
     
-    
-    if TowerD!=null and GetHP(TowerD)<260 and MyHeroHP>200 and can_sima_cast_f() then
+    if rangeToHeroD > 900 and TowerD!=null and GetHP(TowerD)<260 and MyHeroHP>200 and can_sima_cast_f() then
         set zs_action_prioty_arry[60]=102		// 抢塔
     endif
-    if TowerD!=null and GetHP(TowerD)>600 and MyHeroHP>600 and rangeToHeroD>1100  and can_sima_cast_f()  then
+    if rangeToHeroD > 900 and TowerD!=null and GetHP(TowerD)>600 and MyHeroHP>600 and rangeToHeroD>1100  and can_sima_cast_f() and AllyCount>1  then
         set zs_action_prioty_arry[61]=101		// 磨塔
     endif
     
@@ -4361,6 +4404,8 @@ function sima_spell_action takes integer index returns nothing
             endif
         endif
         call sima_cast_e(HeroD)
+		call HeroAttack(HeroD)
+		call sleep(0.8)
         call debugstr("sima_cast_e ")	
     endif
     
@@ -4423,7 +4468,17 @@ function sima_spell_action takes integer index returns nothing
             call sima_cast_ef_feng_n_feng_fe(HeroD)
         endif
     endif
-    
+	
+    if index==57 then
+        call sima_cast_e(HeroD)
+        call debugstr("sima_cast_e ")	
+    endif	
+    if index==58 then
+        if  intoUnitRange(HeroD,700) and can_sima_cast_bian_ef() then
+            call sima_cast_bian_ef(HeroD)
+            call debugstr("sima_cast_bian_ef ")
+        endif
+    endif    
     
     if index==59 and NearestEnemyBubing!=null then
         call debugstr("ef--NearestEnemyBubing ")
@@ -4459,24 +4514,43 @@ function zhuge_spell_condition takes nothing returns nothing
     if HeroD!=null then
         set index=getSpellOffDamageIndex()
         //call debugstr("zhuge-spell-index:"+ITS(index))
-        // G 磨血
+        
 		if can_zhuge_cast_g()  and MyHeroMP>300 and rangeToTowerD>1100  and rangeToHeroD<700  then
-            set zs_action_prioty_arry[50]=56
+            set zs_action_prioty_arry[50]=56 // G 磨血
         endif        
-        if can_zhuge_cast_g() and can_zhuge_cast_e() and mHeroLevel > 10  and MyHeroMP>300   and rangeToTowerD>1100  and rangeToHeroD<700  then
-            set zs_action_prioty_arry[51]=59
+        if can_zhuge_cast_g() and can_zhuge_cast_e() and MyHeroMP>500 and rangeToTowerD>1100  and rangeToHeroD<700  then
+            set zs_action_prioty_arry[51]=59 // GE 磨血
         endif
-        if IsBianXing(HeroD)  and can_zhuge_cast_e() then
-            set zs_action_prioty_arry[57]=58
+        if can_UseBianXing(mHero) and (can_zhuge_cast_eg() or can_zhuge_cast_g or can_zhuge_cast_e) then
+            set zs_action_prioty_arry[61]=60 // 变E
         endif
         if EnemyHeroHP<300 and  can_zhuge_cast_e() then
-            set zs_action_prioty_arry[57]=61
+            set zs_action_prioty_arry[57]=61 // E
         endif
-
-        
+		if can_zhuge_cast_e() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 then
+			set zs_action_prioty_arry[57] = 60	// 有兵E
+		endif	
+		
+		if can_zhuge_cast_e() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+			set zs_action_prioty_arry[57] = 62 // E助攻
+		endif
+		if can_zhuge_cast_g() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+			set zs_action_prioty_arry[50] = 63 // F助攻
+		endif	
+		
+		if EnemyHeroHP<800 and  can_zhuge_cast_e()  and  can_zhuge_cast_x() and rangeToTowerD>1100  and rangeToHeroD<700 then
+			set zs_action_prioty_arry[60]=59 // EX
+		endif
+		if NearestEnemyBubing!=null and EnemyCount>2 and can_zhuge_cast_g() and mHeroLevel>7 then
+			if MyHeroMP>700 or IsManaAlmostFull(mHero) then
+				set zs_action_prioty_arry[58]=60 // G 清兵
+			endif
+		endif
+        if IsBianXing(HeroD)  and can_zhuge_cast_e() then
+            set zs_action_prioty_arry[61]=60 // 变E
+        endif        
         if  index>=0 then
-            set zs_kickoff =true
-            
+            set zs_kickoff =true           
             set zs_action_prioty_arry[50+index]=99
             call debugstr("find============================")
         endif
@@ -4484,12 +4558,9 @@ function zhuge_spell_condition takes nothing returns nothing
     // set zs_action_prioty_arry[55]=99
     
     if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>2 and can_zhuge_cast_g() and can_zhuge_cast_e() and mHeroLevel>7 then
-        if MyHeroMP>1200 or IsManaAlmostFull(mHero) then
-            set zs_action_prioty_arry[59]=58
+        if MyHeroMP>800 or IsManaAlmostFull(mHero) then
+            set zs_action_prioty_arry[59]=58 // GE 清兵
         endif
-    endif
-    if  HeroD!=null and   EnemyHeroHP<800 and  can_zhuge_cast_e()  and  can_zhuge_cast_x()  then
-        set zs_action_prioty_arry[60]=59
     endif
     
 endfunction
@@ -4501,8 +4572,7 @@ function zhuge_spell_action takes integer index returns nothing
     endif
     
     if index==50 then
-        if zs_kickoff then
-            
+        if zs_kickoff then            
             if can_UseFeiXie(mHero)  then
                 call UseFeiXieU(HeroD)
             endif
@@ -4515,8 +4585,7 @@ function zhuge_spell_action takes integer index returns nothing
     endif
     
     if index==51 then
-        if zs_kickoff then
-            
+        if zs_kickoff then            
             if can_UseFeiXie(mHero)  then
                 call UseFeiXieU(HeroD)
             endif
@@ -4574,12 +4643,16 @@ function zhuge_spell_action takes integer index returns nothing
         endif
     endif
     
-    
+    if index==58 and NearestEnemyBubing!=null then
+        call debugstr("NearestBubing --spell ")
+        if  intoUnitRange(NearestEnemyBubing,700) then            
+            call zhuge_cast_g(NearestEnemyBubing)
+        endif
+    endif   
     
     if index==59 and NearestEnemyBubing!=null then
         call debugstr("NearestBubing --spell ")
-        if  intoUnitRange(NearestEnemyBubing,650) then
-            
+        if  intoUnitRange(NearestEnemyBubing,650) then            
             call zhuge_cast_g(NearestEnemyBubing)
             call zhuge_cast_e(NearestEnemyBubing)
         endif
@@ -4590,6 +4663,13 @@ function zhuge_spell_action takes integer index returns nothing
             call zhuge_cast_x_move(HeroD)
         endif
     endif
+    if index==61 then
+        if  intoUnitRange(HeroD,600) then
+			call UseBianXing(HeroD)
+			call zhuge_cast_g(HeroD)
+            call zhuge_cast_e(HeroD)
+        endif
+    endif	
     
 endfunction
 
