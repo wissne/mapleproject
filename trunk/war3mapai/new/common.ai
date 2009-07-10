@@ -1458,6 +1458,12 @@ endfunction
 function IsEnemyBing takes unit TheUnit returns boolean
     return((IsUnitEnemy(TheUnit,ai_player))and(not IsUnitHero(TheUnit))and(not IsStructure(TheUnit))and(CanAttack(TheUnit))and(UnitAlive(TheUnit))  and(CanMove(TheUnit)))
 endfunction
+function IsEnemyHero takes unit TheUnit returns boolean
+    return((IsUnitEnemy(TheUnit,ai_player))and(IsUnitHero(TheUnit))and(not IsStructure(TheUnit))and(CanAttack(TheUnit))and(UnitAlive(TheUnit))  and(CanMove(TheUnit)))
+endfunction
+function IsAllyHero takes unit TheUnit returns boolean
+    return((IsUnitAlly(TheUnit,ai_player))and(IsUnitHero(TheUnit))and(not IsStructure(TheUnit))and(CanAttack(TheUnit))and(UnitAlive(TheUnit))  and(CanMove(TheUnit)))
+endfunction
 
 function IsEnemyTower takes unit TheUnit returns boolean
     return(IsUnitEnemy(TheUnit,ai_player)and(UnitAlive(TheUnit))and IsTower(TheUnit))
