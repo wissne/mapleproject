@@ -4794,8 +4794,8 @@ function Trig_Hero_Revive_Func004C takes nothing returns boolean
     return(((1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))>6))
 endfunction
 function Trig_Hero_Revive_Actions takes nothing returns nothing
-    call StartTimerBJ(udg_Timer_ReviveHero[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))],false,(I2R(GetUnitLevel(GetTriggerUnit()))*5.00))
-    call PolledWait((I2R(GetUnitLevel(GetTriggerUnit()))*5.00))
+    call StartTimerBJ(udg_Timer_ReviveHero[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))],false,(I2R(GetUnitLevel(GetTriggerUnit()))*2.00))//重生时间由5改为2
+    call PolledWait((I2R(GetUnitLevel(GetTriggerUnit()))*2.00))	
     if(Trig_Hero_Revive_Func003C())then
         call ReviveHeroLoc(GetTriggerUnit(),GetRandomLocInRect(gg_rct_SU_Hero),true)
     endif
