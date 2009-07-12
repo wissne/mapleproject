@@ -5,7 +5,6 @@ globals
     //
     //mellee Parameter
     integer array zs_action_prioty_arry
-	string array zs_player_name_array
     unit budaobingW=null
     unit budaobingW2=null
     
@@ -5110,18 +5109,12 @@ function guojia_spell_action takes integer index returns nothing
 endfunction
 function buyHeros takes nothing returns nothing
 	local integer rs=0
-	local integer lp = 0
-	set lp = 5
-	loop
-		exitwhen lp == 1
-		set rs = GetRandomInt(0,9)
-		if rs > 4 then
-			call BuyHero('n001',hid_zhugeliang)
-		else
-			call BuyHero('n001',hid_simayi)
-		endif
-		set lp = lp - 1
-	endloop
+	set rs = GetRandomInt(0,9)
+	if rs > 4 then
+		call BuyHero('n001',hid_zhugeliang)
+	else
+		call BuyHero('n001',hid_simayi)
+	endif
     // call BuyHero('n001',hid_zhugeliang)
     // call BuyHero('n001',hid_zhugeliang)
     // call BuyHero('n001',hid_zhugeliang)
@@ -5131,17 +5124,12 @@ function buyHeros takes nothing returns nothing
     //      call BuyHero('n001',hid_guanyu)  //suguo
     //      call BuyHero('n001',hid_zhangfei)  //suguo
     //       call BuyHero('n001',hid_weiyan)  //suguo
-	set lp = 5
-	loop
-		exitwhen lp == 1
-		set rs = GetRandomInt(0,9)
-		if rs > 4 then
-			call BuyHero('n000',hid_zhugeliang)
-		else
-			call BuyHero('n000',hid_simayi)
-		endif
-		set lp = lp - 1
-	endloop    
+	set rs = GetRandomInt(0,9)
+	if rs > 4 then
+		call BuyHero('n000',hid_zhugeliang)
+	else
+		call BuyHero('n000',hid_simayi)
+	endif
     //call BuyHero('n000',hid_simayi)   //weiguo
     // call BuyHero('n000',hid_simayi)
     // call BuyHero('n000',hid_simayi)
@@ -5192,36 +5180,6 @@ function initPriotArray takes nothing returns nothing
         set zs_action_prioty_arry[index]=0
         set index=index+1
     endloop
-endfunction
-
-function initPlayNameArray takes nothing returns nothing
-    local integer index=0
-    loop
-        exitwhen index==30
-        set zs_player_name_array[index]=""
-        set index=index+1
-    endloop
-	set zs_player_name_array[0]="Wonder"
-	set zs_player_name_array[1]="MonKing"
-	set zs_player_name_array[2]="maple"
-	set zs_player_name_array[3]="织梦行云"
-	set zs_player_name_array[4]="洞溪沉石"
-	set zs_player_name_array[5]="DXN"
-	set zs_player_name_array[6]="kk"
-	set zs_player_name_array[7]="上海骡子"
-	set zs_player_name_array[8]="紫英慕容"
-	set zs_player_name_array[9]="漫步"
-	set zs_player_name_array[10]="山村贞子"
-	set zs_player_name_array[11]="无名小卒"
-	set zs_player_name_array[12]="红颜祸水"
-	set zs_player_name_array[13]="杀我吧"
-	set zs_player_name_array[14]="Lytic"
-	set zs_player_name_array[15]="pray_w "
-	set zs_player_name_array[16]="BoA"
-	set zs_player_name_array[17]="你不是真正的快乐"
-	set zs_player_name_array[18]="老毒物"
-	set zs_player_name_array[19]="突然很想你"
-	set zs_player_name_array[20]="031主义"
 endfunction
 
 function getMaxPriotIndex takes nothing returns integer
@@ -5442,13 +5400,13 @@ function setAIPlayerName takes nothing returns nothing
     // if GetAIDifficulty(ai_player)==AI_DIFFICULTY_INSANE then
         // set  aistr="疯狂电脑"
     // endif
-	loop
-		exitwhen aistr != ""		
-		set index = GetRandomInt(0,20)
-		set aistr = zs_player_name_array[index]
-		set zs_player_name_array[index] = ""
-	endloop    
-    call SetPlayerName(ai_player,aistr)
+	// loop
+		// exitwhen aistr != ""		
+		// set index = GetRandomInt(0,20)
+		// set aistr = zs_player_name_array[index]
+		// set zs_player_name_array[index] = ""
+	// endloop    
+    //call SetPlayerName(ai_player,aistr)
 endfunction
 function setDubingCdtLoc takes nothing returns nothing
     set zs_dubing_cdt_loc=GetLocBetweenTwoLocsRangeToFirst(zs_He_middle,mBaseLoc,-800)
@@ -5476,7 +5434,6 @@ function InitmGlobals takes nothing returns nothing
     local unit uHero=null
     set mForceId=getForceId()
     call adjustBaseLoc()
-    call initPlayNameArray()	//初始化人物姓名
     call zs_initPath()
     set mdubingLoc=getDuBingLoc()
     set mBaseLoc=getBaseLoc()
@@ -5529,7 +5486,7 @@ function InitmGlobals takes nothing returns nothing
         
     endif
     call getfirstHero()
-    call  setAIPlayerName()
+    //call  setAIPlayerName()
     //  call initSkillArry()
     call setAttackRange()
 endfunction
