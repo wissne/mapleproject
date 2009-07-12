@@ -5207,7 +5207,7 @@ function initPlayNameArray takes nothing returns nothing
 	set zs_player_name_array[3]="织梦行云"
 	set zs_player_name_array[4]="洞溪沉石"
 	set zs_player_name_array[5]="DXN"
-	set zs_player_name_array[6]="KK"
+	set zs_player_name_array[6]="kk"
 	set zs_player_name_array[7]="上海骡子"
 	set zs_player_name_array[8]="紫英慕容"
 	set zs_player_name_array[9]="漫步"
@@ -5217,7 +5217,11 @@ function initPlayNameArray takes nothing returns nothing
 	set zs_player_name_array[13]="杀我吧"
 	set zs_player_name_array[14]="Lytic"
 	set zs_player_name_array[15]="pray_w "
-	set zs_player_name_array[16]="魂牵梦萦"
+	set zs_player_name_array[16]="BoA"
+	set zs_player_name_array[17]="你不是真正的快乐"
+	set zs_player_name_array[18]="老毒物"
+	set zs_player_name_array[19]="突然很想你"
+	set zs_player_name_array[20]="031主义"
 endfunction
 
 function getMaxPriotIndex takes nothing returns integer
