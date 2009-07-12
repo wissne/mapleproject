@@ -529,6 +529,10 @@ function giveAIGolds takes nothing returns nothing
         if((GetPlayerSlotState(indexPlayer)==PLAYER_SLOT_STATE_PLAYING)and(index!=6))then
             set indexRace=GetPlayerRace(indexPlayer)
             if(GetPlayerController(indexPlayer)==MAP_CONTROL_COMPUTER)then
+				if GetAIDifficulty(indexPlayer)==AI_DIFFICULTY_NEWBIE then
+                    call GivePlayerGold(indexPlayer,100)
+                    call SetPlayerWood(indexPlayer,GetPlayerWood(indexPlayer)+5)
+				endif
                 if GetAIDifficulty(indexPlayer)==AI_DIFFICULTY_NORMAL then
                     call GivePlayerGold(indexPlayer,200)
                     call SetPlayerWood(indexPlayer,GetPlayerWood(indexPlayer)+5)
