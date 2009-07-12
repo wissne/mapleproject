@@ -1,4 +1,5 @@
 globals
+	string array zs_player_name_array
     unit udg_KillSlash_Caster=null
     timer array udg_Timer_ReviveHero
     unit array udg_Unit_Hero
@@ -385,6 +386,57 @@ globals
     trigger gg_trg_BlockUseAbility
     trigger gg_trg_BlockUseAbility2
 endglobals
+function initPlayNameArray takes nothing returns nothing
+    local integer index=0
+    loop
+        exitwhen index==30
+        set zs_player_name_array[index]=""
+        set index=index+1
+    endloop
+	set zs_player_name_array[0]="Wonder"
+	set zs_player_name_array[1]="MonKing"
+	set zs_player_name_array[2]="maple"
+	set zs_player_name_array[3]="织梦行云"
+	set zs_player_name_array[4]="洞溪沉石"
+	set zs_player_name_array[5]="DXN"
+	set zs_player_name_array[6]="kk"
+	set zs_player_name_array[7]="上海骡子"
+	set zs_player_name_array[8]="紫英慕容"
+	set zs_player_name_array[9]="漫步"
+	set zs_player_name_array[10]="山村贞子"
+	set zs_player_name_array[11]="无名小卒"
+	set zs_player_name_array[12]="红颜祸水"
+	set zs_player_name_array[13]="杀我吧"
+	set zs_player_name_array[14]="Lytic"
+	set zs_player_name_array[15]="pray_w "
+	set zs_player_name_array[16]="BoA"
+	set zs_player_name_array[17]="你不是真正的快乐"
+	set zs_player_name_array[18]="老毒物"
+	set zs_player_name_array[19]="突然很想你"
+	set zs_player_name_array[20]="031主义"
+endfunction
+
+function setAIPlayerName takes player indexPlayer returns nothing
+    local string aistr=""
+	local integer index = 0
+    // if GetAIDifficulty(ai_player)==AI_DIFFICULTY_NEWBIE then
+        // set  aistr="简单电脑"
+    // endif
+    // if GetAIDifficulty(ai_player)==AI_DIFFICULTY_NORMAL then
+        // set  aistr="普通电脑"
+    // endif
+    // if GetAIDifficulty(ai_player)==AI_DIFFICULTY_INSANE then
+        // set  aistr="疯狂电脑"
+    // endif
+	loop
+		exitwhen aistr != ""		
+		set index = GetRandomInt(0,20)
+		set aistr = zs_player_name_array[index]
+		set zs_player_name_array[index] = ""
+	endloop    
+    call SetPlayerName(indexPlayer,aistr)
+endfunction
+
 function DisplayToAll takes string s returns nothing
     call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,10.00,s)
 endfunction
@@ -498,6 +550,7 @@ function zsMeleeStartAI takes nothing returns nothing
     loop
         set indexPlayer=Player(index)
         if((GetPlayerSlotState(indexPlayer)==PLAYER_SLOT_STATE_PLAYING)and(index!=6))then
+			call  setAIPlayerName(indexPlayer)
             set indexRace=GetPlayerRace(indexPlayer)
             if(GetPlayerController(indexPlayer)==MAP_CONTROL_COMPUTER)then
                 call StartCampaignAI(indexPlayer,"zhensan.ai")
@@ -554,6 +607,7 @@ function InitTrig_showHeroLoc takes nothing returns nothing
     set gg_trg_showHeroLoc=CreateTrigger()
     call TriggerRegisterTimerEventPeriodic(gg_trg_showHeroLoc,60)
     call TriggerAddAction(gg_trg_showHeroLoc,function giveAIGolds)
+	call initPlayNameArray()
     call zsMeleeStartAI()
     call InitTrig_BlockUseItem()
 endfunction
