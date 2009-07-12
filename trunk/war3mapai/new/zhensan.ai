@@ -4509,9 +4509,9 @@ function sima_spell_action takes integer index returns nothing
 	
     if index==57 then
 		if can_UseFeiXie(mHero)  then
-			call UseFeiXieU(HeroD)
+			call UseFeiXie(zs_cr_retreatLoc)
 		else
-			if can_UseFengZhang(mHero) or can_UseBianXing(mHero) 
+			if can_UseFengZhang(mHero) or can_UseBianXing(mHero) then
 				call UseFengZhang(HeroD)
 				call UseBianXing(HeroD)
 			else
@@ -4728,15 +4728,15 @@ function zhuge_spell_action takes integer index returns nothing
     endif
 	if index==62 then
 		if can_UseFeiXie(mHero)  then
-			call UseFeiXieU(HeroD)
+			call UseFeiXie(zs_cr_retreatLoc)
 		else
-			if can_UseBianXing(mHero) or can_UseFengZhang(mHero)  then
-				call UseFengZhang(HEroD)
+			if can_UseFengZhang(mHero) or can_UseBianXing(mHero) then
+				call UseFengZhang(HeroD)
 				call UseBianXing(HeroD)
 			else
 				call zhuge_cast_e(HeroD)
-			endif		            
-        endif
+			endif
+		endif
     endif	
     
 endfunction
@@ -5194,6 +5194,32 @@ function initPriotArray takes nothing returns nothing
     endloop
 endfunction
 
+function initPlayNameArray takes nothing returns nothing
+    local integer index=0
+    loop
+        exitwhen index==30
+        set zs_player_name_array[index]=""
+        set index=index+1
+    endloop
+	set zs_player_name_array[0]="Wonder"
+	set zs_player_name_array[1]="MonKing"
+	set zs_player_name_array[2]="maple"
+	set zs_player_name_array[3]="织梦行云"
+	set zs_player_name_array[4]="洞溪沉石"
+	set zs_player_name_array[5]="DXN"
+	set zs_player_name_array[6]="KK"
+	set zs_player_name_array[7]="上海骡子"
+	set zs_player_name_array[8]="紫英慕容"
+	set zs_player_name_array[9]="漫步"
+	set zs_player_name_array[10]="山村贞子"
+	set zs_player_name_array[11]="无名小卒"
+	set zs_player_name_array[12]="红颜祸水"
+	set zs_player_name_array[13]="杀我吧"
+	set zs_player_name_array[14]="Lytic"
+	set zs_player_name_array[15]="pray_w "
+	set zs_player_name_array[16]="魂牵梦萦"
+endfunction
+
 function getMaxPriotIndex takes nothing returns integer
     local integer index=0
     local integer itmp=0
@@ -5402,16 +5428,22 @@ endfunction
 
 function setAIPlayerName takes nothing returns nothing
     local string aistr=""
-    if GetAIDifficulty(ai_player)==AI_DIFFICULTY_NEWBIE then
-        set  aistr="简单电脑"
-    endif
-    if GetAIDifficulty(ai_player)==AI_DIFFICULTY_NORMAL then
-        set  aistr="普通电脑"
-    endif
-    if GetAIDifficulty(ai_player)==AI_DIFFICULTY_INSANE then
-        set  aistr="疯狂电脑"
-    endif
-    
+	local integer index = 0
+    // if GetAIDifficulty(ai_player)==AI_DIFFICULTY_NEWBIE then
+        // set  aistr="简单电脑"
+    // endif
+    // if GetAIDifficulty(ai_player)==AI_DIFFICULTY_NORMAL then
+        // set  aistr="普通电脑"
+    // endif
+    // if GetAIDifficulty(ai_player)==AI_DIFFICULTY_INSANE then
+        // set  aistr="疯狂电脑"
+    // endif
+	loop
+		exitwhen aistr != ""		
+		set index = GetRandomInt(0,20)
+		set aistr = zs_player_name_array[index]
+		set zs_player_name_array[index] = ""
+	endloop    
     call SetPlayerName(ai_player,aistr)
 endfunction
 function setDubingCdtLoc takes nothing returns nothing
@@ -5440,7 +5472,7 @@ function InitmGlobals takes nothing returns nothing
     local unit uHero=null
     set mForceId=getForceId()
     call adjustBaseLoc()
-    
+    call initPlayNameArray()	//初始化人物姓名
     call zs_initPath()
     set mdubingLoc=getDuBingLoc()
     set mBaseLoc=getBaseLoc()
@@ -5493,7 +5525,7 @@ function InitmGlobals takes nothing returns nothing
         
     endif
     call getfirstHero()
-    //call  setAIPlayerName()
+    call  setAIPlayerName()
     //  call initSkillArry()
     call setAttackRange()
 endfunction
