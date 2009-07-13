@@ -2497,6 +2497,20 @@ function sima_cast_ef takes unit TheTarget returns boolean
     set loc=null
     return true
 endfunction
+function sima_cast_fe takes unit TheTarget returns boolean
+    local location loc
+    if    not can_sima_cast_ef() then
+        return false
+    endif
+    set loc=GetUnitLoc(TheTarget)
+    call  sima_cast_f(loc)
+    call RemoveLocation(loc)
+	call HeroAttack(TheTarget)
+	call Sleep(0.8)
+    call  sima_cast_e(TheTarget)
+    set loc=null
+    return true
+endfunction
 
 function can_sima_cast_n_ef takes nothing returns boolean
     if  can_sima_cast_n() and  can_sima_cast_ef() and MyHeroMP>800 then
@@ -3517,10 +3531,10 @@ function zs_buchonghp_condition takes nothing returns nothing
         set zs_action_prioty_arry[2]=48
     endif
     if MyHeroHP<300 then
-        set zs_action_prioty_arry[2]=60
+        set zs_action_prioty_arry[2]=90
     endif
     if MyHeroHP<500 and EnemyHeroMP>320 and EnemyHeroLevel>5 then
-        set zs_action_prioty_arry[2]=62
+        set zs_action_prioty_arry[2]=92
     endif
     
     
@@ -3555,7 +3569,7 @@ function zs_buchongmp_condition takes nothing returns nothing
         return
     endif
     if GetManaVoided(mHero)>180 then
-        set zs_action_prioty_arry[3]=31
+        set zs_action_prioty_arry[3]=51
     endif
     
     
@@ -3620,41 +3634,41 @@ function zs_move_condition takes nothing returns nothing
     endif
     
     if IsLowLife(mHero) and GetNumberOfItemByID(mHero,'hslv')<1  and not IsRestoreHP(mHero)  then
-        set zs_action_prioty_arry[6]=82
+        set zs_action_prioty_arry[6]= 95
     endif
 	
-	if IsLowLife(mHero) and HeroD != null and MyHeroHP < 150 then
-		set zs_action_prioty_arry[6]= 81
+	if IsLowLife(mHero) and HeroD != null then
+		set zs_action_prioty_arry[6]= 95
 	endif
     
     
     if MyHeroHP<300 and GetNumberOfItemByID(mHero,'hslv')<1 and not IsRestoreHP(mHero) then
-        set zs_action_prioty_arry[6]=83
+        set zs_action_prioty_arry[6]=93
     endif
     if MyHeroHP<500 and GetNumberOfItemByID(mHero,'hslv')<1  and not IsRestoreHP(mHero) and EnemyHeroMP>350 and EnemyHeroLevel>5 then
         set zs_action_prioty_arry[6]=84
     endif
     
     if (not IsLifeAlmostFull(mHero) or not IsManaAlmostFull(mHero)) and RangeToLoc(mHero,mBaseLoc)<1600 then
-        set zs_action_prioty_arry[6]=63
+        set zs_action_prioty_arry[6]=81
     endif
     if GetPlayerGold(ai_player)>=3200 and GetNumberOfItemByID(mHero,'I010')<1 then
-        set zs_action_prioty_arry[6]=26
+        set zs_action_prioty_arry[6]=82
     endif
     if rangeToTowerD<900 and HeroD!=null then
         set zs_action_prioty_arry[8]=100
     endif
 	if (EnemyHeroCount - AllyHeroCount) > 1 then
-		set zs_action_prioty_arry[9]=90
+		set zs_action_prioty_arry[9]=92
 	endif
 	if AllyHeroCount==0 and EnemyHeroCount>1 then
-		set zs_action_prioty_arry[9]=90
+		set zs_action_prioty_arry[9]=92
 	endif
 	if AllyCount<1 and EnemyCount>0 then
-		set zs_action_prioty_arry[9]=91
+		set zs_action_prioty_arry[9]=92
 	endif
 	if AllyCount<2 and EnemyCount>2 and HeroD!=null and rangeToHeroD<900 then
-        set zs_action_prioty_arry[9]=91
+        set zs_action_prioty_arry[9]=92
     endif
     if (IsRestoreHP(mHero) or IsRestoreMP(mHero)) and ((HeroD!=null and rangeToHeroD<800) or rangeToTowerD<900 or RangeTo(mHero,NearestEnemyBubing)<360) then
         set zs_action_prioty_arry[9]=52
@@ -3703,7 +3717,6 @@ function zs_move_action takes integer index returns nothing
     local location loc=null
     if index==4 then
         call HeroGotoSafeLoc(mHero)
-		call Sleep(0.2)
         //  call debugstr("HeroGotoSafeLoc ")
     endif
     if index==5 then
@@ -3711,7 +3724,6 @@ function zs_move_action takes integer index returns nothing
             call  UseFeiXie(zs_cr_retreatLoc)
         endif
         call HeroRetreat(1200)
-		call Sleep(0.2)
         // call debugstr("HeroRetreat ")
     endif
     if index==6 then
@@ -3720,20 +3732,17 @@ function zs_move_action takes integer index returns nothing
         endif
         
         call ariveLoc(mHero,mBaseLoc,360)
-		call Sleep(0.2)
         //  call Sleep(0.6)
         // call debugstr("HeroRetreat ")
     endif
     
     if index==8 then
         call HeroRetreat(1600)
-        call Sleep(0.2)
         // call debugstr("HeroRetreat ")
     endif
     if index==9 then
         
         call HeroRetreat(1200)
-		call Sleep(0.2)
         // call debugstr("HeroRetreat ")
     endif
     
@@ -3832,7 +3841,7 @@ function zs_attack_condition_fashi takes nothing returns nothing
     if  zs_mutong!=null then
         set zs_action_prioty_arry[47]=56
     endif
-    if TowerD!=null and GetHP(TowerD)<120 and MyHeroHP>500 and rangeToHeroD>700 and EnemyCount<3 then
+    if TowerD!=null and GetHP(TowerD)<120 and MyHeroHP>500 and rangeToHeroD>700 and EnemyCount<4 then
         set zs_action_prioty_arry[42]=101
     endif
     if TowerD!=null and GetHP(TowerD)<60 and rangeToHeroD>700 and EnemyCount<3 then
@@ -3860,12 +3869,12 @@ function zs_attack_action_fashi takes integer index returns nothing
         endif
         
         call ChaseAttackUnit(HeroD)
-        call Sleep(0.8)
+        call Sleep(0.2)
     endif
     if index==42 then
         call debugstr("HeroAttack --TowerD")
         call HeroAttack(TowerD)
-        call Sleep(0.8)
+        call Sleep(0.2)
     endif
     if index==43 then
         call HeroAttack(HeroD)
@@ -3873,23 +3882,23 @@ function zs_attack_action_fashi takes integer index returns nothing
     endif
     if index==44 then
         call HeroAttack(TowerD)
-        call Sleep(0.8)
+        call Sleep(0.2)
     endif
     if index==45 then
         call HeroAttack(NearestEnemyBubing)
-        call Sleep(0.8)
+        call Sleep(0.2)
     endif
     if index==46 then
         call HeroAttack(NearestEnemyBubing)
-        call Sleep(0.8)
+        call Sleep(0.2)
     endif
     if index==47 then
         call HeroAttack(zs_mutong)
-        call Sleep(0.8)
+        call Sleep(0.2)
     endif
     if index==48 then
         call HeroAttack(TowerW)
-        call Sleep(0.8)
+        call Sleep(0.2)
     endif
     
     
@@ -4529,7 +4538,7 @@ function sima_spell_action takes integer index returns nothing
     if index==59 and NearestEnemyBubing!=null then
         call debugstr("ef--NearestEnemyBubing ")
         if  intoUnitRange(NearestEnemyBubing,650) then
-            call sima_cast_ef(NearestEnemyBubing)
+            call sima_cast_fe(NearestEnemyBubing)
         endif
     endif
     if index==60 then
@@ -4539,9 +4548,8 @@ function sima_spell_action takes integer index returns nothing
     endif
     if index==61 then
         call debugstr("sima---fire-----TowerD ")
-        
         call sima_cast_fu(TowerD)
-    endif
+    endif  
     
 endfunction
 
