@@ -550,9 +550,9 @@ function zsMeleeStartAI takes nothing returns nothing
     loop
         set indexPlayer=Player(index)
         if((GetPlayerSlotState(indexPlayer)==PLAYER_SLOT_STATE_PLAYING)and(index!=6))then
-			call  setAIPlayerName(indexPlayer)
-            set indexRace=GetPlayerRace(indexPlayer)
+			set indexRace=GetPlayerRace(indexPlayer)
             if(GetPlayerController(indexPlayer)==MAP_CONTROL_COMPUTER)then
+				call setAIPlayerName(indexPlayer)
                 call StartCampaignAI(indexPlayer,"zhensan.ai")
             endif
         endif
