@@ -3659,16 +3659,16 @@ function zs_move_condition takes nothing returns nothing
         set zs_action_prioty_arry[8]=100
     endif
 	if (EnemyHeroCount - AllyHeroCount) > 1 then
-		set zs_action_prioty_arry[9]=92
+		set zs_action_prioty_arry[7]=92
 	endif
 	if AllyHeroCount==0 and EnemyHeroCount>1 then
-		set zs_action_prioty_arry[9]=92
+		set zs_action_prioty_arry[7]=92
 	endif
 	if AllyCount<1 and EnemyCount>0 then
-		set zs_action_prioty_arry[9]=92
+		set zs_action_prioty_arry[7]=92
 	endif
 	if AllyCount<2 and EnemyCount>2 and HeroD!=null and rangeToHeroD<900 then
-        set zs_action_prioty_arry[9]=92
+        set zs_action_prioty_arry[7]=92
     endif
     if (IsRestoreHP(mHero) or IsRestoreMP(mHero)) and ((HeroD!=null and rangeToHeroD<800) or rangeToTowerD<900 or RangeTo(mHero,NearestEnemyBubing)<360) then
         set zs_action_prioty_arry[9]=52
@@ -3735,7 +3735,11 @@ function zs_move_action takes integer index returns nothing
         //  call Sleep(0.6)
         // call debugstr("HeroRetreat ")
     endif
-    
+    if index==7 then
+        
+        call HeroRetreat(750)
+        // call debugstr("HeroRetreat ")
+    endif    
     if index==8 then
         call HeroRetreat(1600)
         // call debugstr("HeroRetreat ")
@@ -3744,7 +3748,7 @@ function zs_move_action takes integer index returns nothing
         
         call HeroRetreat(1200)
         // call debugstr("HeroRetreat ")
-    endif
+    endif    
     
     
     if index==11 then
@@ -3828,8 +3832,8 @@ function zs_attack_condition_fashi takes nothing returns nothing
     endif
     
     if TowerD!=null and MyHeroHP>500  and  (FarestAllyBubing!=null and RangeTo(FarestAllyBubing,TowerD)< 560) then
-        if(HeroD==null or rangeToHeroD>1000) then
-            set zs_action_prioty_arry[44]=47
+        if(EnemyHeroCount<=AllyHeroCount and rangeToHeroD>900) then
+            set zs_action_prioty_arry[44]=61
         endif
     endif
     if HeroD==null and NearestEnemyBubing!=null and isZhongLiEnemy(NearestEnemyBubing) then
@@ -3841,10 +3845,10 @@ function zs_attack_condition_fashi takes nothing returns nothing
     if  zs_mutong!=null then
         set zs_action_prioty_arry[47]=56
     endif
-    if TowerD!=null and GetHP(TowerD)<120 and MyHeroHP>500 and rangeToHeroD>700 and EnemyCount<4 then
+    if TowerD!=null and GetHP(TowerD)<120 and MyHeroHP>500 and rangeToHeroD>700 and AllyCount>0 and EnemyCount<3 then
         set zs_action_prioty_arry[42]=101
     endif
-    if TowerD!=null and GetHP(TowerD)<60 and rangeToHeroD>700 and EnemyCount<3 then
+    if TowerD!=null and GetHP(TowerD)<60 and rangeToHeroD>700 and AllyCount>0 and EnemyCount<3 then
         set zs_action_prioty_arry[42]=101
     endif
     if TowerW!=null and GetHP(TowerW)<160 and rangeToHeroD>700 and EnemyCount<3 then
