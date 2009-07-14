@@ -424,6 +424,16 @@ function initPlayNameArray takes nothing returns nothing
 	set zs_player_name_array[28]="菜叶"
 	set zs_player_name_array[29]="盯死你"
 	set zs_player_name_array[30]="最后的战役"
+	set zs_player_name_array[31]="天亮说晚安"
+	set zs_player_name_array[32]="春哥纯爷MAN"
+	set zs_player_name_array[33]="剑客の礼"
+	set zs_player_name_array[34]="不怕不怕"
+	set zs_player_name_array[35]="卧龙孔光"
+	set zs_player_name_array[36]="我非善类"
+	set zs_player_name_array[37]="豆豆丑丑"
+	set zs_player_name_array[38]="人贱人爱"
+	set zs_player_name_array[39]="淡蓝的风"
+	set zs_player_name_array[40]="7-dan"
 endfunction
 
 function setAIPlayerName takes player indexPlayer returns nothing
@@ -440,7 +450,7 @@ function setAIPlayerName takes player indexPlayer returns nothing
     // endif
 	loop
 		exitwhen aistr != ""		
-		set index = GetRandomInt(0,30)
+		set index = GetRandomInt(0,40)
 		set aistr = zs_player_name_array[index]
 		set zs_player_name_array[index] = ""
 	endloop    
