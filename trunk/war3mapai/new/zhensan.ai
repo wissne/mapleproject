@@ -2505,8 +2505,6 @@ function sima_cast_fe takes unit TheTarget returns boolean
     set loc=GetUnitLoc(TheTarget)
     call  sima_cast_f(loc)
     call RemoveLocation(loc)
-	call HeroAttack(TheTarget)
-	call Sleep(0.8)
     call  sima_cast_e(TheTarget)
     set loc=null
     return true
