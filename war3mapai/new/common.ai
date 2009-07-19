@@ -1314,7 +1314,7 @@ function IsEntangled takes unit TheUnit returns boolean
     return(GetUnitAbilityLevel(TheUnit,'BEer')>0 )
 endfunction
 function IsJuFeng takes unit TheUnit returns boolean
-    return(GetUnitAbilityLevel(TheUnit,'Bcy2')>0  or GetUnitAbilityLevel(TheUnit,'Bcyc')>0)
+    return(GetUnitAbilityLevel(TheUnit,'Bcy2')>0)
 endfunction
 
 function IsBianXing takes unit TheUnit returns boolean
