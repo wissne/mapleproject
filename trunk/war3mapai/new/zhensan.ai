@@ -4372,36 +4372,36 @@ function sima_spell_condition takes nothing returns nothing
     if HeroD!=null then
         set index=getSpellOffDamageIndex()
         
-		if MyHeroMP > 300 and can_sima_cast_e() and rangeToTowerD > 1100 and rangeToHeroD < 700 then
+		if MyHeroMP > 300 and can_sima_cast_e() and rangeToTowerD > 1100 and rangeToHeroD < 700 and (not IsJuFeng(HeroD)) then
 			set zs_action_prioty_arry[50] = 56	// E磨血
 		endif
-		if MyHeroMP > 500 and can_sima_cast_ef() and rangeToTowerD > 1100 and rangeToHeroD < 700 then
+		if MyHeroMP > 500 and can_sima_cast_ef() and rangeToTowerD > 1100 and rangeToHeroD < 700 and (not IsJuFeng(HeroD)) then
 			set zs_action_prioty_arry[52] = 59  // EF磨血
 		endif
-        if can_UseBianXing(mHero) and can_sima_cast_ef() then
+        if can_UseBianXing(mHero) and can_sima_cast_ef() and (not IsJuFeng(HeroD)) then
             set zs_action_prioty_arry[58]=60 // 变EF磨血
         endif	
-		if can_sima_cast_e() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 then
+		if can_sima_cast_e() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 and (not IsJuFeng(HeroD)) then
 			set zs_action_prioty_arry[50] = 60	// 有兵E
 		endif		
-		if can_sima_cast_ef() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 then
+		if can_sima_cast_ef() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 and (not IsJuFeng(HeroD)) then
 			set zs_action_prioty_arry[52] = 61  // 有兵EF
 		endif	
 		
-		if can_sima_cast_e() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+		if can_sima_cast_e() and rangeToHeroD < 700 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[50] = 62 // E助攻
 		endif
-		if can_sima_cast_f() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+		if can_sima_cast_f() and rangeToHeroD < 700 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[51] = 63 // F助攻
 		endif		
-		if can_sima_cast_ef() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+		if can_sima_cast_ef() and rangeToHeroD < 700 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[52] = 64 // EF助攻
 		endif		
-		if can_sima_cast_n_ef() and rangeToHeroD < 800 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+		if can_sima_cast_n_ef() and rangeToHeroD < 800 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[55] = 65 // NEF助攻
 		endif	
 
-		if MyHeroHP < 200 and (can_sima_cast_e() or can_UseFeiXie(mHero) or can_UseFengZhang(mHero) or can_UseBianXing(mHero)) and rangeToHeroD < 700 then
+		if MyHeroHP < 200 and (not IsJuFeng(HeroD)) and (can_sima_cast_e() or can_UseFeiXie(mHero) or can_UseFengZhang(mHero) or can_UseBianXing(mHero)) and rangeToHeroD < 700 then
 			set zs_action_prioty_arry[57] = 98 // E逃跑
 		endif		
         
@@ -4411,7 +4411,7 @@ function sima_spell_condition takes nothing returns nothing
 			endif
 		endif
 		
-        if  index>=0 and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and rangeToHeroD < 700 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
+        if  index>=0 and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and rangeToHeroD < 700 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
             set zs_kickoff=true
             set zs_action_prioty_arry[50+index]=99
             call debugstr("find")				// 必杀
@@ -4571,30 +4571,30 @@ function zhuge_spell_condition takes nothing returns nothing
         set index=getSpellOffDamageIndex()
         //call debugstr("zhuge-spell-index:"+ITS(index))
         
-		if can_zhuge_cast_g()  and MyHeroMP>300 and rangeToTowerD>1100  and rangeToHeroD<700  then
+		if can_zhuge_cast_g()  and MyHeroMP>300 and rangeToTowerD>1100  and rangeToHeroD<700  and (not IsJuFeng(HeroD)) then
             set zs_action_prioty_arry[50]=56 // G 磨血
         endif        
-        if can_zhuge_cast_g() and can_zhuge_cast_e() and MyHeroMP>500 and rangeToTowerD>1100  and rangeToHeroD<700  then
+        if can_zhuge_cast_g() and can_zhuge_cast_e() and MyHeroMP>500 and rangeToTowerD>1100  and rangeToHeroD<700 and (not IsJuFeng(HeroD)) then
             set zs_action_prioty_arry[51]=59 // GE 磨血
         endif
-        if can_UseBianXing(mHero) and (can_zhuge_cast_eg() or can_zhuge_cast_g() or can_zhuge_cast_e()) then
+        if can_UseBianXing(mHero) and (can_zhuge_cast_eg() or can_zhuge_cast_g() or can_zhuge_cast_e()) and (not IsJuFeng(HeroD)) then
             set zs_action_prioty_arry[61]=60 // 变E
         endif
-        if EnemyHeroHP<300 and  can_zhuge_cast_e() then
+        if EnemyHeroHP<300 and  can_zhuge_cast_e() and (not IsJuFeng(HeroD)) then
             set zs_action_prioty_arry[57]=61 // E
         endif
-		if can_zhuge_cast_e() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 then
+		if can_zhuge_cast_e() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 and (not IsJuFeng(HeroD)) then
 			set zs_action_prioty_arry[57] = 60	// 有兵E
 		endif	
 		
-		if can_zhuge_cast_e() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+		if can_zhuge_cast_e() and rangeToHeroD < 700 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[57] = 62 // E助攻
 		endif
-		if can_zhuge_cast_g() and rangeToHeroD < 700 and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+		if can_zhuge_cast_g() and rangeToHeroD < 700 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[50] = 63 // F助攻
 		endif	
 		
-		if EnemyHeroHP<800 and  can_zhuge_cast_e()  and  can_zhuge_cast_x() and rangeToTowerD>1100  and rangeToHeroD<700 then
+		if EnemyHeroHP<800 and  can_zhuge_cast_e()  and (not IsJuFeng(HeroD)) and  can_zhuge_cast_x() and rangeToTowerD>1100  and rangeToHeroD<700 then
 			set zs_action_prioty_arry[60]=59 // EX
 		endif
 		if NearestEnemyBubing!=null and EnemyCount>2 and can_zhuge_cast_g() and mHeroLevel>7 then
@@ -4602,14 +4602,14 @@ function zhuge_spell_condition takes nothing returns nothing
 				set zs_action_prioty_arry[58]=60 // G 清兵
 			endif
 		endif
-        if can_UseBianXing(mHero)  and can_zhuge_cast_e() and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and rangeToHeroD < 700 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
+        if can_UseBianXing(mHero)  and can_zhuge_cast_e() and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and rangeToHeroD < 700 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
             set zs_action_prioty_arry[61]=60 // 变E
         endif 
-		if MyHeroHP < 200 and (can_zhuge_cast_e() or can_UseFeiXie(mHero) or can_UseFengZhang(mHero) or can_UseBianXing(mHero)) and rangeToHeroD < 700 then
+		if MyHeroHP < 200 and (not IsJuFeng(HeroD)) and (can_zhuge_cast_e() or can_UseFeiXie(mHero) or can_UseFengZhang(mHero) or can_UseBianXing(mHero)) and rangeToHeroD < 700 then
 			set zs_action_prioty_arry[62] = 98 // E逃跑
 		endif		
 		
-        if  index>=0 and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and rangeToHeroD < 700 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
+        if  index>=0 and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and rangeToHeroD < 700 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
             set zs_kickoff =true           
             set zs_action_prioty_arry[50+index]=99
             call debugstr("find============================")
