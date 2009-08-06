@@ -1979,8 +1979,8 @@ function zs_buyItems_Action_fashi takes nothing returns nothing
         call buyDueNumberOfItem('n00R','I01R',4)    //?
     endif
     call zs_buyxie()
-    call zs_buyHong(4)
-    call zs_buyLan(2)
+    call zs_buyHong(3)
+    call zs_buyLan(3)
     if GetNumberOfItemByID(mHero,'sneg')>0 or GetNumberOfItemByID(mHero,'ssan')>0  then
         call zs_buyLilianghuwan(2)
     endif
@@ -3662,11 +3662,6 @@ function zs_move_condition takes nothing returns nothing
     if IsLowLife(mHero) and GetNumberOfItemByID(mHero,'hslv')<1  and not IsRestoreHP(mHero)  then
         set zs_action_prioty_arry[6]= 95
     endif
-	
-	if IsLowLife(mHero) and HeroD != null then
-		set zs_action_prioty_arry[6]= 95
-	endif
-    
     
     if MyHeroHP<300 and GetNumberOfItemByID(mHero,'hslv')<1 and not IsRestoreHP(mHero) then
         set zs_action_prioty_arry[6]=93
