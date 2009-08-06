@@ -3818,7 +3818,7 @@ function zs_move_action takes integer index returns nothing
         call gotoLocation(mHero,loc,50)
         call RemoveLocation(loc)
         set loc=null
-        call Sleep(1.3)
+        call Sleep(0.3)
     endif
     if index==18 then
         if can_UseFeiXie(mHero) then
@@ -3828,7 +3828,7 @@ function zs_move_action takes integer index returns nothing
         call gotoLocation(mHero,loc,50)
         call RemoveLocation(loc)
         set loc=null
-        call Sleep(2.0)
+        call Sleep(0.3)
     endif
     
     //return
@@ -4442,7 +4442,7 @@ function sima_spell_condition takes nothing returns nothing
 			endif
 		endif
 		
-        if  index>=0 and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and rangeToHeroD < 700 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
+        if  index>=0 and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
             set zs_kickoff=true
             set zs_action_prioty_arry[50+index]=99
             call debugstr("find")				// 必杀
@@ -4624,11 +4624,11 @@ function zhuge_spell_condition takes nothing returns nothing
 		if can_zhuge_cast_g() and rangeToHeroD < 700 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[50] = 63 // G助攻
 		endif
-		if can_zhuge_cast_g() and rangeToHeroD < 700 and EnemyHeroCount > 2 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+		if can_zhuge_cast_x_move_g() and rangeToHeroD < 700 and EnemyHeroCount > 2 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[56] = 67 // X助攻
 		endif	
 		if can_zhuge_cast_fei_e_x_g() and rangeToHeroD < 1500 and EnemyHeroCount > 2 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
-			set zs_action_prioty_arry[53] = 68 // EXG助攻
+			set zs_action_prioty_arry[53] = 68 // Fei EXG助攻
 		endif				
 		if can_zhuge_cast_x_move_g() and rangeToHeroD < 700 and EnemyHeroCount > 2 and AllyHeroCount > 1 and AllyCount > 1 and EnemyCount > 1 then
 			set zs_action_prioty_arry[56] = 66 // X清英雄
@@ -4649,7 +4649,7 @@ function zhuge_spell_condition takes nothing returns nothing
 			set zs_action_prioty_arry[62] = 98 // E逃跑
 		endif		
 		
-        if  index>=0 and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and rangeToHeroD < 700 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
+        if  index>=0 and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
             set zs_kickoff =true           
             set zs_action_prioty_arry[50+index]=99
             call debugstr("find============================")
