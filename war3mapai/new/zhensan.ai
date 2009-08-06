@@ -3677,7 +3677,7 @@ function zs_move_condition takes nothing returns nothing
         set zs_action_prioty_arry[6]=82
     endif
     if rangeToTowerD<900 and HeroD!=null then
-        set zs_action_prioty_arry[8]=100
+        set zs_action_prioty_arry[8]=60
     endif
 	if (EnemyHeroCount - AllyHeroCount) > 1 then
 		set zs_action_prioty_arry[7]=92
