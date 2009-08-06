@@ -5769,10 +5769,10 @@ function main takes nothing returns nothing
     call TriggerRegisterUnitEvent(gg_trg_WEI_Barn_Die,gg_unit_hars_0045,EVENT_UNIT_DEATH)
     call TriggerAddAction(gg_trg_WEI_Barn_Die,function Trig_WEI_Barn_Die_Actions)
     set gg_trg_SU_Add_Gold=CreateTrigger()
-    call TriggerRegisterTimerEventPeriodic(gg_trg_SU_Add_Gold,12.00)
+    call TriggerRegisterTimerEventPeriodic(gg_trg_SU_Add_Gold,6.00)	//加速发钱
     call TriggerAddAction(gg_trg_SU_Add_Gold,function Trig_SU_Add_Gold_Actions)
     set gg_trg_WEI_Add_Gold=CreateTrigger()
-    call TriggerRegisterTimerEventPeriodic(gg_trg_WEI_Add_Gold,12.00)
+    call TriggerRegisterTimerEventPeriodic(gg_trg_WEI_Add_Gold,6.00) //加速发钱
     call TriggerAddAction(gg_trg_WEI_Add_Gold,function Trig_WEI_Add_Gold_Actions)
     set gg_trg_Killed_unit_get_tree=CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(gg_trg_Killed_unit_get_tree,EVENT_PLAYER_UNIT_DEATH)
