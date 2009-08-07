@@ -269,6 +269,7 @@ globals
     real zs_nearestAllyBingMinHp=999999
     real zs_nearestEnemyBingMinHp=999999
     real zs_nearestEnemyHeroMinRange=999999
+	real zs_nearestAllyHeroMinRange=999999
     real zs_nearestEnemyTowerMinRange=999999
     real zs_nearestAllyTowerMinRange=999999
     real zs_nearestEnemyBingMinRange=999999
