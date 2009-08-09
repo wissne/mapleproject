@@ -4463,7 +4463,7 @@ function sima_spell_condition takes nothing returns nothing
 			endif
 		endif		
 		
-        if  index>=0 and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
+        if (not isZhugeCastingX(HeroY)) and index>=0 and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
             set zs_kickoff=true
             set zs_action_prioty_arry[50+index]=99
             //call debugstr("必杀")				// 必杀
@@ -4696,7 +4696,7 @@ function zhuge_spell_condition takes nothing returns nothing
 			//call debugstr("E逃跑")
 		endif		
 		
-        if  index>=0 and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
+        if (not isZhugeCastingX(HeroY)) and index>=0 and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
             set zs_kickoff =true           
             set zs_action_prioty_arry[50+index]=99
             //call debugstr("必杀")
