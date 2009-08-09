@@ -603,16 +603,16 @@ function giveAIGolds takes nothing returns nothing
             set indexRace=GetPlayerRace(indexPlayer)
             if(GetPlayerController(indexPlayer)==MAP_CONTROL_COMPUTER)then
 				if GetAIDifficulty(indexPlayer)==AI_DIFFICULTY_NEWBIE then
-                    call GivePlayerGold(indexPlayer,100)
+                    call GivePlayerGold(indexPlayer,200)
                     call SetPlayerWood(indexPlayer,GetPlayerWood(indexPlayer)+5)
 				endif
                 if GetAIDifficulty(indexPlayer)==AI_DIFFICULTY_NORMAL then
-                    call GivePlayerGold(indexPlayer,200)
+                    call GivePlayerGold(indexPlayer,300)
                     call SetPlayerWood(indexPlayer,GetPlayerWood(indexPlayer)+5)
                     //call DisplayToAll("给普通电脑玩家"+I2S(index)+" 增加 200 个金币,5个木") //delete by maple
                 endif
                 if GetAIDifficulty(indexPlayer)==AI_DIFFICULTY_INSANE then
-                    call GivePlayerGold(indexPlayer,250)
+                    call GivePlayerGold(indexPlayer,450)
                     call SetPlayerWood(indexPlayer,GetPlayerWood(indexPlayer)+10)
                     //call DisplayToAll("给疯狂电脑玩家"+I2S(index)+" 增加 250 个金币,10个木") //delete by maple
                 endif
