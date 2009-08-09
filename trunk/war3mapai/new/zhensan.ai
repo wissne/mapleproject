@@ -3707,7 +3707,7 @@ function zs_move_condition takes nothing returns nothing
     endif
     
     //   call debugstr(ITS(EnemyCount))
-    if EnemyCount==0 and mHeroLevel<7 then
+    if EnemyCount==0 then
         
         if (zs_dubingZhonglu or(FarestAllyBubingFromRetreatLoc!=null and RangeToLoc(FarestAllyBubingFromRetreatLoc,mBaseLoc)-RangeToLoc(mHero,mBaseLoc)<1600)) and zs_cr_fightline==1  then
             set zs_action_prioty_arry[11]=33
@@ -4432,7 +4432,7 @@ function sima_spell_condition takes nothing returns nothing
 			set zs_action_prioty_arry[52] = 64 // EF助攻
 			//call debugstr("EF助攻")
 		endif		
-		if can_sima_cast_n_ef() and rangeToHeroD < 800 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
+		if can_sima_cast_n_ef() and EnemyHeroCount > 2 and rangeToHeroD < 800 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[55] = 65 // NEF助攻
 			//call debugstr("NEF助攻")
 		endif	
