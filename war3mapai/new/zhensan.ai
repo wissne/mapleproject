@@ -3696,15 +3696,15 @@ function zs_move_condition takes nothing returns nothing
 	if AllyCount<2 and EnemyCount>2 and HeroD!=null and rangeToHeroD<900 then
         set zs_action_prioty_arry[7]=92
     endif
+	if EnemyHeroCount-AllyHeroCount >= 2 then
+		set zs_action_prioty_arry[7]=95
+	endif	
     if (IsRestoreHP(mHero) or IsRestoreMP(mHero)) and ((HeroD!=null and rangeToHeroD<800) or rangeToTowerD<900 or RangeTo(mHero,NearestEnemyBubing)<360) then
         set zs_action_prioty_arry[9]=52
     endif
     if (IsRestoreHP(mHero) or IsRestoreMP(mHero)) and AllyCount==0 then
         set zs_action_prioty_arry[9]=62
     endif
-	if EnemyHeroCount-AllyHeroCount >= 2 then
-		set zs_action_prioty_arry[9]=95
-	endif
     
     //   call debugstr(ITS(EnemyCount))
     if EnemyCount==0 and mHeroLevel<7 then
@@ -3766,7 +3766,7 @@ function zs_move_action takes integer index returns nothing
     endif
     if index==7 then
         
-        call HeroRetreat(750)
+        call HeroRetreat(950)
         // call debugstr("HeroRetreat ")
     endif    
     if index==8 then
@@ -4474,14 +4474,14 @@ function sima_spell_condition takes nothing returns nothing
     
     if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>=2 and AllyCount>=1 and can_sima_cast_ef() and mHeroLevel>6 then
         if MyHeroMP>400 or IsManaAlmostFull(mHero) then
-            set zs_action_prioty_arry[59]=65	// FE清兵
-			//call debugstr("FE清兵")
+            set zs_action_prioty_arry[59]=95	// FE清兵
+			call debugstr("无敌FE清兵")
         endif
     endif
     if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>=2 and AllyCount==0 and can_sima_cast_ef() and mHeroLevel>6 then
         if MyHeroMP>400 or IsManaAlmostFull(mHero) then
-            set zs_action_prioty_arry[62]=66	// EF清兵
-			//call debugstr("EF清兵")
+            set zs_action_prioty_arry[62]=95	// EF清兵
+			call debugstr("无敌EF清兵")
         endif
     endif    
     
@@ -4706,14 +4706,14 @@ function zhuge_spell_condition takes nothing returns nothing
     
     if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>=2 and can_zhuge_cast_g() then
         if MyHeroMP>300 or IsManaAlmostFull(mHero) then
-            set zs_action_prioty_arry[58]=58 // G 清兵
+            set zs_action_prioty_arry[58]=95 // G 清兵
 			//call debugstr("无敌G清兵")
         endif
     endif
 	
     if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>=2 and can_zhuge_cast_g() and can_zhuge_cast_e() and mHeroLevel>7 then
         if MyHeroMP>600 or IsManaAlmostFull(mHero) then
-            set zs_action_prioty_arry[59]=59 // GE 清兵
+            set zs_action_prioty_arry[59]=96 // GE 清兵
 			//call debugstr("无敌GE清兵")
         endif
     endif	
