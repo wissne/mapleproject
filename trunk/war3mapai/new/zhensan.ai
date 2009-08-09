@@ -299,7 +299,7 @@ function getUnitByid takes integer iunitid,location loc,real radius returns unit
     call DestroyGroup(g)
     set g = null
     if(ru==null) then
-        call debugstr("unit not found")
+        // call debugstr("unit not found")
     endif
     //     call Sleep(0.1)
     return ru
@@ -633,7 +633,7 @@ function GetNearestEnemyAttackerNearHeroFromBase takes unit TheUnit,real Radius,
     local unit ru = null
     local group g = CreateGroup()
     if(TheUnit==null)or(not IsAlive(TheUnit))then
-        call debugstr("GetNearestEnemyAttackerNearHeroFromBase unit null")
+        //call debugstr("GetNearestEnemyAttackerNearHeroFromBase unit null")
         return null
     endif
     set Loc=GetUnitLoc(TheUnit)
@@ -761,7 +761,7 @@ function getFireMiddleLineLoc takes nothing returns location
     set unit2=GetNearestEnemyFromBaseInMiddleLine()
     
     if unit1==null or unit2==null then
-        call debugstr("getFireMiddleLineLoc--unit-null")
+        //call debugstr("getFireMiddleLineLoc--unit-null")
         return null
     endif
     //call debugUnit(unit1,1)
@@ -780,7 +780,7 @@ function GetNearestTowerAttackerNearHeroFromBase takes unit TheUnit,real Radius,
     local unit ru = null
     local group g = CreateGroup()
     if(TheUnit==null)or(not IsAlive(TheUnit))then
-        call debugstr("GetNearestEnemyAttackerNearHeroFromBase unit null")
+        //call debugstr("GetNearestEnemyAttackerNearHeroFromBase unit null")
         return null
     endif
     set Loc=GetUnitLoc(TheUnit)
@@ -921,7 +921,7 @@ function GetEnemyNearestBubingNearHero takes unit TheUnit,real Radius,boolean in
     local unit ru = null
     local group g = CreateGroup()
     if(TheUnit==null)or(not IsAlive(TheUnit))then
-        call debugstr(" unit null")
+        //call debugstr(" unit null")
         return null
     endif
     set Loc=GetUnitLoc(TheUnit)
@@ -960,7 +960,7 @@ function GetEnemyWeakestBubingNearHero takes unit TheUnit,real Radius,boolean in
     local unit ru = null
     local group g = CreateGroup()
     if(TheUnit==null)or(not IsAlive(TheUnit))then
-        call debugstr(" unit null")
+        //call debugstr(" unit null")
         return null
     endif
     set Loc=GetUnitLoc(TheUnit)
@@ -1022,7 +1022,7 @@ function GetAllyBuDaoBubingNearHero takes unit TheUnit,real Radius,boolean inclu
     local unit ru = null
     local group g = CreateGroup()
     if(TheUnit==null)or(not IsAlive(TheUnit))then
-        call debugstr(" unit null")
+        //call debugstr(" unit null")
         return null
     endif
     set Loc=GetUnitLoc(TheUnit)
@@ -1463,7 +1463,7 @@ function sellLowPrice takes nothing returns nothing
     if (not sellItemById('n00R','I01R')) or (not  sellItemById('n00R','pclr')) then
         if (not sellItemById('n00R','I004')) then
             if (not sellItemById('n00R','hslv')) then
-                call debugstr("no --slot--empty")
+                //call debugstr("no --slot--empty")
             endif
         endif
     endif
@@ -1498,11 +1498,11 @@ function can_buy_liliang takes integer num returns boolean
         if GetSlotsFreeOnUnit(mHero)<1 then
             if  GetNumberOfItemByID(mHero,'I01R')>0 or  GetNumberOfItemByID(mHero,'pclr')>0  then
                 return true
-                call debugstr("can-buy- liliang")
+                //call debugstr("can-buy- liliang")
             endif
         endif
         if GetSlotsFreeOnUnit(mHero)>0 then
-            call debugstr("can-buy- liliang")
+            //call debugstr("can-buy- liliang")
             return true
         endif
     endif
@@ -1534,13 +1534,13 @@ function can_BuyItems_fashi takes nothing returns boolean
     //hp
     if mGold>=55 and GetItemChargesById(mHero,'hslv')<4  then
         set rb=true
-        call debugstr("can-buy- hp")
+        //call debugstr("can-buy- hp")
     endif
     
     //mp
     if mGold>=45 and GetNumberOfItemByID(mHero,'I01S')<1 and GetItemChargesById(mHero,'sneg')<1  and GetNumberOfItemByID(mHero,'ssan')<1  and GetItemChargesById(mHero,'pclr')<3 then
         set rb=true
-        call debugstr("can-buy- mp")
+        //call debugstr("can-buy- mp")
         
     endif
     
@@ -1549,11 +1549,11 @@ function can_BuyItems_fashi takes nothing returns boolean
         if GetSlotsFreeOnUnit(mHero)<1 then
             if  GetNumberOfItemByID(mHero,'I01R')>0 or  GetNumberOfItemByID(mHero,'pclr')>0  then
                 set rb=true
-                call debugstr("can-buy- liliang")
+                //call debugstr("can-buy- liliang")
             endif
         endif
         if GetSlotsFreeOnUnit(mHero)>0 then
-            call debugstr("can-buy- liliang")
+            //call debugstr("can-buy- liliang")
             set rb=true
         endif
         
@@ -1564,27 +1564,27 @@ function can_BuyItems_fashi takes nothing returns boolean
     //?
     if mGold>=1050 and GetNumberOfItemByID(mHero,'wneg')<1 and GetNumberOfItemByID(mHero,'sneg')<1  and GetNumberOfItemByID(mHero,'ssan')<1 then
         set rb=true
-        call debugstr("can-buy- fujue")
+        //call debugstr("can-buy- fujue")
         
     endif
     
     //??
     if mGold>=950 and GetNumberOfItemByID(mHero,'I01S')<1 and GetNumberOfItemByID(mHero,'sneg')<1  and GetNumberOfItemByID(mHero,'ssan')<1 then
         set rb=true
-        call debugstr("can-buy- huodan")
+        //call debugstr("can-buy- huodan")
         
     endif
     
     //
     if mGold>=450 and GetNumberOfItemByID(mHero,'I01S')>0 and GetNumberOfItemByID(mHero,'wneg')>0 then
-        call debugstr("can-buy- fengzhang")
+        //call debugstr("can-buy- fengzhang")
         
         set rb=true
         
     endif
     //Ь
     if mGold>=2350 and GetNumberOfItemByID(mHero,'bspd')>0 and GetNumberOfItemByID(mHero,'desc')<1 then
-        call debugstr("can-buy- feixie")
+        //call debugstr("can-buy- feixie")
         
         set rb=true
         
@@ -1593,20 +1593,20 @@ function can_BuyItems_fashi takes nothing returns boolean
     //?
     if mGold>=1100 and GetNumberOfItemByID(mHero,'I00F')<1 and GetNumberOfItemByID(mHero,'sneg')>0  and GetNumberOfItemByID(mHero,'ssan')<1 then
         set rb=true
-        call debugstr("can-buy- zhuanshi")
+        //call debugstr("can-buy- zhuanshi")
         
     endif
     
     //?
     if mGold>=950 and GetNumberOfItemByID(mHero,'I01S')<1 and GetNumberOfItemByID(mHero,'I00F')>0 and GetNumberOfItemByID(mHero,'sneg')>0  and GetNumberOfItemByID(mHero,'ssan')<1 then
         set rb=true
-        call debugstr("can-buy- huodan2")
+        //call debugstr("can-buy- huodan2")
         
     endif
     
     //
     if mGold>=900 and GetNumberOfItemByID(mHero,'I01S')>0 and GetNumberOfItemByID(mHero,'I00F')>0 and GetNumberOfItemByID(mHero,'sneg')>0 then
-        call debugstr("can-buy- bianyang")
+        //call debugstr("can-buy- bianyang")
         
         set rb=true
     endif
@@ -1614,18 +1614,18 @@ function can_BuyItems_fashi takes nothing returns boolean
     //??
     if mGold>=1700 and GetNumberOfItemByID(mHero,'I00U')<1 and GetNumberOfItemByID(mHero,'I010')<1 then
         set rb=true
-        call debugstr("can-buy- 1700")
+        //call debugstr("can-buy- 1700")
         
     endif
     
     if mGold>=3200 and GetNumberOfItemByID(mHero,'I001')<1 and GetNumberOfItemByID(mHero,'I010')<1 then
         set rb=true
-        call debugstr("can-buy- 3200")
+        //call debugstr("can-buy- 3200")
         
     endif
     
     if mGold>=1350 and GetNumberOfItemByID(mHero,'I001')>0 and GetNumberOfItemByID(mHero,'I00U')>0 then
-        call debugstr("can-buy- 1350")
+        //call debugstr("can-buy- 1350")
         
         set rb=true
     endif
@@ -1826,7 +1826,7 @@ function zs_buyFengzhangshu takes nothing returns nothing
     
     if mGold>=450 and GetNumberOfItemByID(mHero,'I01S')>0 and GetNumberOfItemByID(mHero,'wneg')>0 then
         set zs_buyitemtmpshop= getUnitByid('n014',mBaseLoc,8888)
-        call debugstr("feng--zhang--fengzhangkaishi")
+        //call debugstr("feng--zhang--fengzhangkaishi")
         
         call UnitDropItemSlot(mHero,GetItemByID(mHero,'wneg'),0)
         call UnitDropItemSlot(mHero,GetItemByID(mHero,'I01S'),1)
@@ -1834,7 +1834,7 @@ function zs_buyFengzhangshu takes nothing returns nothing
         call dropAllItems(zs_buyitemtmpshop)
         call buyDueNumberOfItem('n014','glsk',1)
         call PickAllItems()
-        call debugstr("feng--zhang--jieshu")
+        //call debugstr("feng--zhang--jieshu")
         
     endif
     
@@ -1844,7 +1844,7 @@ function zs_buyfeixieshu takes nothing returns nothing
     set mGold=GetPlayerGold(ai_player)
     
     if mGold>=2350 and GetNumberOfItemByID(mHero,'bspd')>0 and GetNumberOfItemByID(mHero,'desc')<1 then
-        call debugstr("fei ---xie")
+        //call debugstr("fei ---xie")
         if GetSlotsFreeOnUnit(mHero)<1 then
             set zs_buyitemtmpshop= getUnitByid('n014',mBaseLoc,8888)
             call ariveUnit(mHero,zs_buyitemtmpshop,200)
@@ -2628,20 +2628,20 @@ endfunction
 function sima_cast_ef_feng_n_feng_fe takes unit Target returns nothing
     local location loc=null
     if Target==null then
-        call debugstr("sima_cast_ef_feng_n_feng_fe ??????????Target null")
+        //call debugstr("sima_cast_ef_feng_n_feng_fe ??????????Target null")
         return
     endif
     if (not can_sima_cast_ef_feng_n_feng_fe())  then
         return
     endif
-    call debugstr("sima_cast_ef_feng_n_feng_fe =========================================begin")
+    //call debugstr("sima_cast_ef_feng_n_feng_fe =========================================begin")
     set loc=GetLocBetweenTwoUnitsRangeToFirst(Target,mHero,900)
     //call debugLoc(loc,1)
     call sima_cast_ef(Target)
     //    call debugstr("ef-- ed")
     call Sleep(0.46)
     if UseFengZhang(Target) then
-        call debugstr("UseFengZhang-- ed")
+        //call debugstr("UseFengZhang-- ed")
         call gotoLocation(mHero,loc,20)
         call Sleep(2.2)
         call sima_cast_n(Target)
@@ -2776,7 +2776,7 @@ function zhuge_cast_fei_e_x_g takes unit Target returns nothing
         if  can_UseFeiXie(mHero) then
             call UseFeiXie(loc)
             
-            call  debugstr("fei xie ---used")
+            // call  debugstr("fei xie ---used")
             call  zhuge_cast_e(Target)
             call zhuge_cast_x(Target)
             call zhuge_cast_g(Target)
@@ -2784,7 +2784,7 @@ function zhuge_cast_fei_e_x_g takes unit Target returns nothing
             call Sleep(1)
             //     call Sleep(5)
             //else
-            call  debugstr("fei xie not ---nnnnnnnnnnnnnn---------used")
+            // call  debugstr("fei xie not ---nnnnnnnnnnnnnn---------used")
             call RemoveLocation(loc)
             set loc=null
             
@@ -2840,7 +2840,7 @@ function zhuge_cast_bian_e_x_g takes unit Target returns nothing
     if mHeroId== 'H008' then
         call UseBianXing(Target)
         //     if  UseFeiXie(loc) then
-        call  debugstr("fei xie ---used")
+        //call  debugstr("fei xie ---used")
         set loc=GetLocBetweenTwoUnitsRangeToFirst(Target,mHero,100)
         call gotoLocation(mHero,loc,10)
         call Sleep(1)
@@ -2857,7 +2857,7 @@ function zhuge_cast_bian_e_x_g takes unit Target returns nothing
         
         //     call Sleep(5)
         //else
-        call  debugstr("fei xie not ---nnnnnnnnnnnnnn---------used")
+        //call  debugstr("fei xie not ---nnnnnnnnnnnnnn---------used")
         
         //     endif
         call RemoveLocation(loc)
@@ -3620,11 +3620,11 @@ endfunction
 function zs_move_condition takes nothing returns nothing
     set zs_action_prioty_arry[4]=10
     
-    if EnemyCount>AllyCount+2 and AllyCount>1 then
-        set zs_action_prioty_arry[4]=40
+    if EnemyCount>AllyCount+2 and AllyCount<3 then
+        set zs_action_prioty_arry[4]=70
     endif
     if rangeToFireLine>300 and safeLoc!=null then
-        set zs_action_prioty_arry[4]=41
+        set zs_action_prioty_arry[4]=71
     endif
     
     if EnemyCount>AllyCount+3 then
@@ -3640,19 +3640,19 @@ function zs_move_condition takes nothing returns nothing
         set zs_action_prioty_arry[5]=89
     endif
     
-    if AllyCount==0 and EnemyCount>2 and MyHeroHP<300 then
+    if AllyCount==0 and EnemyCount>2 and MyHeroHP<600 then
         set zs_action_prioty_arry[5]=58
     endif
     if TowerD!=null then
-        if rangeToTowerD<1100 and MyHeroHP<400 and (FarestAllyBubing==null or RangeTo(FarestAllyBubing,TowerD)> 500) then
+        if rangeToTowerD<1100 and (FarestAllyBubing==null or RangeTo(FarestAllyBubing,TowerD)> 500) then
             set zs_action_prioty_arry[5]=61
         endif
     endif
-    if MyHeroHP<300 and rangeToTowerD<900   then
+    if MyHeroHP<400 and rangeToTowerD<900   then
         set zs_action_prioty_arry[5]=55
     endif
     
-    if MyHeroHP<300  and HeroD!=null and EnemyHeroMP>350 and EnemyHeroLevel>5 then
+    if MyHeroHP<500  and HeroD!=null and EnemyHeroMP>350 and EnemyHeroLevel>5 then
         set zs_action_prioty_arry[5]=46
     endif
     if IsLowLife(mHero)  and HeroD!=null then
@@ -3662,6 +3662,11 @@ function zs_move_condition takes nothing returns nothing
     if IsLowLife(mHero) and GetNumberOfItemByID(mHero,'hslv')<1  and not IsRestoreHP(mHero)  then
         set zs_action_prioty_arry[6]= 95
     endif
+    
+	if IsLowLife(mHero) and HeroD != null then
+		set zs_action_prioty_arry[6]= 95
+	endif
+    
     
     if MyHeroHP<300 and GetNumberOfItemByID(mHero,'hslv')<1 and not IsRestoreHP(mHero) then
         set zs_action_prioty_arry[6]=93
@@ -3702,7 +3707,7 @@ function zs_move_condition takes nothing returns nothing
 	endif
     
     //   call debugstr(ITS(EnemyCount))
-    if EnemyCount==0 then
+    if EnemyCount==0 and mHeroLevel<7 then
         
         if (zs_dubingZhonglu or(FarestAllyBubingFromRetreatLoc!=null and RangeToLoc(FarestAllyBubingFromRetreatLoc,mBaseLoc)-RangeToLoc(mHero,mBaseLoc)<1600)) and zs_cr_fightline==1  then
             set zs_action_prioty_arry[11]=33
@@ -3850,7 +3855,7 @@ function zs_attack_condition_fashi takes nothing returns nothing
             set zs_action_prioty_arry[41]=55
         endif
         if IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD) then
-            set zs_action_prioty_arry[43]=62
+            set zs_action_prioty_arry[43]=56
         endif
         
     endif
@@ -3900,7 +3905,7 @@ function zs_attack_action_fashi takes integer index returns nothing
         call Sleep(0.8)
     endif
     if index==42 then
-        call debugstr("HeroAttack --TowerD")
+        //call debugstr("HeroAttack --TowerD")
         call HeroAttack(TowerD)
         call Sleep(0.8)
     endif
@@ -4013,7 +4018,7 @@ function zs_attack_action_zhanshi takes integer index returns nothing
         call Sleep(0.8)
     endif
     if index==42 then
-        call debugstr("HeroAttack --TowerD")
+        //call debugstr("HeroAttack --TowerD")
         call HeroAttack(TowerD)
         call Sleep(0.8)
     endif
@@ -4412,46 +4417,56 @@ function sima_spell_condition takes nothing returns nothing
 		endif		
 		if can_sima_cast_ef() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 and (not IsJuFeng(HeroD)) then
 			set zs_action_prioty_arry[52] = 61  // 有兵EF
+			//call debugstr("有兵EF")
 		endif	
 		
 		if can_sima_cast_e() and rangeToHeroD < 700 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[50] = 62 // E助攻
+			//call debugstr("E助攻")
 		endif
 		if can_sima_cast_f() and rangeToHeroD < 700 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[51] = 63 // F助攻
+			//call debugstr("F助攻")
 		endif		
 		if can_sima_cast_ef() and rangeToHeroD < 700 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[52] = 64 // EF助攻
+			//call debugstr("EF助攻")
 		endif		
 		if can_sima_cast_n_ef() and rangeToHeroD < 800 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[55] = 65 // NEF助攻
+			//call debugstr("NEF助攻")
 		endif	
-		if can_sima_cast_n_ef() and rangeToHeroD < 950 and EnemyHeroCount >= 2 and AllyHeroCount >= 1 and AllyCount > 1 then
-			set zs_action_prioty_arry[55] = 66 // NEF清英雄
+		if can_sima_cast_n_ef() and rangeToHeroD < 900 and EnemyHeroCount > 2 and AllyHeroCount > 1 and AllyCount >= 1 then
+			set zs_action_prioty_arry[55] = 95 // NEF清英雄		
+			//call debugstr("NEF清英雄	")			
 		endif
-		
-		if ((EnemyCount-AllyCount>2) or (EnemyHeroCount-AllyHeroCount>1)) and (can_sima_cast_e() or can_UseFeiXie(mHero) or can_UseFengZhang(mHero) or can_UseBianXing(mHero)) and rangeToHeroD < 700 then
+		//call debugstr("sima: EnemyHeroCount:" + ITS(EnemyHeroCount) + " AllyHeroCount:" + ITS(AllyHeroCount) + " AllyCount:"+ ITS(AllyCount))
+		if ((EnemyCount-AllyCount>2) or (EnemyHeroCount-AllyHeroCount>1)) and can_sima_cast_e() and rangeToHeroD < 700 then
 			set zs_action_prioty_arry[57] = 98 // E逃跑
+			//call debugstr("E逃跑")
 		endif		
-		if MyHeroHP < 200 and (not IsJuFeng(HeroD)) and (can_sima_cast_e() or can_UseFeiXie(mHero) or can_UseFengZhang(mHero) or can_UseBianXing(mHero)) and rangeToHeroD < 700 then
+		if MyHeroHP < 200 and (not IsJuFeng(HeroD)) and can_sima_cast_e() and rangeToHeroD < 700 then
 			set zs_action_prioty_arry[57] = 98 // E逃跑
+			//call debugstr("E逃跑")
 		endif		
         
 		if NearestEnemyBubing!=null and EnemyCount>=2 and can_sima_cast_ef() and AllyCount>=1 and mHeroLevel>6 then
 			if MyHeroMP>500 or IsManaAlmostFull(mHero) then
 				set zs_action_prioty_arry[59]=65	// 7级以上FE清兵
+				//call debugstr("7级以上FE清兵")
 			endif
 		endif
 		if NearestEnemyBubing!=null and EnemyCount>=2 and can_sima_cast_ef() and AllyCount==0 and mHeroLevel>6 then
 			if MyHeroMP>500 or IsManaAlmostFull(mHero) then
 				set zs_action_prioty_arry[62]=66	// 7级以上EF清兵
+				//call debugstr("7级以上EF清兵")
 			endif
 		endif		
 		
         if  index>=0 and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
             set zs_kickoff=true
             set zs_action_prioty_arry[50+index]=99
-            call debugstr("find")				// 必杀
+            //call debugstr("必杀")				// 必杀
         endif
         
     endif
@@ -4460,19 +4475,23 @@ function sima_spell_condition takes nothing returns nothing
     if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>=2 and AllyCount>=1 and can_sima_cast_ef() and mHeroLevel>6 then
         if MyHeroMP>400 or IsManaAlmostFull(mHero) then
             set zs_action_prioty_arry[59]=65	// FE清兵
+			//call debugstr("FE清兵")
         endif
     endif
     if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>=2 and AllyCount==0 and can_sima_cast_ef() and mHeroLevel>6 then
         if MyHeroMP>400 or IsManaAlmostFull(mHero) then
             set zs_action_prioty_arry[62]=66	// EF清兵
+			//call debugstr("EF清兵")
         endif
     endif    
     
     if rangeToHeroD > 900 and TowerD!=null and GetHP(TowerD)<260 and MyHeroHP>200 and can_sima_cast_f() then
         set zs_action_prioty_arry[60]=102		// 抢塔
+		//call debugstr("抢塔")
     endif
-    if rangeToHeroD > 900 and (EnemyHeroCount-AllyHeroCount)<1 and TowerD!=null and GetHP(TowerD)>400 and MyHeroHP>600 and can_sima_cast_f() and AllyCount>1 and EnemyCount < 3 then
+    if rangeToHeroD > 900 and (EnemyHeroCount-AllyHeroCount)<1 and TowerD!=null and GetHP(TowerD)>400 and MyHeroHP>600 and can_sima_cast_f() and AllyCount>1 and EnemyCount < 3 and mHeroLevel>6 then
         set zs_action_prioty_arry[61]=101		// 磨塔
+		//call debugstr("磨塔")
     endif
     
     
@@ -4496,7 +4515,7 @@ function sima_spell_action takes integer index returns nothing
         call sima_cast_e(HeroD)
 		call HeroAttack(HeroD)
 		call Sleep(0.8)
-        call debugstr("sima_cast_e ")	
+        //call debugstr("sima_cast_e ")	
     endif
     
     if index==51 then
@@ -4509,7 +4528,7 @@ function sima_spell_action takes integer index returns nothing
             endif
         endif
         call sima_cast_fu(HeroD)
-        call debugstr("sima_cast_f ")
+        //call debugstr("sima_cast_f ")
     endif
     
     if index==52 then
@@ -4524,7 +4543,7 @@ function sima_spell_action takes integer index returns nothing
                 endif
             endif
             call sima_cast_ef(HeroD)
-            call debugstr("sima_cast_ef ")
+            //call debugstr("sima_cast_ef ")
         endif
     endif
     
@@ -4532,7 +4551,7 @@ function sima_spell_action takes integer index returns nothing
         if  intoUnitRange(HeroD,700) then
             if can_sima_cast_feng_n_ef() then
                 call sima_cast_feng_n_ef(HeroD)
-                call debugstr("sima_cast_feng_n_ef ")
+                //call debugstr("sima_cast_feng_n_ef ")
             endif
         endif
     endif
@@ -4540,64 +4559,55 @@ function sima_spell_action takes integer index returns nothing
     if index==54 then
         if  intoUnitRange(HeroD,700) and can_sima_cast_bian_n_ef() then
             call sima_cast_bian_n_ef(HeroD)
-            call debugstr("sima_cast_bian_n_ef ")
+            //call debugstr("sima_cast_bian_n_ef ")
         endif
     endif
     
     
     if index==55 then
         if  intoUnitRange(HeroD,800) then
-            call debugstr("sima_cast_n_ef ")
+            //call debugstr("sima_cast_n_ef ")
             call sima_cast_n_ef(HeroD)
         endif
     endif
     
     if index==56 then
         if  intoUnitRange(HeroD,650) then
-            call debugstr("sima_cast_ef_feng_n_feng_fe ")
+            //call debugstr("sima_cast_ef_feng_n_feng_fe ")
             call sima_cast_ef_feng_n_feng_fe(HeroD)
         endif
     endif
 	
     if index==57 then
-		if can_UseFeiXie(mHero)  then
-			call UseFeiXie(zs_cr_retreatLoc)
-		else
-			if can_UseFengZhang(mHero) or can_UseBianXing(mHero) then
-				call UseFengZhang(HeroD)
-				call UseBianXing(HeroD)
-			else
-				call sima_cast_e(HeroD)
-			endif
-		endif        
+		call sima_cast_e(HeroD)    
 		call HeroRetreat(1200)
-        call debugstr("sima_cast_e ")	
+        //call debugstr("sima_cast_e_to_retrive ")	
     endif	
     if index==58 then
         if  intoUnitRange(HeroD,700) and can_sima_cast_bian_ef() then
             call sima_cast_bian_ef(HeroD)
-            call debugstr("sima_cast_bian_ef ")
+            //call debugstr("sima_cast_bian_ef ")
         endif
     endif    
     
     if index==59 and NearestEnemyBubing!=null then
-        call debugstr("fe--NearestEnemyBubing ")
+        //call debugstr("fe--NearestEnemyBubing ")
         if  intoUnitRange(NearestEnemyBubing,650) then
             call sima_cast_fe(NearestEnemyBubing)
         endif
     endif
     if index==60 then
-        call debugstr("sima---fire-----TowerD ")
+        //call debugstr("sima---fire-----TowerD ")
         
         call sima_cast_fu(TowerD)
     endif
     if index==61 then
-        call debugstr("sima---fire-----TowerD ")
+        //call debugstr("sima---fire-----TowerD ")
         call sima_cast_fu(TowerD)
     endif  
     
     if index==62 and NearestEnemyBubing!=null then
-        call debugstr("ef--NearestEnemyBubing ")
+        //call debugstr("ef--NearestEnemyBubing ")
         if  intoUnitRange(NearestEnemyBubing,650) then
             call sima_cast_ef(NearestEnemyBubing)
         endif
@@ -4622,72 +4632,89 @@ function zhuge_spell_condition takes nothing returns nothing
         
 		if can_zhuge_cast_g()  and MyHeroMP>300 and rangeToTowerD>1100  and rangeToHeroD<700  and (not IsJuFeng(HeroD)) then
             set zs_action_prioty_arry[50]=56 // G 磨血
+			//call debugstr("G 磨血")
         endif        
         if can_zhuge_cast_g() and can_zhuge_cast_e() and MyHeroMP>500 and rangeToTowerD>1100  and rangeToHeroD<700 and (not IsJuFeng(HeroD)) then
             set zs_action_prioty_arry[51]=59 // GE 磨血
+			//call debugstr("GE 磨血")
         endif
         if can_UseBianXing(mHero) and (can_zhuge_cast_eg() or can_zhuge_cast_g() or can_zhuge_cast_e()) and (not IsJuFeng(HeroD)) then
-            set zs_action_prioty_arry[61]=60 // 变E
+            set zs_action_prioty_arry[61]=62 // 变E
+			//call debugstr("变E")
         endif
         if EnemyHeroHP<300 and  can_zhuge_cast_e() and (not IsJuFeng(HeroD)) then
-            set zs_action_prioty_arry[57]=61 // E
+            set zs_action_prioty_arry[57]=64 // E
+			//call debugstr(" E")
         endif
 		if can_zhuge_cast_e() and rangeToHeroD < 700 and AllyCount > 2 and EnemyCount < 1 and (not IsJuFeng(HeroD)) then
 			set zs_action_prioty_arry[57] = 60	// 有兵E
+			//call debugstr("有兵E")
 		endif	
 		
 		if can_zhuge_cast_e() and rangeToHeroD < 700 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
-			set zs_action_prioty_arry[57] = 62 // E助攻
+			set zs_action_prioty_arry[57] = 63 // E助攻
+			//call debugstr("E助攻")
 		endif
 		if can_zhuge_cast_g() and rangeToHeroD < 700 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
-			set zs_action_prioty_arry[50] = 63 // G助攻
+			set zs_action_prioty_arry[50] = 62 // G助攻
+			//call debugstr("G助攻")
 		endif
 		if can_zhuge_cast_x_move_g() and rangeToHeroD < 700 and EnemyHeroCount > 2 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[56] = 67 // X助攻
+			//call debugstr("X助攻")
 		endif	
 		if can_zhuge_cast_fei_e_x_g() and rangeToHeroD < 1500 and EnemyHeroCount > 2 and (not IsJuFeng(HeroD)) and (IsBianXing(HeroD) or IsStunned(HeroD) or IsLocked(HeroD) or IsSlowed(HeroD) or IsSlowStriked(HeroD)) then
 			set zs_action_prioty_arry[53] = 68 // Fei EXG助攻
+			//call debugstr("Fei EXG助攻")
 		endif				
-		if can_zhuge_cast_x_move_g() and can_zhuge_cast_e() and rangeToHeroD < 700 and EnemyHeroCount >= 2 and AllyHeroCount >= 1 and AllyCount > 1 then
-			set zs_action_prioty_arry[60] = 68 // EXG清英雄
+		if can_zhuge_cast_x_move_g() and rangeToHeroD < 900 and EnemyHeroCount > 2 and AllyHeroCount > 1 and AllyCount >= 1 then
+			set zs_action_prioty_arry[60] = 95 // EXG清英雄
+			//call debugstr("EXG清英雄")
 		endif
-		
+		//call debugstr("zhuge:EnemyHeroCount:" + ITS(EnemyHeroCount) + " AllyHeroCount:" + ITS(AllyHeroCount) + " AllyCount:"+ ITS(AllyCount))
 		if EnemyHeroHP<800 and  can_zhuge_cast_e() and (not IsJuFeng(HeroD)) and  can_zhuge_cast_x() and rangeToTowerD>1100  and rangeToHeroD<700 then
 			set zs_action_prioty_arry[60]=59 // EXG
+			//call debugstr(" EXG")
 		endif
 		if NearestEnemyBubing!=null and EnemyCount>=2 and can_zhuge_cast_g() and mHeroLevel>7 then
 			if MyHeroMP>400 or IsManaAlmostFull(mHero) then
-				set zs_action_prioty_arry[58]=65 // G 清兵
+				set zs_action_prioty_arry[58]=55 // G 清兵
+				//call debugstr("G 清兵")
 			endif
 		endif
         if can_UseBianXing(mHero)  and can_zhuge_cast_e() and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and rangeToHeroD < 700 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
             set zs_action_prioty_arry[61]=60 // 变E
+			//call debugstr("变E")
         endif 
 
-		if ((EnemyCount-AllyCount>2) or (EnemyHeroCount-AllyHeroCount>1)) and (can_zhuge_cast_e() or can_UseFeiXie(mHero) or can_UseFengZhang(mHero) or can_UseBianXing(mHero)) and rangeToHeroD < 700 then
+		if ((EnemyCount-AllyCount>2) or (EnemyHeroCount-AllyHeroCount>1)) and can_zhuge_cast_e() and rangeToHeroD < 700 then
 			set zs_action_prioty_arry[62] = 98 // E逃跑
+			//call debugstr("E逃跑")
 		endif				
-		if MyHeroHP < 200 and (not IsJuFeng(HeroD)) and (can_zhuge_cast_e() or can_UseFeiXie(mHero) or can_UseFengZhang(mHero) or can_UseBianXing(mHero)) and rangeToHeroD < 700 then
+		if MyHeroHP < 200 and (not IsJuFeng(HeroD)) and can_zhuge_cast_e() and rangeToHeroD < 700 then
 			set zs_action_prioty_arry[62] = 98 // E逃跑
+			//call debugstr("E逃跑")
 		endif		
 		
         if  index>=0 and (not IsJuFeng(HeroD)) and (EnemyHeroCount-AllyHeroCount)<1 and rangeToTowerD > 1100 and (EnemyCount <= 2 or EnemyCount<=AllyCount) then
             set zs_kickoff =true           
             set zs_action_prioty_arry[50+index]=99
-            call debugstr("find============================")
+            //call debugstr("必杀")
         endif
     endif
     // set zs_action_prioty_arry[55]=99
     
     if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>=2 and can_zhuge_cast_g() then
         if MyHeroMP>300 or IsManaAlmostFull(mHero) then
-            set zs_action_prioty_arry[58]=65 // G 清兵
+            set zs_action_prioty_arry[58]=58 // G 清兵
+			//call debugstr("无敌G清兵")
         endif
     endif
 	
     if HeroD==null and  NearestEnemyBubing!=null and EnemyCount>=2 and can_zhuge_cast_g() and can_zhuge_cast_e() and mHeroLevel>7 then
         if MyHeroMP>600 or IsManaAlmostFull(mHero) then
             set zs_action_prioty_arry[59]=59 // GE 清兵
+			//call debugstr("无敌GE清兵")
         endif
     endif	
     
@@ -4709,7 +4736,7 @@ function zhuge_spell_action takes integer index returns nothing
             endif
         endif
         call zhuge_cast_g(HeroD)
-        call debugstr("zhuge_cast_g ")
+        //call debugstr("zhuge_cast_g ")
     endif
     
     if index==51 then
@@ -4726,27 +4753,27 @@ function zhuge_spell_action takes integer index returns nothing
             call zhuge_cast_e(HeroD)
             call zhuge_cast_g(HeroD)
         endif
-        call debugstr("zhuge_cast_eg ")
+        //call debugstr("zhuge_cast_eg ")
     endif
     
     if index==52 then
         if  intoUnitRange(HeroD,700) then
             call zhuge_cast_feng_e_x_g(HeroD)
-            call debugstr("can_zhuge_cast_feng_e_x_g ")
+            //call debugstr("can_zhuge_cast_feng_e_x_g ")
         endif
     endif
     
     
     if index==53 then
         if  intoUnitRange(HeroD,650) then
-            call debugstr("zhuge_cast_fei_e_x_g ")
+            //call debugstr("zhuge_cast_fei_e_x_g ")
             call zhuge_cast_fei_e_x_g(HeroD)
         endif
     endif
     
     if index==54 then
         if  intoUnitRange(HeroD,650) then
-            call debugstr("zhuge_cast_bian_e_x_g ")
+            //call debugstr("zhuge_cast_bian_e_x_g ")
             call zhuge_cast_bian_e_x_g(HeroD)
         endif
     endif
@@ -4754,14 +4781,14 @@ function zhuge_spell_action takes integer index returns nothing
     
     if index==55 then
         if  intoUnitRange(HeroD,650) then
-            call debugstr("zhuge_cast_x_move ")
+            //call debugstr("zhuge_cast_x_move ")
             call zhuge_cast_x_move(HeroD)
         endif
     endif
     
     if index==56 then
         if  intoUnitRange(HeroD,700) then
-            call debugstr("zhuge_cast_x_move_g ")
+            //call debugstr("zhuge_cast_x_move_g ")
             call zhuge_cast_x_move_g(HeroD)
         endif
     endif
@@ -4772,14 +4799,14 @@ function zhuge_spell_action takes integer index returns nothing
     endif
     
     if index==58 and NearestEnemyBubing!=null then
-        call debugstr("NearestBubing --spell ")
+        //call debugstr("NearestBubing --spell ")
         if  intoUnitRange(NearestEnemyBubing,650) then            
             call zhuge_cast_g(NearestEnemyBubing)
         endif
     endif   
     
     if index==59 and NearestEnemyBubing!=null then
-        call debugstr("NearestBubing --spell ")
+        //call debugstr("NearestBubing --spell ")
         if  intoUnitRange(NearestEnemyBubing,650) then            
             call zhuge_cast_g(NearestEnemyBubing)
             call zhuge_cast_e(NearestEnemyBubing)
@@ -4800,16 +4827,7 @@ function zhuge_spell_action takes integer index returns nothing
         endif
     endif
 	if index==62 then
-		if can_UseFeiXie(mHero)  then
-			call UseFeiXie(zs_cr_retreatLoc)
-		else
-			if can_UseFengZhang(mHero) or can_UseBianXing(mHero) then
-				call UseFengZhang(HeroD)
-				call UseBianXing(HeroD)
-			else
-				call zhuge_cast_e(HeroD)
-			endif
-		endif
+		call zhuge_cast_e(HeroD)	
 		call HeroRetreat(1200)
     endif	
     
@@ -5635,7 +5653,7 @@ function ShareEverythingWithTeam takes player whichPlayer returns nothing
     endloop
 endfunction
 function main takes nothing returns nothing
-	// set isdebug = true
+	//set isdebug = true
     set ai_player = Player(GetAiPlayer())
     call InitmGlobals()
     //    call FogEnable(false)
