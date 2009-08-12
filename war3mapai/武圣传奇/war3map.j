@@ -17,6 +17,7 @@
 
 globals
     // User-defined
+	string array 			zs_player_name_array
 	unit array				zs_maple_MaySlash_Unit_Caster_Array
 	integer					zs_maple_MaySlash_Index = -1
 	integer					zs_maple_MaySlash_Count = 0
@@ -461,7 +462,76 @@ function ITS takes integer ic returns string
     endif
     return s
 endfunction
+function initPlayNameArray takes nothing returns nothing
+    local integer index=0
+    loop
+        exitwhen index==30
+        set zs_player_name_array[index]=""
+        set index=index+1
+    endloop
+	set zs_player_name_array[0]="Wonder"
+	set zs_player_name_array[1]="MonKing"
+	set zs_player_name_array[2]="maple"
+	set zs_player_name_array[3]="织梦行云"
+	set zs_player_name_array[4]="洞溪沉石"
+	set zs_player_name_array[5]="DXN"
+	set zs_player_name_array[6]="kk"
+	set zs_player_name_array[7]="上海骡子"
+	set zs_player_name_array[8]="紫英慕容"
+	set zs_player_name_array[9]="漫步"
+	set zs_player_name_array[10]="山村贞子"
+	set zs_player_name_array[11]="无名小卒"
+	set zs_player_name_array[12]="红颜祸水"
+	set zs_player_name_array[13]="杀我吧"
+	set zs_player_name_array[14]="Lytic"
+	set zs_player_name_array[15]="pray_w "
+	set zs_player_name_array[16]="BoA"
+	set zs_player_name_array[17]="你不是真正的快乐"
+	set zs_player_name_array[18]="老毒物"
+	set zs_player_name_array[19]="突然很想你"
+	set zs_player_name_array[20]="031主义"
+	set zs_player_name_array[21]="IDzeas"
+	set zs_player_name_array[22]="移动经验书"
+	set zs_player_name_array[23]="没有小鸡鸡"
+	set zs_player_name_array[24]="Dai[饭团]"
+	set zs_player_name_array[25]="月月"
+	set zs_player_name_array[26]="上海马超"
+	set zs_player_name_array[27]="等待复活"
+	set zs_player_name_array[28]="菜叶"
+	set zs_player_name_array[29]="盯死你"
+	set zs_player_name_array[30]="最后的战役"
+	set zs_player_name_array[31]="天亮说晚安"
+	set zs_player_name_array[32]="春哥纯爷MAN"
+	set zs_player_name_array[33]="剑客の礼"
+	set zs_player_name_array[34]="不怕不怕"
+	set zs_player_name_array[35]="卧龙孔光"
+	set zs_player_name_array[36]="我非善类"
+	set zs_player_name_array[37]="豆豆丑丑"
+	set zs_player_name_array[38]="人贱人爱"
+	set zs_player_name_array[39]="淡蓝的风"
+	set zs_player_name_array[40]="7-dan"
+endfunction
 
+function setAIPlayerName takes player indexPlayer returns nothing
+    local string aistr=""
+	local integer index = 0
+    // if GetAIDifficulty(ai_player)==AI_DIFFICULTY_NEWBIE then
+        // set  aistr="简单电脑"
+    // endif
+    // if GetAIDifficulty(ai_player)==AI_DIFFICULTY_NORMAL then
+        // set  aistr="普通电脑"
+    // endif
+    // if GetAIDifficulty(ai_player)==AI_DIFFICULTY_INSANE then
+        // set  aistr="疯狂电脑"
+    // endif
+	loop
+		exitwhen aistr != ""		
+		set index = GetRandomInt(0,40)
+		set aistr = zs_player_name_array[index]
+		set zs_player_name_array[index] = ""
+	endloop    
+    call SetPlayerName(indexPlayer,aistr)
+endfunction
 function getCurMaySlashUnit takes nothing returns nothing
 	local unit whichHero = null
 	local integer i = 0
@@ -7663,6 +7733,7 @@ function StartSangoAI takes nothing returns nothing
       set p=Player(i)
       if((GetPlayerSlotState(p)==PLAYER_SLOT_STATE_PLAYING)and(i!=6))then
         if(GetPlayerController(p)==MAP_CONTROL_COMPUTER)then
+		  call setAIPlayerName(p)
           call StartCampaignAI(p,"zhensan.ai")
         endif
       endif
@@ -7862,6 +7933,7 @@ function InitCustomTriggers takes nothing returns nothing
     call InitTrig_Intro(  )
     call InitTrig_Count_Board(  )
     call InitTrig_Kills_and_Deads(  )
+	call initPlayNameArray()
     call InitTrig_StartAI(  )
 endfunction
 

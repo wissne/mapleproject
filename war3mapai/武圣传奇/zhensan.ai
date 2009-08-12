@@ -11017,7 +11017,7 @@ function B7V takes integer OK returns nothing
     endif
     if OK==51 and X1V(FI,220)then
         call PZ(NI,HO,"whirlwind")
-        call Sleep(1)
+        call Sleep(0.3)
     endif
     if OK==52 and X1V(FI,700)then
         set AM=GetUnitLoc(FI)
@@ -11029,7 +11029,7 @@ function B7V takes integer OK returns nothing
         call Sleep(1)
         if X1V(FI,220)then
             call PZ(NI,HO,"whirlwind")
-            call Sleep(1)
+            call Sleep(.3)
         endif
     endif
     if OK==53 and X1V(G,700)then
@@ -11150,7 +11150,7 @@ function CRV takes nothing returns boolean
         endif
     endif
     if NI==null then
-        if NS()>20.2 then
+        if NS()>1 then
             call COV()
         endif
         call EZ(1)
