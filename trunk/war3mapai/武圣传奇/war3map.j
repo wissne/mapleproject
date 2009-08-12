@@ -20,7 +20,8 @@ globals
 	string array 			zs_player_name_array
 	unit array				zs_maple_MaySlash_Unit_Caster_Array
 	integer					zs_maple_MaySlash_Index = -1
-	integer					zs_maple_MaySlash_Count = 0
+	unit array				zs_maple_XSlash_Mirror_Array
+	integer					zs_maple_XSlash_Index = -1
     unit                    udg_KillSlash_Caster       = null
     timer array             udg_Timer_ReviveHero
     unit array              udg_Unit_Hero
@@ -554,6 +555,28 @@ function setCurMaySlashUnit takes unit whichHero returns nothing
 	endif
 	set zs_maple_MaySlash_Unit_Caster_Array[index] = whichHero
 	set zs_maple_MaySlash_Index = index
+endfunction
+
+function getCurXSlashUnit takes nothing returns nothing
+	local unit whichHero = null
+	local integer i = 0
+    loop
+        exitwhen (i == 40)
+        set whichHero = zs_maple_XSlash_Mirror_Array[i]
+        if whichHero != null then
+			call RemoveUnit(whichHero)        
+        endif
+        set i = i + 1
+    endloop
+endfunction
+function setCurXSlashUnit takes unit whichHero returns nothing
+    local integer index = zs_maple_XSlash_Index	  
+	set index = index + 1
+	if index >= 40 then
+		set index = 0
+	endif
+	set zs_maple_XSlash_Mirror_Array[index] = whichHero
+	set zs_maple_XSlash_Index = index
 endfunction
 
 function InitGlobals takes nothing returns nothing
@@ -2209,10 +2232,12 @@ set udg_XSlash_Caster=GetSpellAbilityUnit()
 set udg_XSlash_Target=GetSpellTargetUnit()
 call CreateNUnitsAtLocFacingLocBJ(1,'E008',GetOwningPlayer(udg_XSlash_Caster),PolarProjectionBJ(GetUnitLoc(udg_XSlash_Target),256.00,(AngleBetweenPoints(GetUnitLoc(udg_XSlash_Target),GetUnitLoc(udg_XSlash_Caster))+45.00)),GetUnitLoc(udg_XSlash_Target))
 set udg_XSlash_Mirror[0]=bj_lastCreatedUnit
+call setCurXSlashUnit(udg_XSlash_Mirror[0])
 call SetUnitAnimationWithRarity(udg_XSlash_Mirror[0],"attack",RARITY_RARE)
 call SetUnitVertexColorBJ(udg_XSlash_Mirror[0],100,100,100,50.00)
 call CreateNUnitsAtLocFacingLocBJ(1,'E008',GetOwningPlayer(udg_XSlash_Caster),PolarProjectionBJ(GetUnitLoc(udg_XSlash_Target),256.00,(AngleBetweenPoints(GetUnitLoc(udg_XSlash_Target),GetUnitLoc(udg_XSlash_Caster))-45.00)),GetUnitLoc(udg_XSlash_Target))
 set udg_XSlash_Mirror[1]=bj_lastCreatedUnit
+call setCurXSlashUnit(udg_XSlash_Mirror[1])
 call SetUnitAnimationWithRarity(udg_XSlash_Mirror[1],"attack",RARITY_RARE)
 call SetUnitVertexColorBJ(udg_XSlash_Mirror[1],100,100,100,50.00)
 call PolledWait(GetRandomReal(0.40,0.70))
@@ -2238,6 +2263,7 @@ set bj_forLoopBIndex=bj_forLoopBIndex+1
 endloop
 call RemoveUnit(udg_XSlash_Mirror[0])
 call RemoveUnit(udg_XSlash_Mirror[1])
+call getCurXSlashUnit()
 endfunction
 
 //===========================================================================
