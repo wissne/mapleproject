@@ -4042,9 +4042,9 @@ function E6 takes nothing returns unit
         call H1()
         call SetUnitAcquireRange(NI,60)
         call U0()
-        if not XH then
-            call S1()
-        endif
+        //if not XH then
+            //call S1()
+        //endif
         call S0()
         call T0()
     endif
