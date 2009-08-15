@@ -1942,7 +1942,7 @@ endfunction
 function N0 takes nothing returns boolean
     return DN==WV
 endfunction
-function B0 takes nothing returns boolean
+function B0 takes nothing returns boolean	//isGuanYu
     return DN==KV
 endfunction
 function C0 takes nothing returns boolean
@@ -6649,7 +6649,7 @@ function RKV takes nothing returns boolean
     endif
     return rb
 endfunction
-function RLV takes nothing returns nothing
+function RLV takes nothing returns nothing	//guanyu_cast_b
     if not PZ(NI,'A00A',"whirlwind")then
         call PZ(NI,'A02V',"whirlwind")
     endif
@@ -7527,7 +7527,7 @@ function AZV takes nothing returns nothing
         endif
     endif
 endfunction
-function A_V takes nothing returns nothing
+function A_V takes nothing returns nothing //zs_move_condition
     local integer A0V=0
     set BH=false
     set BH=T<BV and(PD<1 or Q<800 or Z<11)
@@ -8326,7 +8326,7 @@ function A3V takes integer OK returns nothing
         endif
     endif
 endfunction
-function A4V takes nothing returns nothing
+function A4V takes nothing returns nothing //zs_attack_condition_zhanshi
     if FI!=null then
         if YQ(FI)then
             set CB=620
@@ -9894,7 +9894,7 @@ function BXV takes integer OK returns nothing
         call AGV(1000)
     endif
 endfunction
-function BOV takes nothing returns nothing	// GuanYu spell condition
+function BOV takes nothing returns nothing	//
     if not B0()then
         return
     endif
@@ -10053,7 +10053,7 @@ function BOV takes nothing returns nothing	// GuanYu spell condition
         set I[64]='j'
     endif
 endfunction
-function BRV takes integer OK returns nothing
+function BRV takes integer OK returns nothing	//guanyu_spell_action
     local location AM=null
     if not B0()then
         return
@@ -10086,7 +10086,7 @@ function BRV takes integer OK returns nothing
         call XQ(NI,AM,30)
         call RemoveLocation(AM)
         set AM=null
-        call Sleep(.2)
+        call Sleep(.28)
     endif
     if OK==55 and X1V(FI,450)then
         call RCV(FI)
