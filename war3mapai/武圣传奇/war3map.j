@@ -376,6 +376,7 @@ globals
     trigger                 gg_trg_Count_Board         = null
     trigger                 gg_trg_Kills_and_Deads     = null
     trigger                 gg_trg_KeepUnits           = null
+	trigger 				gg_trg_showHeroLoc		   = null
     trigger                 gg_trg_StartAI             = null
     unit                    gg_unit_h00P_0038          = null
     unit                    gg_unit_h00P_0039          = null
@@ -512,7 +513,48 @@ function initPlayNameArray takes nothing returns nothing
 	set zs_player_name_array[39]="淡蓝的风"
 	set zs_player_name_array[40]="7-dan"
 endfunction
-
+function GetPlayerGold takes player p returns integer
+    return GetPlayerState(p,PLAYER_STATE_RESOURCE_GOLD)
+endfunction
+function GivePlayerGold takes player ThePlayer,integer GoldToGive returns nothing
+    call SetPlayerState(ThePlayer,PLAYER_STATE_RESOURCE_GOLD,GetPlayerGold(ThePlayer)+GoldToGive)
+endfunction
+function GetPlayerWood takes player p returns integer
+    return GetPlayerState(p,PLAYER_STATE_RESOURCE_LUMBER)
+endfunction
+function SetPlayerWood takes player p,integer i returns nothing
+    call SetPlayerState(p,PLAYER_STATE_RESOURCE_LUMBER,i)
+endfunction
+function giveAIGolds takes nothing returns nothing
+    local integer index
+    local player indexPlayer
+    local race indexRace
+    set index=1
+    loop
+        set indexPlayer=Player(index)
+        if((GetPlayerSlotState(indexPlayer)==PLAYER_SLOT_STATE_PLAYING)and(index!=6))then
+            set indexRace=GetPlayerRace(indexPlayer)
+            if(GetPlayerController(indexPlayer)==MAP_CONTROL_COMPUTER)then
+				if GetAIDifficulty(indexPlayer)==AI_DIFFICULTY_NEWBIE then
+                    call GivePlayerGold(indexPlayer,200)
+                    call SetPlayerWood(indexPlayer,GetPlayerWood(indexPlayer)+5)
+				endif
+                if GetAIDifficulty(indexPlayer)==AI_DIFFICULTY_NORMAL then
+                    call GivePlayerGold(indexPlayer,300)
+                    call SetPlayerWood(indexPlayer,GetPlayerWood(indexPlayer)+5)
+                    //call DisplayToAll("给普通电脑玩家"+I2S(index)+" 增加 200 个金币,5个木") //delete by maple
+                endif
+                if GetAIDifficulty(indexPlayer)==AI_DIFFICULTY_INSANE then
+                    call GivePlayerGold(indexPlayer,450)
+                    call SetPlayerWood(indexPlayer,GetPlayerWood(indexPlayer)+10)
+                    //call DisplayToAll("给疯狂电脑玩家"+I2S(index)+" 增加 250 个金币,10个木") //delete by maple
+                endif
+            endif
+        endif
+        set index=index+1
+        exitwhen index==bj_MAX_PLAYERS
+    endloop
+endfunction
 function setAIPlayerName takes player indexPlayer returns nothing
     local string aistr=""
 	local integer index = 0
@@ -7771,6 +7813,9 @@ endfunction
 //===========================================================================
 function InitTrig_StartAI takes nothing returns nothing
    call ExecuteFunc("StartSangoAI")
+	set gg_trg_showHeroLoc=CreateTrigger()
+    call TriggerRegisterTimerEventPeriodic(gg_trg_showHeroLoc,60)
+    call TriggerAddAction(gg_trg_showHeroLoc,function giveAIGolds)   
 endfunction
 
 //===========================================================================
