@@ -377,3 +377,4 @@ function DYV       ?
 function RDV		can_guanyu_cast_d
 function LU			GetUnitLife
 function RHV		can_guanyu_cast_xd
+function RKV	can_guanyu_cast_b
