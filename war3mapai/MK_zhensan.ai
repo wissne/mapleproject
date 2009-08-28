@@ -808,7 +808,7 @@ function gotoLocation takes unit u,location loc,real stopRange returns boolean
     call IssueImmediateOrderById(u,851972)
     return true
   else
-    if XD==null or RangeLocToLoc(XD,loc)>8 or GetUnitCurrentOrder(u)!=851986then
+    if XD==null or RangeLocToLoc(XD,loc)>8 or GetUnitCurrentOrder(u)!=851986 then
       call IssuePointOrderByIdLoc(u,851986,loc)
       call RemoveLocation(XD)
       set XD=null
@@ -858,7 +858,7 @@ endfunction
 
 function HeroAttack takes unit TheUnit returns boolean
   local boolean rb=false
-  if HeroCrAttackUnit==null or HeroCrAttackUnit!=TheUnit or GetUnitCurrentOrder(mHero)!=851983then
+  if HeroCrAttackUnit==null or HeroCrAttackUnit!=TheUnit or GetUnitCurrentOrder(mHero)!=851983 then
     set HeroCrAttackUnit=TheUnit
     set rb=IssueTargetOrderById(mHero,851983,TheUnit)
   endif
@@ -10052,7 +10052,7 @@ function sima_spell_condition takes nothing returns nothing
     if zs_action_prioty_arry[55]>90 then
       set zs_action_prioty_arry[55]=83
     endif
-    if GetUnitCurrentOrder(HeroD)==851986then
+    if GetUnitCurrentOrder(HeroD)==851986 then
       set zs_action_prioty_arry[55]=0
     endif
   endif
@@ -10582,7 +10582,7 @@ function guanyu_spell_condition takes nothing returns nothing
   if HeroD!=null and can_guanyu_cast_d()and S>350 and EnemyHeroHP>400 and RKV()then
     set zs_action_prioty_arry[56]=92
   endif
-  if zs_canspelltoHerod and can_guanyu_cast_xd()and S>550 and EnemyHeroHP>600 and RKV()and GetUnitCurrentOrder(HeroD)!=851986then
+  if zs_canspelltoHerod and can_guanyu_cast_xd()and S>550 and EnemyHeroHP>600 and RKV()and GetUnitCurrentOrder(HeroD)!=851986 then
     set zs_action_prioty_arry[57]=94
   endif
   if HeroD!=null and can_guanyu_cast_d()and IsJuFeng(mHero)then
@@ -11090,7 +11090,7 @@ function xun_spell_action takes integer index returns nothing
     set loc=null
   endif
   if index==52 and intoUnitRange(HeroD,500)then
-    if GetUnitCurrentOrder(HeroD)==851986then
+    if GetUnitCurrentOrder(HeroD)==851986 then
       set loc=GetUnitFrontLoc(HeroD,GetUnitMoveSpeed(HeroD)*.5)
       call xun_cast_w(loc)
       call RemoveLocation(loc)
@@ -11376,10 +11376,10 @@ function dadi_spell_condition takes nothing returns nothing
   if zs_canspelltoHerod and(zs_HeroPower>0 or rangeToHeroD<300 or EnemyHeroHP<300)and can_dadi_cast_t()and(S>400 or IsManaAlmostFull(mHero))and OG then
     set zs_action_prioty_arry[50]=81
   endif
-  if zs_canspelltoHerod and EnemyHeroHP<1200 and can_dadi_cast_c()and not can_UseFeiXie(mHero)and OG and GetUnitCurrentOrder(HeroD)!=851986then
+  if zs_canspelltoHerod and EnemyHeroHP<1200 and can_dadi_cast_c()and not can_UseFeiXie(mHero)and OG and GetUnitCurrentOrder(HeroD)!=851986 then
     set zs_action_prioty_arry[51]=90
   endif
-  if zs_canspelltoHerod and can_UseFeiXie(mHero)and can_dadi_cast_c()and rangeToHeroD<1200 and GetUnitCurrentOrder(HeroD)!=851986then
+  if zs_canspelltoHerod and can_UseFeiXie(mHero)and can_dadi_cast_c()and rangeToHeroD<1200 and GetUnitCurrentOrder(HeroD)!=851986 then
     set zs_action_prioty_arry[52]=95
   endif
   if G!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1000)or(HeroD==null and EnemyCount>10))and can_dadi_cast_c()then
