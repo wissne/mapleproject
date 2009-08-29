@@ -18,7 +18,7 @@ globals
   real EnemyHeroHP=99999
   real EnemyHeroMP=99999
   real MyHeroHP=0
-  real S=0
+  real MyHeroMP=0
   real T=99999
   real U=99999
   real rangeToHeroD=999999
@@ -413,8 +413,8 @@ function CK takes integer i returns item
   return null
 endfunction
 
-function DisplayToAll takes string s returns nothing
-  call DisplayTimedTextToPlayer(GetLocalPlayer(),0,0,15,message_add+s)
+function DisplayToAll takes string MyHeroMP returns nothing
+  call DisplayTimedTextToPlayer(GetLocalPlayer(),0,0,15,message_add+MyHeroMP)
   call StartSound(chatSound)
 endfunction
 
@@ -451,14 +451,14 @@ function GetSlotsFreeOnUnit takes unit u returns integer
   return XL
 endfunction
 
-function debugstr takes string s returns nothing
+function debugstr takes string MyHeroMP returns nothing
   if isdebug then
-    call DisplayToAll(s)
+    call DisplayToAll(MyHeroMP)
   endif
 endfunction
 
 function ITS takes integer ic returns string
-  local string s=""
+  local string MyHeroMP=""
   local integer i=ic
   local integer NL=0
   local boolean BL=false
@@ -473,12 +473,12 @@ function ITS takes integer ic returns string
     exitwhen i==0
     set NL=i
     set i=i/ 10
-    set s=digit_str[NL-10*i]+s
+    set MyHeroMP=digit_str[NL-10*i]+MyHeroMP
   endloop
   if BL then
-    return"-"+s
+    return"-"+MyHeroMP
   endif
-  return s
+  return MyHeroMP
 endfunction
 
 function isZhongLiEnemy takes unit u returns boolean
@@ -964,12 +964,12 @@ function NS takes nothing returns real
   return TimerGetElapsed(zs_timer1)
 endfunction
 
-function BS takes string s,integer i returns nothing
-  call StoreInteger(CV,"storevaluei",s,i)
+function BS takes string MyHeroMP,integer i returns nothing
+  call StoreInteger(CV,"storevaluei",MyHeroMP,i)
 endfunction
 
-function CS takes string s returns integer
-  return GetStoredInteger(CV,"storevaluei",s)
+function CS takes string MyHeroMP returns integer
+  return GetStoredInteger(CV,"storevaluei",MyHeroMP)
 endfunction
 
 function FS takes integer GS,integer level,integer cd returns nothing
@@ -6557,7 +6557,7 @@ function isHeroHasBianYang takes unit TheHero returns boolean
   return GetNumberOfItemByID(TheHero,'I00Q')>0 or GetNumberOfItemByID(TheHero,'ssan')>0
 endfunction
 
-function XTV takes unit theUnit returns boolean
+function can_UseBianXing takes unit theUnit returns boolean
   local boolean result=false
   if not zs_canspelltoHerod then
     return false
@@ -6566,7 +6566,7 @@ function XTV takes unit theUnit returns boolean
   return result
 endfunction
 
-function XUV takes unit Target returns boolean
+function UseBianXing takes unit Target returns boolean
   local boolean result=false
   if not zs_canspelltoHerod then
     return false
@@ -6748,7 +6748,7 @@ function sima_cast_ef takes unit TheTarget returns boolean
 endfunction
 
 function can_sima_cast_n_ef takes nothing returns boolean
-  return(can_sima_cast_n()and can_sima_cast_ef()and S>800)
+  return(can_sima_cast_n()and can_sima_cast_ef()and MyHeroMP>800)
 endfunction
 
 function sima_cast_n_ef takes unit Target returns nothing
@@ -6761,7 +6761,7 @@ function sima_cast_n_ef takes unit Target returns nothing
 endfunction
 
 function can_sima_cast_feng_n_ef takes nothing returns boolean
-  return(can_UseFengZhang(mHero)and can_sima_cast_n()and can_sima_cast_ef()and S>800)
+  return(can_UseFengZhang(mHero)and can_sima_cast_n()and can_sima_cast_ef()and MyHeroMP>800)
 endfunction
 
 function sima_cast_feng_n_ef takes unit Target returns nothing
@@ -6787,8 +6787,31 @@ function sima_cast_feng_n_ef takes unit Target returns nothing
   set loc=null
 endfunction
 
+function can_sima_cast_bian_ef takes nothing returns boolean
+    if isHeroHasBianYang(mHero) and  can_sima_cast_ef() and MyHeroMP>300 then
+        return true
+    endif
+    return false
+endfunction
+function sima_cast_bian_ef takes unit Target returns nothing
+    local location loc=null
+    if (not isHeroHasBianYang(mHero)) or (not can_sima_cast_ef())  then
+        return
+    endif
+    set loc=GetLocBetweenTwoUnitsRangeToFirst(Target,mHero,700)
+    if UseBianXing(Target) then
+		call HeroAttack(Target)
+		call Sleep(0.8)
+		call HeroAttack(Target)
+		call Sleep(0.8)		
+        call sima_cast_ef(Target)
+    endif
+    call RemoveLocation(loc)
+    set loc=null
+endfunction
+
 function can_sima_cast_bian_n_ef takes nothing returns boolean
-  return(XTV(mHero)and can_sima_cast_n()and can_sima_cast_ef()and S>700)
+  return(can_UseBianXing(mHero)and can_sima_cast_n()and can_sima_cast_ef()and MyHeroMP>700)
 endfunction
 
 function sima_cast_bian_n_ef takes unit Target returns nothing
@@ -6797,7 +6820,7 @@ function sima_cast_bian_n_ef takes unit Target returns nothing
     return
   endif
   set loc=GetLocBetweenTwoUnitsRangeToFirst(Target,mHero,700)
-  if XUV(Target)then
+  if UseBianXing(Target)then
     call gotoLocation(mHero,loc,20)
     call OOV(Target)
     call sima_cast_ef(Target)
@@ -6807,7 +6830,7 @@ function sima_cast_bian_n_ef takes unit Target returns nothing
 endfunction
 
 function can_sima_cast_ef_feng_n_feng_fe takes nothing returns boolean
-  return(can_UseFengZhang(mHero)and can_sima_cast_n()and can_sima_cast_ef()and S>950)
+  return(can_UseFengZhang(mHero)and can_sima_cast_n()and can_sima_cast_ef()and MyHeroMP>950)
 endfunction
 
 function sima_cast_ef_feng_n_feng_fe takes unit Target returns nothing
@@ -6969,7 +6992,7 @@ function zhuge_cast_x_move_g takes unit Target returns nothing
 endfunction
 
 function can_zhuge_cast_fei_e_x_g takes nothing returns boolean
-  return(can_UseFeiXie(mHero)and can_zhuge_cast_x()and can_zhuge_cast_e()and can_zhuge_cast_g()and S>700)
+  return(can_UseFeiXie(mHero)and can_zhuge_cast_x()and can_zhuge_cast_e()and can_zhuge_cast_g()and MyHeroMP>700)
 endfunction
 
 function zhuge_cast_fei_e_x_g takes unit Target returns nothing
@@ -6978,8 +7001,8 @@ function zhuge_cast_fei_e_x_g takes unit Target returns nothing
     return
   endif
   set loc=GetLocBetweenTwoUnitsRangeToFirst(Target,mHero,100)
-  if XTV(mHero)then
-    call XUV(Target)
+  if can_UseBianXing(mHero)then
+    call UseBianXing(Target)
   endif
   call UseFeiXie(loc)
   call zhuge_cast_e(Target)
@@ -6992,7 +7015,7 @@ function zhuge_cast_fei_e_x_g takes unit Target returns nothing
 endfunction
 
 function can_zhuge_cast_feng_e_x_g takes nothing returns boolean
-  return(can_UseFengZhang(mHero)and can_zhuge_cast_x()and can_zhuge_cast_e()and can_zhuge_cast_g()and S>700)
+  return(can_UseFengZhang(mHero)and can_zhuge_cast_x()and can_zhuge_cast_e()and can_zhuge_cast_g()and MyHeroMP>700)
 endfunction
 
 function zhuge_cast_feng_e_x_g takes unit Target returns nothing
@@ -7012,7 +7035,7 @@ function zhuge_cast_feng_e_x_g takes unit Target returns nothing
 endfunction
 
 function can_zhuge_cast_bian_e_x_g takes nothing returns boolean
-  return(XTV(mHero)and can_zhuge_cast_x()and can_zhuge_cast_e()and can_zhuge_cast_g()and S>700)
+  return(can_UseBianXing(mHero)and can_zhuge_cast_x()and can_zhuge_cast_e()and can_zhuge_cast_g()and MyHeroMP>700)
 endfunction
 
 function zhuge_cast_bian_e_x_g takes unit Target returns nothing
@@ -7020,7 +7043,7 @@ function zhuge_cast_bian_e_x_g takes unit Target returns nothing
   if(not isHeroHasBianYang(mHero))or(not can_zhuge_cast_x())then
     return
   endif
-  call XUV(Target)
+  call UseBianXing(Target)
   set loc=GetLocBetweenTwoUnitsRangeToFirst(Target,mHero,100)
   call gotoLocation(mHero,loc,10)
   call Sleep(1)
@@ -8200,20 +8223,20 @@ function A_V takes nothing returns nothing
     set FV=FV+mHeroLevel/5
     set FV=FV+R2I((mHeroLevel-Y)/2)
     set FV=FV+R2I((MyHeroHP-EnemyHeroHP)/100)
-    set A0V=R2I((S-EnemyHeroMP)/200)
+    set A0V=R2I((MyHeroMP-EnemyHeroMP)/200)
     if A0V>3 then
       set A0V=3
     endif
     if EnemyHeroMP<120 then
       set A0V=A0V+1
     endif
-    if S<120 then
+    if MyHeroMP<120 then
       set A0V=A0V-1
     endif
     if EnemyHeroMP<300 then
       set A0V=A0V+1
     endif
-    if S<300 then
+    if MyHeroMP<300 then
       set A0V=A0V-1
     endif
     set FV=FV+A0V
@@ -8438,10 +8461,10 @@ function A_V takes nothing returns nothing
   if(not IsLifeAlmostFull(mHero)or not IsManaAlmostFull(mHero))and RangeToLoc(mHero,mBaseLoc)<1600 then
     set zs_action_prioty_arry[6]=63
   endif
-  if HeroD!=null and(GetUnitLifePercent(mHero)<40)and S<130 and not isHeroHasLan(mHero)then
+  if HeroD!=null and(GetUnitLifePercent(mHero)<40)and MyHeroMP<130 and not isHeroHasLan(mHero)then
     set zs_action_prioty_arry[6]=65
   endif
-  if zs_HeroPower<0 and(GetUnitLifePercent(mHero)<60)and S<130 and not isHeroHasLan(mHero)then
+  if zs_HeroPower<0 and(GetUnitLifePercent(mHero)<60)and MyHeroMP<130 and not isHeroHasLan(mHero)then
     set zs_action_prioty_arry[6]=65
   endif
   if zs_HeroPower<-1 and(GetUnitLifePercent(mHero)<80)then
@@ -8540,7 +8563,7 @@ function A_V takes nothing returns nothing
   if zs_weiguoyinbing and HN==2 and mForceId==2 and mHeroLevel<10 then
     set zs_action_prioty_arry[16]=62
   endif
-  set LH=rangeToHeroD>800 and(zs_HeroPower>1 or(zs_HeroPower==1 and zs_EnemyHeroNearMeCount==1))and ZG<=0 and zs_AllyHeroNearestToHeroD!=null and zs_allyHeroToHeroDMinRange>700 and KH>700 and MyHeroHP>EH-50 and S>135
+  set LH=rangeToHeroD>800 and(zs_HeroPower>1 or(zs_HeroPower==1 and zs_EnemyHeroNearMeCount==1))and ZG<=0 and zs_AllyHeroNearestToHeroD!=null and zs_allyHeroToHeroDMinRange>700 and KH>700 and MyHeroHP>EH-50 and MyHeroMP>135
   if HN!=zs_cr_fightline and LH and WL(mHero,zs_AllyHeroNearestToHeroD,HeroD)then
     if zs_IsTimeOut(50,2)then
       if FP(zs_AllyHeroNearestToHeroD,HeroD)!=null then
@@ -8560,7 +8583,7 @@ function A_V takes nothing returns nothing
   if mHeroLevel>18 then
     set NJ=4600
   endif
-  if KH>900 and MyHeroHP>EH and S>135 and HH==0 and zs_IsTimeOut(52,2)then
+  if KH>900 and MyHeroHP>EH and MyHeroMP>135 and HH==0 and zs_IsTimeOut(52,2)then
     set FH=H6(mHero)
     if FH!=null and RangeTo(mHero,FH)<NJ then
       set GH=D6(FH)
@@ -8748,7 +8771,7 @@ function A2V takes nothing returns nothing
     if(X2V(HeroD,650)or(rangeToHeroD<800 and absolute(RangeToLoc(mHero,zs_cr_retreatLoc)-RangeToLoc(HeroD,zs_cr_retreatLoc))<650))and FV>4 and YG>-1 then
       set zs_action_prioty_arry[41]=53
     endif
-    if MyHeroHP>EnemyHeroHP and S>EnemyHeroMP and OG then
+    if MyHeroHP>EnemyHeroHP and MyHeroMP>EnemyHeroMP and OG then
       set zs_action_prioty_arry[41]=55
     endif
     if zs_HeroPower>0 and YG>-3 and OG then
@@ -8923,7 +8946,7 @@ function zs_attack_condition_zhanshi takes nothing returns nothing
     if not IsRangeAttacker(HeroD)and YG>0 and RG then
       set zs_action_prioty_arry[40]=52
     endif
-    if MyHeroHP>EnemyHeroHP and S>EnemyHeroMP and FV>3 and RG and rangeToHeroD<300 then
+    if MyHeroHP>EnemyHeroHP and MyHeroMP>EnemyHeroMP and FV>3 and RG and rangeToHeroD<300 then
       set zs_action_prioty_arry[41]=52
     endif
     if zs_HeroPower>0 and MyHeroHP>500 and YG>-2 and OG then
@@ -9241,7 +9264,7 @@ function zs_useitem_condition takes nothing returns nothing
       if can_UseFengZhang(mHero)then
         set zs_action_prioty_arry[21]=102
       endif
-      if XTV(mHero)then
+      if can_UseBianXing(mHero)then
         set zs_action_prioty_arry[22]=103
       endif
       if XXV(mHero)then
@@ -9252,17 +9275,17 @@ function zs_useitem_condition takes nothing returns nothing
       set zs_action_prioty_arry[33]=91
     endif
     if not can_sima_cast_n()or not can_zhuge_cast_x()then
-      if XTV(mHero)then
+      if can_UseBianXing(mHero)then
         set zs_action_prioty_arry[23]=100
       endif
     endif
     if EnemyHeroHP>1800 or IsLifeAlmostFull(HeroD)then
-      if XTV(mHero)then
+      if can_UseBianXing(mHero)then
         set zs_action_prioty_arry[23]=100
       endif
     endif
     if EnemyHeroHP<600 then
-      if XTV(mHero)then
+      if can_UseBianXing(mHero)then
         set zs_action_prioty_arry[23]=100
       endif
     endif
@@ -9273,7 +9296,7 @@ function zs_useitem_condition takes nothing returns nothing
       set CR=true
     endif
     if EnemyHeroHP>1000 and not can_sima_cast_n()and not can_zhuge_cast_x()then
-      if XTV(mHero)then
+      if can_UseBianXing(mHero)then
         set zs_action_prioty_arry[23]=100
       endif
     endif
@@ -9375,8 +9398,8 @@ function NXV takes nothing returns nothing
       call zhaoyun_cast_c(PG)
       return
     endif
-    if XTV(mHero)then
-      call XUV(PG)
+    if can_UseBianXing(mHero)then
+      call UseBianXing(PG)
       return
     endif
   endif
@@ -9443,11 +9466,11 @@ function NOV takes integer index returns nothing
   endif
   if index==22 and HeroD!=null then
     call Sleep(5.7)
-    call XUV(HeroD)
+    call UseBianXing(HeroD)
     call Sleep(.3)
   endif
   if index==23 and HeroD!=null then
-    call XUV(HeroD)
+    call UseBianXing(HeroD)
   endif
   if index==24 and HeroD!=null then
     set loc=GetLocBetweenTwoUnitsRangeToFirst(HeroD,mHero,-200)
@@ -9566,21 +9589,21 @@ function zs_shiftLine_cdt takes nothing returns nothing
   endif
   if isZhuGeLiang()or isSiMaYi()then
   endif
-  if ShangluAllyHeroCountNearFL>0 and ShangluEnemyHeroCountNearFL>0 and((zs_cr_fightline==1 and mHeroLevel>7 and MyHeroHP>500 and S>300)or likaizhonglu)then
+  if ShangluAllyHeroCountNearFL>0 and ShangluEnemyHeroCountNearFL>0 and((zs_cr_fightline==1 and mHeroLevel>7 and MyHeroHP>500 and MyHeroMP>300)or likaizhonglu)then
     if(TowerD!=null and RangeToLoc(TowerD,zs_MyFireLoc)<1000)or(RF[0]==null or RangeToLoc(RF[0],zs_firelines[0])>2000)then
       set NDV=0
     endif
   endif
-  if XialuAllyHeroCountNearFL>0 and XialuEnemyHeroCountNearFL>0 and((zs_cr_fightline==1 and mHeroLevel>7 and MyHeroHP>500 and S>300)or likaizhonglu)then
+  if XialuAllyHeroCountNearFL>0 and XialuEnemyHeroCountNearFL>0 and((zs_cr_fightline==1 and mHeroLevel>7 and MyHeroHP>500 and MyHeroMP>300)or likaizhonglu)then
     if(TowerD!=null and RangeToLoc(TowerD,zs_MyFireLoc)<1000)or(RF[2]==null or RangeToLoc(RF[2],zs_firelines[2])>2000)then
       set NDV=2
     endif
   endif
-  if zs_cr_fightline==0 and HN!=0 and(ShangluEnemyHeroCountNearFL==0 or MyHeroHP<500 or S<100 or RangeToLoc(TowerD,zs_MyFireLoc)<1000)then
+  if zs_cr_fightline==0 and HN!=0 and(ShangluEnemyHeroCountNearFL==0 or MyHeroHP<500 or MyHeroMP<100 or RangeToLoc(TowerD,zs_MyFireLoc)<1000)then
     set NDV=1
     set NFV=true
   endif
-  if zs_cr_fightline==2 and HN!=2 and(XialuEnemyHeroCountNearFL==0 or MyHeroHP<500 or S<100 or RangeToLoc(TowerD,zs_MyFireLoc)<1000)then
+  if zs_cr_fightline==2 and HN!=2 and(XialuEnemyHeroCountNearFL==0 or MyHeroHP<500 or MyHeroMP<100 or RangeToLoc(TowerD,zs_MyFireLoc)<1000)then
     set NDV=1
     set NFV=true
   endif
@@ -9635,7 +9658,7 @@ function zs_shiftLine_cdt takes nothing returns nothing
     endif
   endif
   if not GG and aidzhonglu then
-    if FG==0 and MyHeroHP>600 and S>200 and mHeroLevel>3 then
+    if FG==0 and MyHeroHP>600 and MyHeroMP>200 and mHeroLevel>3 then
       set NDV=1
     endif
     if FG==1 and MyHeroHP>700 and mHeroLevel>10 then
@@ -10036,13 +10059,13 @@ function sima_spell_condition takes nothing returns nothing
   endif
   if HeroD!=null and zs_canspelltoHerod then
     set index=getSpellOffDamageIndex()
-    if(EnemyHeroHP>1000)and S>300 and T>1100 and rangeToHeroD<700 and can_sima_cast_ef()and OG then
+    if(EnemyHeroHP>1000)and MyHeroMP>300 and T>1100 and rangeToHeroD<700 and can_sima_cast_ef()and OG then
       set zs_action_prioty_arry[52]=82
     endif
     if zs_HeroPower>0 and can_sima_cast_ef()and OG then
       set zs_action_prioty_arry[52]=82
     endif
-    if(EnemyHeroHP>600 or IsLifeAlmostFull(HeroD)or(EnemyHeroHP>300 and mHeroLevel<5))and T>1100 and S>300 and rangeToHeroD<710 and can_sima_cast_e()and OG then
+    if(EnemyHeroHP>600 or IsLifeAlmostFull(HeroD)or(EnemyHeroHP>300 and mHeroLevel<5))and T>1100 and MyHeroMP>300 and rangeToHeroD<710 and can_sima_cast_e()and OG then
       set zs_action_prioty_arry[50]=81
     endif
     if index>=0 and YG>-4 and(rangeToHeroD<900 or ZG>0)then
@@ -10071,7 +10094,7 @@ function sima_spell_condition takes nothing returns nothing
     set zs_action_prioty_arry[52]=0
   endif
   if HeroD==null and G!=null and EnemyCount>2 and mHeroLevel>6 and can_sima_cast_ef()then
-    if S>1200 or IsManaAlmostFull(mHero)then
+    if MyHeroMP>1200 or IsManaAlmostFull(mHero)then
       set zs_action_prioty_arry[59]=58
     endif
   endif
@@ -10101,8 +10124,8 @@ function sima_spell_action takes integer index returns nothing
       if can_UseFeiXie(mHero)then
         call X0V(HeroD)
       endif
-      if XTV(mHero)then
-        call XUV(HeroD)
+      if can_UseBianXing(mHero)then
+        call UseBianXing(HeroD)
       endif
     endif
     call sima_cast_e(HeroD)
@@ -10114,8 +10137,8 @@ function sima_spell_action takes integer index returns nothing
       if can_UseFeiXie(mHero)then
         call X0V(HeroD)
       endif
-      if XTV(mHero)then
-        call XUV(HeroD)
+      if can_UseBianXing(mHero)then
+        call UseBianXing(HeroD)
       endif
     endif
     call sima_cast_fu2(HeroD)
@@ -10129,8 +10152,8 @@ function sima_spell_action takes integer index returns nothing
       call X0V(HeroD)
     endif
     if K and intoUnitRange(HeroD,600)then
-      if XTV(mHero)then
-        call XUV(HeroD)
+      if can_UseBianXing(mHero)then
+        call UseBianXing(HeroD)
       endif
     endif
     if intoUnitRange(HeroD,600)then
@@ -10202,7 +10225,7 @@ function zhuge_spell_condition takes nothing returns nothing
   endif
   if zs_canspelltoHerod then
     set index=getSpellOffDamageIndex()
-    if(IsLifeAlmostFull(HeroD)or EnemyHeroHP>1500)and can_zhuge_cast_g()and can_zhuge_cast_e()and S>300 and T>1100 and rangeToHeroD<700 then
+    if(IsLifeAlmostFull(HeroD)or EnemyHeroHP>1500)and can_zhuge_cast_g()and can_zhuge_cast_e()and MyHeroMP>300 and T>1100 and rangeToHeroD<700 then
       set zs_action_prioty_arry[59]=81
     endif
     if IsBianXing(HeroD)and can_zhuge_cast_e()then
@@ -10211,10 +10234,10 @@ function zhuge_spell_condition takes nothing returns nothing
     if(EnemyHeroHP<300 or(EnemyHeroHP<zs_get_zhuge_e_damage()+110+mHeroLevel*10))and can_zhuge_cast_e()and OG then
       set zs_action_prioty_arry[57]=81
     endif
-    if can_zhuge_cast_g()and S>500 and T>1100 and rangeToHeroD<=700 and(FV>2 or zs_action_prioty_arry[41]>50)then
+    if can_zhuge_cast_g()and MyHeroMP>500 and T>1100 and rangeToHeroD<=700 and(FV>2 or zs_action_prioty_arry[41]>50)then
       set zs_action_prioty_arry[50]=83
     endif
-    if can_zhuge_cast_g()and S>280 and T>1100 and rangeToHeroD<=700 and(zs_action_prioty_arry[41]>56 or FV>2)then
+    if can_zhuge_cast_g()and MyHeroMP>280 and T>1100 and rangeToHeroD<=700 and(zs_action_prioty_arry[41]>56 or FV>2)then
       set zs_action_prioty_arry[50]=83
     endif
     if zs_HeroPower>0 and can_zhuge_cast_g()and OG then
@@ -10229,16 +10252,16 @@ function zhuge_spell_condition takes nothing returns nothing
     set zs_action_prioty_arry[53]=0
   endif
   if HeroD==null and zs_nearestMinHpEnemyBing!=null and zs_nearestEnemyBingMinHp<zs_get_zhuge_g_damage()and EnemyCount>2 and mHeroLevel>7 and can_zhuge_cast_g()then
-    if S>1200 or IsManaAlmostFull(mHero)then
+    if MyHeroMP>1200 or IsManaAlmostFull(mHero)then
       set zs_action_prioty_arry[59]=58
     endif
   endif
   if HeroD!=null and zs_nearestMinHpEnemyBing!=null and zs_nearestEnemyBingMinHp<zs_get_zhuge_g_damage()and EnemyCount>1 and mHeroLevel>2 and can_zhuge_cast_g()then
-    if S>600 or IsManaAlmostFull(mHero)then
+    if MyHeroMP>600 or IsManaAlmostFull(mHero)then
       set zs_action_prioty_arry[59]=58
     endif
   endif
-  if zs_canspelltoHerod and EnemyHeroHP<1600 and MyHeroHP>EH and can_zhuge_cast_e()and can_zhuge_cast_x()and T>1000 and S>550 and OG then
+  if zs_canspelltoHerod and EnemyHeroHP<1600 and MyHeroHP>EH and can_zhuge_cast_e()and can_zhuge_cast_x()and T>1000 and MyHeroMP>550 and OG then
     set zs_action_prioty_arry[60]=86
   endif
   if zs_get_zhuge_lei_damage()>LowestEnemyHeroHp and IsUnitVisible(zs_weakestEnemyHero,ai_player)and RangeTo(D6(zs_weakestEnemyHero),zs_weakestEnemyHero)>600 and can_zhuge_cast_x()and not IsImmune(zs_weakestEnemyHero)then
@@ -10256,7 +10279,7 @@ function zhuge_spell_condition takes nothing returns nothing
   if zs_canspelltoHerod and(IsStunned(HeroD)or GetUnitMoveSpeed(HeroD)<280)and can_zhuge_cast_e()then
     set zs_action_prioty_arry[57]=91
   endif
-  if zs_canspelltoHerod and can_zhuge_cast_e()and MyHeroHP>EH and can_zhuge_cast_g()and EnemyHeroHP<zs_get_zhuge_g_damage()+zs_get_zhuge_e_damage()+120+mHeroLevel*10 and S>295 and T>1000 and zs_action_prioty_arry[5]<60 and OG then
+  if zs_canspelltoHerod and can_zhuge_cast_e()and MyHeroHP>EH and can_zhuge_cast_g()and EnemyHeroHP<zs_get_zhuge_g_damage()+zs_get_zhuge_e_damage()+120+mHeroLevel*10 and MyHeroMP>295 and T>1000 and zs_action_prioty_arry[5]<60 and OG then
     set zs_action_prioty_arry[58]=85
   endif
   if((EnemyHeroHP<500 or(zs_HeroPower>1 and EnemyHeroHP<1000))and zs_EnemyHeroNearMeCount==1)or(not IsUnitType(HeroD,UNIT_TYPE_HERO))then
@@ -10279,8 +10302,8 @@ function zhuge_spell_action takes integer index returns nothing
       if can_UseFeiXie(mHero)then
         call X0V(HeroD)
       endif
-      if XTV(mHero)then
-        call XUV(HeroD)
+      if can_UseBianXing(mHero)then
+        call UseBianXing(HeroD)
       endif
     endif
     call zhuge_cast_g(HeroD)
@@ -10291,8 +10314,8 @@ function zhuge_spell_action takes integer index returns nothing
       if can_UseFeiXie(mHero)then
         call X0V(HeroD)
       endif
-      if XTV(mHero)then
-        call XUV(HeroD)
+      if can_UseBianXing(mHero)then
+        call UseBianXing(HeroD)
       endif
     endif
     if intoUnitRange(HeroD,600)then
@@ -10393,7 +10416,7 @@ function zhangliao_spell_condition takes nothing returns nothing
     endif
   endif
   if HeroD==null and G!=null and EnemyCount>2 and mHeroLevel>7 and can_zhangliao_cast_w()then
-    if S>300 or IsManaAlmostFull(mHero)then
+    if MyHeroMP>300 or IsManaAlmostFull(mHero)then
       set zs_action_prioty_arry[50]=52
     endif
   endif
@@ -10532,7 +10555,7 @@ function guanyu_spell_condition takes nothing returns nothing
     set zs_action_prioty_arry[6]=59
   endif
   if zs_canspelltoHerod and can_guanyu_cast_x()then
-    if(EnemyHeroHP>1200 and S>500)and T>1100 and(rangeToHeroD<700 or GetUnitMoveSpeed(mHero)>=GetUnitMoveSpeed(HeroD)+50)and OG then
+    if(EnemyHeroHP>1200 and MyHeroMP>500)and T>1100 and(rangeToHeroD<700 or GetUnitMoveSpeed(mHero)>=GetUnitMoveSpeed(HeroD)+50)and OG then
       set zs_action_prioty_arry[50]=78
     endif
     if zs_HeroPower>0 and(rangeToHeroD<700 or GetUnitMoveSpeed(mHero)>=GetUnitMoveSpeed(HeroD)+50)and OG then
@@ -10576,13 +10599,13 @@ function guanyu_spell_condition takes nothing returns nothing
   endif
   if isGuanyuXuanFeng(mHero)then
   endif
-  if zs_canspelltoHerod and can_guanyu_cast_x()and S>350 and EnemyHeroHP>400 and RKV()and OG then
+  if zs_canspelltoHerod and can_guanyu_cast_x()and MyHeroMP>350 and EnemyHeroHP>400 and RKV()and OG then
     set zs_action_prioty_arry[55]=93
   endif
-  if HeroD!=null and can_guanyu_cast_d()and S>350 and EnemyHeroHP>400 and RKV()then
+  if HeroD!=null and can_guanyu_cast_d()and MyHeroMP>350 and EnemyHeroHP>400 and RKV()then
     set zs_action_prioty_arry[56]=92
   endif
-  if zs_canspelltoHerod and can_guanyu_cast_xd()and S>550 and EnemyHeroHP>600 and RKV()and GetUnitCurrentOrder(HeroD)!=851986 then
+  if zs_canspelltoHerod and can_guanyu_cast_xd()and MyHeroMP>550 and EnemyHeroHP>600 and RKV()and GetUnitCurrentOrder(HeroD)!=851986 then
     set zs_action_prioty_arry[57]=94
   endif
   if HeroD!=null and can_guanyu_cast_d()and IsJuFeng(mHero)then
@@ -10622,7 +10645,7 @@ function guanyu_spell_condition takes nothing returns nothing
   if(not QH or IsDead(SH))and RangeTo(mHero,SH)<600 then
     set AO=1
   endif
-  if PH and MyHeroHP>1000 and S>500 and RKV()then
+  if PH and MyHeroHP>1000 and MyHeroMP>500 and RKV()then
     if AO<100 or AO==103 or AO==102 then
       if IsAlive(NF)then
         set KI=NF
@@ -10656,7 +10679,7 @@ function guanyu_spell_condition takes nothing returns nothing
       set KI=null
     endif
   endif
-  if PH and IsAlive(KI)and((MyHeroHP>1600 and S>500)or(RangeTo(mHero,KI)<1000 and MyHeroHP>800))and RKV()then
+  if PH and IsAlive(KI)and((MyHeroHP>1600 and MyHeroMP>500)or(RangeTo(mHero,KI)<1000 and MyHeroHP>800))and RKV()then
     set zs_action_prioty_arry[63]=105
   else
     if AO==101 or(AO>=104 and AO<=106)then
@@ -10773,7 +10796,7 @@ function guanyu_spell_action takes integer index returns nothing
   endif
   if index==63 then
     if intoUnitRange(KI,700)then
-      if can_guanyu_cast_d()and S>500 then
+      if can_guanyu_cast_d()and MyHeroMP>500 then
         call guanyu_cast_du(KI)
       endif
     endif
@@ -10831,10 +10854,10 @@ function weiyan_spell_condition takes nothing returns nothing
   if EnemyCount>AllyCount+8 and can_weiyan_cast_r()and G!=null then
     set zs_action_prioty_arry[53]=80
   endif
-  if zs_canspelltoHerod and can_weiyan_cast_t()and can_UseFeiXie(mHero)and S>400 and can_weiyan_cast_r()then
+  if zs_canspelltoHerod and can_weiyan_cast_t()and can_UseFeiXie(mHero)and MyHeroMP>400 and can_weiyan_cast_r()then
     set zs_action_prioty_arry[54]=93
   endif
-  if zs_canspelltoHerod and can_weiyan_cast_t()and rangeToHeroD<200 and S>400 and can_weiyan_cast_r()then
+  if zs_canspelltoHerod and can_weiyan_cast_t()and rangeToHeroD<200 and MyHeroMP>400 and can_weiyan_cast_r()then
     set zs_action_prioty_arry[55]=94
   endif
   if VJ!=null and RangeTo(mHero,VJ)<160 and can_weiyan_cast_r()then
@@ -10995,7 +11018,7 @@ function dianwei_spell_condition takes nothing returns nothing
   if HeroD!=null and(isHeroHasJinglinghuo(HeroD)or IsStunned(HeroD))and MyHeroHP>500 and(YG>-5 and T>1000)and(zs_prioty_index!=5 and zs_prioty_index!=8)then
     set zs_action_prioty_arry[52]=73
   endif
-  if G!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1000)or(HeroD==null and S>400 and EnemyCount>2)or ZhongliEnemy!=null)and can_dianwei_cast_t()then
+  if G!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1000)or(HeroD==null and MyHeroMP>400 and EnemyCount>2)or ZhongliEnemy!=null)and can_dianwei_cast_t()then
     set zs_action_prioty_arry[53]=80
   endif
 endfunction
@@ -11039,10 +11062,10 @@ function xun_spell_condition takes nothing returns nothing
   if not isxun()then
     return
   endif
-  if EnemyCount>2 and G!=null and can_xun_cast_g()and(not can_xun_cast_w()or(can_xun_cast_w()and S>300))then
+  if EnemyCount>2 and G!=null and can_xun_cast_g()and(not can_xun_cast_w()or(can_xun_cast_w()and MyHeroMP>300))then
     set zs_action_prioty_arry[50]=57
   endif
-  if can_xun_cast_t()and T>700 and G!=null and(not can_xun_cast_w()or(can_xun_cast_w()and S>300))then
+  if can_xun_cast_t()and T>700 and G!=null and(not can_xun_cast_w()or(can_xun_cast_w()and MyHeroMP>300))then
     set zs_action_prioty_arry[51]=62
   endif
   if HeroD!=null and can_xun_cast_w()and EnemyHeroHP>300 then
@@ -11155,7 +11178,7 @@ function zhangfei_spell_condition takes nothing returns nothing
   if HeroD!=null and can_zhangfei_cast_v()and RQV()then
     set zs_action_prioty_arry[54]=92
   endif
-  if G!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1000)or(HeroD==null and S>400 and EnemyCount>2))and RMV()then
+  if G!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1000)or(HeroD==null and MyHeroMP>400 and EnemyCount>2))and RMV()then
     set zs_action_prioty_arry[55]=80
   endif
 endfunction
@@ -11205,7 +11228,7 @@ function guojia_spell_condition takes nothing returns nothing
   if not isguojia()then
     return
   endif
-  if zs_canspelltoHerod and can_guojia_cast_n()and(S>400 or zs_HeroPower>0)and OG then
+  if zs_canspelltoHerod and can_guojia_cast_n()and(MyHeroMP>400 or zs_HeroPower>0)and OG then
     set zs_action_prioty_arry[50]=80
   endif
   if(HeroD!=null or T<700 or zs_myhero_hpchanged<-20)and can_guojia_cast_f()and zs_IsTimeOut(61,30)then
@@ -11214,18 +11237,18 @@ function guojia_spell_condition takes nothing returns nothing
   if HeroD!=null and(not IsJuFeng(HeroD))and can_guojia_cast_c()and(EnemyHeroHP<500 or zs_HeroPower>0)then
     set zs_action_prioty_arry[52]=89
   endif
-  if zs_canspelltoHerod and can_guojia_cast_c()and can_guojia_cast_n()and S>520 and(EnemyHeroHP<800 or zs_HeroPower>0)then
+  if zs_canspelltoHerod and can_guojia_cast_c()and can_guojia_cast_n()and MyHeroMP>520 and(EnemyHeroHP<800 or zs_HeroPower>0)then
     set zs_action_prioty_arry[53]=99
   endif
   if HeroD==null and G!=null and EnemyCount>1 and can_guojia_cast_n()and mHeroLevel>6 then
-    if S>1500 or IsManaAlmostFull(mHero)then
+    if MyHeroMP>1500 or IsManaAlmostFull(mHero)then
       set zs_action_prioty_arry[59]=58
     endif
   endif
-  if zs_canspelltoHerod and EnemyHeroHP>800 and EnemyHeroHP<1700 and MyHeroHP>600 and can_guojia_cast_c()and can_guojia_cast_n()and S>1300 and XIV(mHero)then
+  if zs_canspelltoHerod and EnemyHeroHP>800 and EnemyHeroHP<1700 and MyHeroHP>600 and can_guojia_cast_c()and can_guojia_cast_n()and MyHeroMP>1300 and XIV(mHero)then
     set zs_action_prioty_arry[60]=91
   endif
-  if zs_canspelltoHerod and not can_guojia_cast_c()and not can_guojia_cast_n()and S>800 and XIV(mHero)then
+  if zs_canspelltoHerod and not can_guojia_cast_c()and not can_guojia_cast_n()and MyHeroMP>800 and XIV(mHero)then
     call XAV(mHero)
   endif
 endfunction
@@ -11272,16 +11295,16 @@ function caoren_spell_condition takes nothing returns nothing
     return
   endif
   if not LF then
-    if zs_canspelltoHerod and(zs_HeroPower>0 or EnemyHeroHP<300 or S>330)and can_caoren_cast_c()and OG then
+    if zs_canspelltoHerod and(zs_HeroPower>0 or EnemyHeroHP<300 or MyHeroMP>330)and can_caoren_cast_c()and OG then
       set zs_action_prioty_arry[50]=85
     endif
-    if zs_canspelltoHerod and can_caoren_cast_f()and S>500 and rangeToHeroD<600 then
+    if zs_canspelltoHerod and can_caoren_cast_f()and MyHeroMP>500 and rangeToHeroD<600 then
       set zs_action_prioty_arry[51]=81
     endif
     if zs_canspelltoHerod and zs_HeroPower>0 and MyHeroHP>400 and can_caoren_cast_e()and rangeToHeroD>400 and OG then
       set zs_action_prioty_arry[52]=71
     endif
-    if G!=null and(EnemyCount>AllyCount+6 or((HeroD==null and EnemyCount>2)and S>400)or(GetHP(G)<300 and S>300))and can_caoren_cast_c()then
+    if G!=null and(EnemyCount>AllyCount+6 or((HeroD==null and EnemyCount>2)and MyHeroMP>400)or(GetHP(G)<300 and MyHeroMP>300))and can_caoren_cast_c()then
       set zs_action_prioty_arry[53]=80
     endif
     if zs_canspelltoHerod and(((EnemyHeroHP<600 or zs_HeroPower>0)and EnemyHeroHP>220)or MyHeroHP<330 or CW(mHero))and can_caoren_cast_g()then
@@ -11373,7 +11396,7 @@ function dadi_spell_condition takes nothing returns nothing
   if not isdadi()then
     return
   endif
-  if zs_canspelltoHerod and(zs_HeroPower>0 or rangeToHeroD<300 or EnemyHeroHP<300)and can_dadi_cast_t()and(S>400 or IsManaAlmostFull(mHero))and OG then
+  if zs_canspelltoHerod and(zs_HeroPower>0 or rangeToHeroD<300 or EnemyHeroHP<300)and can_dadi_cast_t()and(MyHeroMP>400 or IsManaAlmostFull(mHero))and OG then
     set zs_action_prioty_arry[50]=81
   endif
   if zs_canspelltoHerod and EnemyHeroHP<1200 and can_dadi_cast_c()and not can_UseFeiXie(mHero)and OG and GetUnitCurrentOrder(HeroD)!=851986 then
@@ -11452,7 +11475,7 @@ function madai_spell_condition takes nothing returns nothing
   set BSV=CanCastAbilityOrder(mHero,aid_madai_yingyan,"Locustswarm")
   set BTV=CanCastAbilityOrder2(mHero,aid_madai_zhuihun,"chainlightning")
   if HeroD!=null then
-    if BSV and(zs_HeroPower>0 or rangeToHeroD<500 or EnemyHeroHP<600)and(S>220 or IsManaAlmostFull(mHero))and OG then
+    if BSV and(zs_HeroPower>0 or rangeToHeroD<500 or EnemyHeroHP<600)and(MyHeroMP>220 or IsManaAlmostFull(mHero))and OG then
       set zs_action_prioty_arry[50]=81
     endif
     if BTV and(zs_HeroPower>0 or rangeToHeroD<500 or EnemyHeroHP<1000)and OG then
@@ -11497,7 +11520,7 @@ function zhanghe_spell_condition takes nothing returns nothing
   set BZV=CanCastAbilityOrderById2(mHero,aid_zhanghe_dujian,852254)
   set B_V=CanCastAbilityOrder2(mHero,aid_zhanghe_juduji,"shadowstrike")
   if HeroD!=null then
-    if BYV and(zs_HeroPower>0 or rangeToHeroD<500 or EnemyHeroHP<600)and(S>320 or IsManaAlmostFull(mHero))and OG then
+    if BYV and(zs_HeroPower>0 or rangeToHeroD<500 or EnemyHeroHP<600)and(MyHeroMP>320 or IsManaAlmostFull(mHero))and OG then
       set zs_action_prioty_arry[50]=81
     endif
     if BZV and zs_canspelltoHerod and(zs_HeroPower>0 or rangeToHeroD<500 or EnemyHeroHP<1000)and OG then
@@ -11583,7 +11606,7 @@ function sunquan_spell_condition takes nothing returns nothing
   set B3V=CanCastAbilityOrderById2(mHero,aid_sunquan_bizhan,852230)
   set BZV=CanCastAbilityOrder(mHero,ER,"roar")
   if HeroD!=null then
-    if BTV and(zs_HeroPower>0 or rangeToHeroD<500 or EnemyHeroHP<600)and(S>320 or IsManaAlmostFull(mHero))and OG then
+    if BTV and(zs_HeroPower>0 or rangeToHeroD<500 or EnemyHeroHP<600)and(MyHeroMP>320 or IsManaAlmostFull(mHero))and OG then
       set zs_action_prioty_arry[50]=81
     endif
     if B3V and(zs_HeroPower>0 or rangeToHeroD<500 or EnemyHeroHP<1000)and OG then
@@ -11623,13 +11646,13 @@ function gongben_spell_condition takes nothing returns nothing
   set B6V=HT(mHero,aid_xiahouyuan_huixuanzhan)
   set B_V=CanCastAbilityOrder2(mHero,aid_gongben_longzuishan,"dispel")
   if HeroD!=null then
-    if B_V and(zs_HeroPower>0 or rangeToHeroD<700 or EnemyHeroHP<600)and(S>320 or IsManaAlmostFull(mHero))and OG then
+    if B_V and(zs_HeroPower>0 or rangeToHeroD<700 or EnemyHeroHP<600)and(MyHeroMP>320 or IsManaAlmostFull(mHero))and OG then
       set zs_action_prioty_arry[50]=83
     endif
     if B6V and(zs_HeroPower>0 or rangeToHeroD<200 or EnemyHeroHP<1000)and RG then
       set zs_action_prioty_arry[51]=82
     endif
-    if B_V and B6V and(zs_HeroPower>0 or rangeToHeroD<700 or EnemyHeroHP<1000)and OG and S>190 then
+    if B_V and B6V and(zs_HeroPower>0 or rangeToHeroD<700 or EnemyHeroHP<1000)and OG and MyHeroMP>190 then
       set zs_action_prioty_arry[52]=89
     endif
   endif
@@ -12143,7 +12166,7 @@ function RefreshParam takes nothing returns nothing
     set rangeToHeroD=999999
   endif
   set MyHeroHP=GetHP(mHero)
-  set S=GetMP(mHero)
+  set MyHeroMP=GetMP(mHero)
   if NearestHeroD!=null then
     set KH=RangeTo(mHero,NearestHeroD)
   else
@@ -12208,7 +12231,7 @@ function RefreshParam2 takes nothing returns nothing
     set KH=9999999
   endif
   set MyHeroHP=GetHP(mHero)
-  set S=GetMP(mHero)
+  set MyHeroMP=GetMP(mHero)
   if TowerD!=null then
     set T=RangeTo(mHero,TowerD)
   else
@@ -12512,7 +12535,7 @@ function testhero takes nothing returns nothing
   endloop
   loop
     if intoUnitRange(HeroD,600)then
-      call XUV(HeroD)
+      call UseBianXing(HeroD)
       call Sleep(1)
       call UseFeiXie(GetUnitLoc(HeroD))
       call XRV(HeroD)
@@ -12522,7 +12545,7 @@ function testhero takes nothing returns nothing
       call E0(mHero,iid_xuanwufu)
       call E0(mHero,'ssan')
     endif
-    set S=GetMP(mHero)
+    set MyHeroMP=GetMP(mHero)
     if can_QingNangShu(mHero)then
       call debugstr("can_QingNangShu")
       call UseQingNangShu()
@@ -12531,9 +12554,9 @@ function testhero takes nothing returns nothing
       call debugstr("can_UseMengDe")
       call UseMengDe(HeroD)
     endif
-    if IsAlive(HeroD)and XTV(mHero)and intoUnitRange(HeroD,600)then
+    if IsAlive(HeroD)and can_UseBianXing(mHero)and intoUnitRange(HeroD,600)then
       call debugstr("can_UseBianXing")
-      call XUV(HeroD)
+      call UseBianXing(HeroD)
     endif
     if can_SunZiBingFa(mHero)then
       call debugstr("can_SunZiBingFa")
@@ -12593,7 +12616,7 @@ function testhero takes nothing returns nothing
     call debugstr("can_UseFengZhang")
   endif
   call UseQingNangShu()
-  if XTV(mHero)then
+  if can_UseBianXing(mHero)then
     call debugstr("can_UseBianXing")
   endif
   loop
@@ -12614,7 +12637,7 @@ function testhero takes nothing returns nothing
   call Sleep(2)
   call XGV(GetEnemyNearestBubingNearHero(mHero,1200,false))
   call Sleep(2)
-  call XUV(GetEnemyNearestBubingNearHero(mHero,1200,false))
+  call UseBianXing(GetEnemyNearestBubingNearHero(mHero,1200,false))
   call Sleep(2)
   call UseTuiMoDao(GetEnemyNearestBubingNearHero(mHero,1200,false))
   call Sleep(2)
