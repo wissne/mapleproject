@@ -9567,181 +9567,6 @@ function getNearestFLFromBase takes nothing returns integer
 endfunction
 
 function zs_shiftLine_cdt takes nothing returns nothing
-  local boolean aidzhonglu=false
-  local boolean likaizhonglu=false
-  local integer nearestfl=-1
-  local integer priority=51
-  local integer NDV=-1
-  local integer bangbianlu=-1
-  local boolean NFV=false
-  local integer NGV=-1
-  if not LD then
-    return
-  endif
-  if T<1200 then
-    set priority=55
-  endif
-  if ZhongluAllyHeroCountNearFL>0 and ZhongluEnemyHeroCountNearFL>0 and zs_cr_fightline!=1 then
-    set aidzhonglu=true
-  endif
-  if zs_cr_fightline==1 and HN!=1 and(MyHeroHP<500 or MyHeroHP<130 or ZhongluEnemyHeroCountNearFL==0 or RangeToLoc(HeroD,zs_firelines[1])>1200 or GetHP(zs_AllyHeroNearestToMe)<500 or GetMP(zs_AllyHeroNearestToMe)<200)then
-    set likaizhonglu=true
-  endif
-  if isZhuGeLiang()or isSiMaYi()then
-  endif
-  if ShangluAllyHeroCountNearFL>0 and ShangluEnemyHeroCountNearFL>0 and((zs_cr_fightline==1 and mHeroLevel>7 and MyHeroHP>500 and MyHeroMP>300)or likaizhonglu)then
-    if(TowerD!=null and RangeToLoc(TowerD,zs_MyFireLoc)<1000)or(RF[0]==null or RangeToLoc(RF[0],zs_firelines[0])>2000)then
-      set NDV=0
-    endif
-  endif
-  if XialuAllyHeroCountNearFL>0 and XialuEnemyHeroCountNearFL>0 and((zs_cr_fightline==1 and mHeroLevel>7 and MyHeroHP>500 and MyHeroMP>300)or likaizhonglu)then
-    if(TowerD!=null and RangeToLoc(TowerD,zs_MyFireLoc)<1000)or(RF[2]==null or RangeToLoc(RF[2],zs_firelines[2])>2000)then
-      set NDV=2
-    endif
-  endif
-  if zs_cr_fightline==0 and HN!=0 and(ShangluEnemyHeroCountNearFL==0 or MyHeroHP<500 or MyHeroMP<100 or RangeToLoc(TowerD,zs_MyFireLoc)<1000)then
-    set NDV=1
-    set NFV=true
-  endif
-  if zs_cr_fightline==2 and HN!=2 and(XialuEnemyHeroCountNearFL==0 or MyHeroHP<500 or MyHeroMP<100 or RangeToLoc(TowerD,zs_MyFireLoc)<1000)then
-    set NDV=1
-    set NFV=true
-  endif
-  if isweiyan()then
-    if aidzhonglu and mHeroLevel>1 and MyHeroHP>550 and can_weiyan_cast_t()then
-      set NDV=1
-    endif
-  endif
-  if isguanyu()then
-    if aidzhonglu and mHeroLevel>5 and MyHeroHP>550 and can_guanyu_cast_x()then
-      set NDV=1
-    endif
-  endif
-  if iszhangfei()then
-    if aidzhonglu and mHeroLevel>10 and isHeroHasFeiXie(mHero)and MyHeroHP>550 and RMV()then
-      set NDV=1
-    endif
-  endif
-  if iszhaoyun()then
-    if aidzhonglu and mHeroLevel>15 and MyHeroHP>550 and can_zhaoyun_cast_b()then
-      set NDV=1
-    endif
-  endif
-  if isdadi()then
-    if aidzhonglu and mHeroLevel>15 and MyHeroHP>550 and can_dadi_cast_c()then
-      set NDV=1
-    endif
-  endif
-  if isdianwei()then
-    if aidzhonglu and mHeroLevel>5 and MyHeroHP>550 and can_dianwei_cast_t()then
-      set NDV=1
-    endif
-  endif
-  if isguojia()then
-    if aidzhonglu and mHeroLevel>5 and MyHeroHP>550 and can_guojia_cast_c()then
-      set NDV=1
-    endif
-  endif
-  if iszhangliao()then
-    if aidzhonglu and mHeroLevel>7 and MyHeroHP>550 and can_zhangliao_cast_fw()then
-      set NDV=1
-    endif
-  endif
-  if isxun()then
-    if aidzhonglu and mHeroLevel>5 and can_xun_cast_w()and MyHeroHP>550 then
-      set NDV=1
-    endif
-  endif
-  if iscaoren()then
-    if aidzhonglu and mHeroLevel>2 and MyHeroHP>550 and(can_caoren_cast_g()or can_caoren_cast_c())then
-      set NDV=1
-    endif
-  endif
-  if not GG and aidzhonglu then
-    if FG==0 and MyHeroHP>600 and MyHeroMP>200 and mHeroLevel>3 then
-      set NDV=1
-    endif
-    if FG==1 and MyHeroHP>700 and mHeroLevel>10 then
-      set NDV=1
-    endif
-    if FG==2 and MyHeroHP>700 and mHeroLevel>8 then
-      set NDV=1
-    endif
-  endif
-  if likaizhonglu then
-    if NDV==-1 or NDV==zs_cr_fightline then
-      set NDV=HN
-    endif
-  endif
-  set nearestfl=getNearestFLFromBase()
-  if AS()>25*60 and mHeroLevel>11 then
-    set ND=9999
-    set likaizhonglu=false
-    set NFV=false
-    set NDV=-1
-    if DF[1]!=null and IsAlive(DF[1])then
-      set NDV=1
-    endif
-    if DF[2]!=null and IsAlive(DF[2])then
-      set NDV=2
-    endif
-    if DF[0]!=null and IsAlive(DF[0])then
-      set NDV=0
-    endif
-    if nearestfl>-1 and nearestfl!=zs_cr_fightline and RangeLocToLoc(mBaseLoc,zs_firelines[nearestfl])<9000 and J6(zs_firelines[nearestfl],2500)>1 then
-      set NDV=nearestfl
-    endif
-  endif
-  if AS()>46*60 and NF!=null and not IG then
-    set likaizhonglu=false
-    set NFV=false
-    if mForceId==1 then
-      set NDV=2
-    endif
-    if mForceId==2 then
-      set NDV=0
-    endif
-  endif
-  if nearestfl>-1 and nearestfl!=zs_cr_fightline and RangeLocToLoc(mBaseLoc,zs_firelines[nearestfl])<5000 then
-    set priority=56
-    if nearestfl==0 and ShangluEnemyHeroCountNearFL>1 then
-      set NGV=nearestfl
-    endif
-    if nearestfl==1 and ZhongluEnemyHeroCountNearFL>1 then
-      set NGV=nearestfl
-    endif
-    if nearestfl==2 and XialuEnemyHeroCountNearFL>1 then
-      set NGV=nearestfl
-    endif
-    if AO<99 and NGV>-1 then
-      set AO=nearestfl
-    endif
-  endif
-  if NDV>-1 then
-    if zs_IsTimeOut(85,50)then
-      if AO<99 then
-        set AO=NDV
-      endif
-    endif
-  endif
-  if NFV or(likaizhonglu and mHeroLevel<16)then
-    set AO=NDV
-  endif
-  if AO>-1 and zs_cr_fightline!=AO then
-    if AO>99 then
-      set priority=55
-    endif
-    if AO==103 then
-      set priority=57
-    endif
-    if AO==101 or(AO>=104 and AO<=106)then
-      set priority=79
-    endif
-    set zs_action_prioty_arry[90+AO]=priority
-    if AO>99 then
-      set zs_action_prioty_arry[99]=priority
-    endif
-  endif
 endfunction
 
 function GetLineLocByRangeFromBase takes integer lineid,real range returns location
@@ -9835,20 +9660,7 @@ function zs_gotoFL takes integer id returns nothing
 endfunction
 
 function zs_shiftLine_action takes integer index returns nothing
-  if index==90 then
-    call zs_gotoFL(0)
-  endif
-  if index==91 then
     call zs_gotoFL(1)
-  endif
-  if index==92 then
-    call zs_gotoFL(2)
-  endif
-  if index==93 then
-  endif
-  if index==99 then
-    call zs_gotoFL(AO)
-  endif
 endfunction
 
 function zs_get_sima_e_damage takes nothing returns integer
@@ -11795,17 +11607,17 @@ function COV takes nothing returns nothing
   if zs_CCPlayerID<0 then
     return
   endif
-  if BJ then
-    call CXV()
-    return
-  endif
-  if IJ then
-    if NS()>24 then
-      call CEV()
-    endif
-    return
-  endif
-  call CEV()
+//  if BJ then
+//    call CXV()
+//    return
+//  endif
+//  if IJ then
+//    if NS()>24 then
+//      call CEV()
+//    endif
+//    return
+//  endif
+  call CXV()
 endfunction
 
 function isToLoop takes nothing returns boolean
