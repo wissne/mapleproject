@@ -341,7 +341,7 @@ globals
   integer NG=0
   unit BG=null
   real CG=999999
-  integer DG=-1
+  integer zs_player_index=-1
   integer FG=0
   boolean GG=false
   integer HG=0
@@ -11744,12 +11744,12 @@ function CEV takes nothing returns nothing
 endfunction
 
 function CXV takes nothing returns nothing
-  if DG==1 then
+  if zs_player_index==1 then
     if BuyHero('n001',hid_zhugeliang)then
       return
     endif
   endif
-  if DG==7 then
+  if zs_player_index==7 then
     if BuyHero('n000',hid_simayi)then
       return
     endif
@@ -11758,28 +11758,28 @@ function CXV takes nothing returns nothing
     return
   endif
   call Sleep(2)
-  if DG==4 then
+  if zs_player_index==4 then
     call BuyHero('n001',hid_weiyan)
   endif
-  if DG==2 then
+  if zs_player_index==2 then
     call BuyHero('n001',hid_guanyu)
   endif
-  if DG==5 then
+  if zs_player_index==5 then
     call BuyHero('n001',hid_zhaoyun)
   endif
-  if DG==3 then
+  if zs_player_index==3 then
     call BuyHero('n001',hid_zhangfei)
   endif
-  if DG==8 then
+  if zs_player_index==8 then
     call BuyHero('n000',hid_guojia)
   endif
-  if DG==10 then
+  if zs_player_index==10 then
     call BuyHero('n000',hid_dianwei)
   endif
-  if DG==11 then
+  if zs_player_index==11 then
     call BuyHero('n00Y',hid_xun)
   endif
-  if DG==9 then
+  if zs_player_index==9 then
     call BuyHero('n000',hid_caoren)
   endif
   call Sleep(3)
@@ -13508,7 +13508,7 @@ function main takes nothing returns nothing
   endif
   set C0V=null
   set mForceId=getForceId()
-  set DG=GetPlayerId(ai_player)
+  set zs_player_index=GetPlayerId(ai_player)
   call adjustBaseLoc()
   if mForceId==1 then
     set zs_path_middle[0]=suguoBaseLoc
