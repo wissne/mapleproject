@@ -5,16 +5,16 @@ globals
   constant real bj_RADTODEG=180./3.14159
   integer array zs_action_prioty_arry
   unit budaobingW=null
-  unit N=null
+  unit budaobingW2=null
   unit budaobingD=null
-  unit C=null
+  unit budaobingD2=null
   unit TowerD=null
   unit TowerW=null
-  unit G=null
+  unit NearestEnemyBubing=null
   unit FarestAllyBubing=null
   unit ZhongliEnemy=null
-  boolean K=false
-  location L=null
+  boolean zs_kickoff=false
+  location safeLoc=null
   real EnemyHeroHP=99999
   real EnemyHeroMP=99999
   real MyHeroHP=0
@@ -22,19 +22,19 @@ globals
   real T=99999
   real U=99999
   real rangeToHeroD=999999
-  integer Y=0
+  integer EnemyHeroLevel=0
   integer mHeroLevel=0
   integer EnemyCount=0
   integer ZhongliEnemyCount=0
   integer AllyCount=0
-  integer OV=0
+  integer crEnemyHeroOrder=0
   integer array spell_damage_m
   integer zs_prioty_index=0
   location zs_MyFireLoc=null
   real NV=999999
   integer BV=990
-  gamecache CV=InitGameCache("zhensan.w3v")
-  gamecache DV=CV
+  gamecache zs_gamecache=InitGameCache("zhensan.w3v")
+  gamecache zs_gamecache2=zs_gamecache
   integer FV=0
   string aistr=""
   integer hid_zhugeliang='H008'
@@ -519,7 +519,7 @@ function AngleBetweenUnits takes unit u1,unit u2 returns real
   return bj_RADTODEG*Atan2(GetUnitY(u2)-GetUnitY(u1),GetUnitX(u2)-GetUnitX(u1))
 endfunction
 
-function WL takes unit u1,unit u2,unit u3 returns boolean
+function AngleBetweenThreeUnits takes unit u1,unit u2,unit u3 returns boolean
   local real YL=AngleBetweenUnits(u3,u1)
   local real ZL=AngleBetweenUnits(u3,u2)
   return absolute(YL-ZL)<60
@@ -965,69 +965,69 @@ function NS takes nothing returns real
 endfunction
 
 function BS takes string MyHeroMP,integer i returns nothing
-  call StoreInteger(CV,"storevaluei",MyHeroMP,i)
+  call StoreInteger(zs_gamecache,"storevaluei",MyHeroMP,i)
 endfunction
 
 function CS takes string MyHeroMP returns integer
-  return GetStoredInteger(CV,"storevaluei",MyHeroMP)
+  return GetStoredInteger(zs_gamecache,"storevaluei",MyHeroMP)
 endfunction
 
 function FS takes integer GS,integer level,integer cd returns nothing
-  call StoreInteger(CV,"cd"+ITS(level),ITS(GS),cd)
+  call StoreInteger(zs_gamecache,"cd"+ITS(level),ITS(GS),cd)
 endfunction
 
 function JS takes integer GS,integer level returns integer
-  return GetStoredInteger(CV,"cd"+ITS(level),ITS(GS))
+  return GetStoredInteger(zs_gamecache,"cd"+ITS(level),ITS(GS))
 endfunction
 
 function KS takes integer LS,integer index,integer MS returns nothing
-  call StoreInteger(CV,"ha"+ITS(LS),ITS(index),MS)
+  call StoreInteger(zs_gamecache,"ha"+ITS(LS),ITS(index),MS)
 endfunction
 
 function PS takes integer LS,integer index returns integer
-  return GetStoredInteger(CV,"ha"+ITS(LS),ITS(index))
+  return GetStoredInteger(zs_gamecache,"ha"+ITS(LS),ITS(index))
 endfunction
 
 function QS takes integer LS,integer count returns nothing
-  call StoreInteger(CV,ITS(LS),"hacount",count)
+  call StoreInteger(zs_gamecache,ITS(LS),"hacount",count)
 endfunction
 
 function TS takes integer LS returns integer
-  return GetStoredInteger(CV,ITS(LS),"hacount")
+  return GetStoredInteger(zs_gamecache,ITS(LS),"hacount")
 endfunction
 
 function VT takes integer GS returns integer
-  return GetStoredInteger(CV,"aspelltype",ITS(GS))
+  return GetStoredInteger(zs_gamecache,"aspelltype",ITS(GS))
 endfunction
 
 function ET takes integer GS,integer level,integer mp returns nothing
-  call StoreInteger(CV,"mpneed"+ITS(level),ITS(GS),mp)
+  call StoreInteger(zs_gamecache,"mpneed"+ITS(level),ITS(GS),mp)
 endfunction
 
 function XT takes integer GS,integer level returns integer
-  return GetStoredInteger(CV,"mpneed"+ITS(level),ITS(GS))
+  return GetStoredInteger(zs_gamecache,"mpneed"+ITS(level),ITS(GS))
 endfunction
 
 function OT takes integer GS,integer range returns nothing
-  call StoreInteger(CV,"abilityrange",ITS(GS),range)
+  call StoreInteger(zs_gamecache,"abilityrange",ITS(GS),range)
 endfunction
 
 function RT takes integer GS,integer IT returns nothing
-  call StoreInteger(CV,"abilityOderId",ITS(GS),IT)
+  call StoreInteger(zs_gamecache,"abilityOderId",ITS(GS),IT)
 endfunction
 
 function NT takes unit theUnit,integer GS,integer time returns nothing
   if theUnit==null then
     return
   endif
-  call StoreInteger(CV,ITS(AK(theUnit))+"abilityLastSpellTime",ITS(GS),time)
+  call StoreInteger(zs_gamecache,ITS(AK(theUnit))+"abilityLastSpellTime",ITS(GS),time)
 endfunction
 
 function CT takes unit theUnit,integer GS returns integer
   if theUnit==null then
     return 999999
   endif
-  return GetStoredInteger(CV,ITS(AK(theUnit))+"abilityLastSpellTime",ITS(GS))
+  return GetStoredInteger(zs_gamecache,ITS(AK(theUnit))+"abilityLastSpellTime",ITS(GS))
 endfunction
 
 function DT takes unit theUnit,integer GS returns integer
@@ -2888,17 +2888,17 @@ function zs_IsTimeOut takes integer id,real period returns boolean
   return false
 endfunction
 
-function W1 takes group g returns integer
+function W1 takes group NearestEnemyBubing returns integer
   local integer count=0
   local integer index=0
   local unit u=null
   local group rg=null
-  if g==null then
+  if NearestEnemyBubing==null then
     return-1
   endif
   set rg=CreateGroup()
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen index>=13
     if u!=null and IsAlive(u)then
       call SetUnitAcquireRange(u,61)
@@ -2906,35 +2906,35 @@ function W1 takes group g returns integer
       call GroupAddUnit(rg,u)
     endif
     set index=index+1
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  if g==VF then
+  if NearestEnemyBubing==VF then
     set VF=rg
   endif
-  if g==zs_toushiche_group then
+  if NearestEnemyBubing==zs_toushiche_group then
     set zs_toushiche_group=rg
   endif
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   return count
 endfunction
 
 function SelectUnitsById takes player ThePlayer,integer uid returns group
   local unit u=null
-  local group g=CreateGroup()
+  local group NearestEnemyBubing=CreateGroup()
   local group rg=CreateGroup()
-  call GroupEnumUnitsOfPlayer(g,ThePlayer,null)
+  call GroupEnumUnitsOfPlayer(NearestEnemyBubing,ThePlayer,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(GetUnitTypeId(u)==uid and IsAlive(u))then
       call SetUnitAcquireRange(u,61)
       call GroupAddUnit(rg,u)
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   return rg
 endfunction
 
@@ -2944,37 +2944,37 @@ endfunction
 
 function SelectUnitsByIlussion takes player ThePlayer returns group
   local unit u=null
-  local group g=CreateGroup()
+  local group NearestEnemyBubing=CreateGroup()
   local group rg=CreateGroup()
-  call GroupEnumUnitsOfPlayer(g,ThePlayer,null)
+  call GroupEnumUnitsOfPlayer(NearestEnemyBubing,ThePlayer,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(IsUnitIllusion(u)and IsAlive(u))then
       call GroupAddUnit(rg,u)
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   return rg
 endfunction
 
 function SelectWard takes player ThePlayer returns group
   local unit u=null
-  local group g=CreateGroup()
+  local group NearestEnemyBubing=CreateGroup()
   local group rg=CreateGroup()
-  call GroupEnumUnitsOfPlayer(g,ThePlayer,null)
+  call GroupEnumUnitsOfPlayer(NearestEnemyBubing,ThePlayer,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(GetUnitTypeId(u)=='o00H' or GetUnitTypeId(u)=='o00I' or GetUnitTypeId(u)=='o00J')and IsAlive(u)then
       call GroupAddUnit(rg,u)
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   return rg
 endfunction
 
@@ -3015,14 +3015,14 @@ function A2 takes unit theunit,integer N2 returns integer
 endfunction
 
 function B2 takes unit u,string id returns nothing
-  call StoreInteger(CV,"units",id,AK(u))
+  call StoreInteger(zs_gamecache,"units",id,AK(u))
 endfunction
 
 function C2 takes string id returns unit
-  if GetStoredInteger(CV,"units",id)<1 then
+  if GetStoredInteger(zs_gamecache,"units",id)<1 then
     return null
   endif
-  return NK(GetStoredInteger(CV,"units",id))
+  return NK(GetStoredInteger(zs_gamecache,"units",id))
 endfunction
 
 function D2 takes location loc returns nothing
@@ -3108,7 +3108,7 @@ function P2 takes location loc returns boolean
 endfunction
 
 function Q2 takes nothing returns nothing
-  local integer S2=GetStoredInteger(CV,"zs_itemNearHero","playerid"+ITS(GetPlayerId(ai_player)))
+  local integer S2=GetStoredInteger(zs_gamecache,"zs_itemNearHero","playerid"+ITS(GetPlayerId(ai_player)))
   set GD=null
   if S2>0 then
     set GD=CK(S2)
@@ -3117,7 +3117,7 @@ endfunction
 
 function T2 takes nothing returns nothing
   set GD=null
-  call StoreInteger(CV,"zs_itemNearHero","playerid"+ITS(GetPlayerId(ai_player)),-1)
+  call StoreInteger(zs_gamecache,"zs_itemNearHero","playerid"+ITS(GetPlayerId(ai_player)),-1)
 endfunction
 
 function U2 takes integer JT,integer level,integer cd,integer mp,integer range,integer W2 returns nothing
@@ -3210,10 +3210,10 @@ function getUnitByid takes integer iunitid,location loc,real radius returns unit
   local real nearestRange=999999
   local unit u=null
   local unit ru=null
-  local group g=CreateGroup()
-  call GroupEnumUnitsInRangeOfLoc(g,loc,radius,null)
+  local group NearestEnemyBubing=CreateGroup()
+  call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,loc,radius,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(GetUnitTypeId(u)==iunitid)then
       set TheRange=RangeToLoc(u,loc)
@@ -3222,10 +3222,10 @@ function getUnitByid takes integer iunitid,location loc,real radius returns unit
         set ru=u
       endif
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   if(ru==null)then
   endif
   return ru
@@ -3233,18 +3233,18 @@ endfunction
 
 function F3 takes nothing returns nothing
   local unit u=null
-  local group g=CreateGroup()
-  call GroupEnumUnitsInRangeOfLoc(g,TH,600,null)
+  local group NearestEnemyBubing=CreateGroup()
+  call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,TH,600,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if GetUnitTypeId(u)==uid_dragon and IsAlive(u)then
       set SH=u
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
 endfunction
 
 function G3 takes unit TheUnit,real Radius,boolean includeInvisible returns unit
@@ -3253,16 +3253,16 @@ function G3 takes unit TheUnit,real Radius,boolean includeInvisible returns unit
   local real nearestRange=999999
   local unit u=null
   local unit ru=null
-  local group g=CreateGroup()
+  local group NearestEnemyBubing=CreateGroup()
   if(TheUnit==null)and(not IsAlive(TheUnit))then
     return null
   endif
   set Loc=GetUnitLoc(TheUnit)
-  call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+  call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
   call RemoveLocation(Loc)
   set Loc=null
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if IsUnitEnemy(u,ai_player)and IsAlive(u)then
       if GetUnitTypeId(u)==uid_zhimingjiejieLv1 or GetUnitTypeId(u)==uid_zhimingjiejieLv2 or GetUnitTypeId(u)==uid_zhimingjiejieLv3 or GetUnitTypeId(u)==uid_zhimingjiejieLv4 then
@@ -3284,10 +3284,10 @@ function G3 takes unit TheUnit,real Radius,boolean includeInvisible returns unit
         endif
       endif
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   if(ru!=null)then
   endif
   set u=null
@@ -3298,16 +3298,16 @@ function GetNearestEnemyImportantStructs takes unit TheUnit,real Radius,boolean 
   local location Loc=null
   local unit u=null
   local unit ru=null
-  local group g=CreateGroup()
+  local group NearestEnemyBubing=CreateGroup()
   if(TheUnit==null)and(not IsAlive(TheUnit))then
     return null
   endif
   set Loc=GetUnitLoc(TheUnit)
-  call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+  call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
   call RemoveLocation(Loc)
   set Loc=null
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null or ru!=null
     if IsUnitEnemy(u,ai_player)and IsAlive(u)then
       if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
@@ -3316,10 +3316,10 @@ function GetNearestEnemyImportantStructs takes unit TheUnit,real Radius,boolean 
         endif
       endif
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   set u=null
   if ru==null then
     if NF!=null and RangeTo(TheUnit,NF)<2800 then
@@ -3335,16 +3335,16 @@ function GetNearestEnemyTower takes unit TheUnit,real Radius returns unit
   local real nearestRange=999999
   local unit u=null
   local unit ru=null
-  local group g=CreateGroup()
+  local group NearestEnemyBubing=CreateGroup()
   if(TheUnit==null)and(not IsAlive(TheUnit))then
     return null
   endif
   set Loc=GetUnitLoc(TheUnit)
-  call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+  call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
   call RemoveLocation(Loc)
   set Loc=null
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(IsEnemyTower(u))then
       set TheRange=RangeTo(TheUnit,u)
@@ -3353,10 +3353,10 @@ function GetNearestEnemyTower takes unit TheUnit,real Radius returns unit
         set ru=u
       endif
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   if(ru!=null)then
   endif
   set u=null
@@ -3366,20 +3366,20 @@ endfunction
 function GetEnemyBingInRangeCount takes location Loc,real Radius,boolean includeInvisible returns integer
   local integer result=0
   local unit u=null
-  local group g=CreateGroup()
-  call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+  local group NearestEnemyBubing=CreateGroup()
+  call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(IsEnemyBing(u)and IsAlive(u))then
       if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
         set result=result+1
       endif
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   set u=null
   return result
 endfunction
@@ -3387,20 +3387,20 @@ endfunction
 function GetAllyBingInRangeCount takes location Loc,real Radius,boolean includeInvisible returns integer
   local integer result=0
   local unit u=null
-  local group g=CreateGroup()
-  call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+  local group NearestEnemyBubing=CreateGroup()
+  call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(IsAllyBing(u)and IsAlive(u))then
       if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
         set result=result+1
       endif
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   set u=null
   return result
 endfunction
@@ -3408,20 +3408,20 @@ endfunction
 function GetZhongliEnemyInRangeCount takes location Loc,real Radius,boolean includeInvisible returns integer
   local integer result=0
   local unit u=null
-  local group g=CreateGroup()
-  call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+  local group NearestEnemyBubing=CreateGroup()
+  call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(isZhongLiEnemy(u)and IsAlive(u))then
       if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
         set result=result+1
       endif
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   set u=null
   return result
 endfunction
@@ -3432,16 +3432,16 @@ function GetFarestAllyBubingNearHeroFromBase takes unit TheUnit,real Radius,bool
   local real fareastRange=0
   local unit u=null
   local unit ru=null
-  local group g=CreateGroup()
+  local group NearestEnemyBubing=CreateGroup()
   if(TheUnit==null)or(not IsAlive(TheUnit))then
     return null
   endif
   set Loc=GetUnitLoc(TheUnit)
-  call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+  call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
   call RemoveLocation(Loc)
   set Loc=null
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(IsAllyBing(u)and IsMoving(u))then
       if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
@@ -3452,10 +3452,10 @@ function GetFarestAllyBubingNearHeroFromBase takes unit TheUnit,real Radius,bool
         endif
       endif
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   if(ru!=null)then
   endif
   set u=null
@@ -3467,10 +3467,10 @@ function GetFarestAllyFromBaseInMiddleLine takes nothing returns unit
   local real FarestRange=0
   local unit u=null
   local unit ru=null
-  local group g=CreateGroup()
-  call GroupEnumUnitsInRangeOfLoc(g,mBaseLoc,999999,null)
+  local group NearestEnemyBubing=CreateGroup()
+  call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,mBaseLoc,999999,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(IsAllyBingAttaker(u)and isUnitInMiddleLine(u))then
       set TheRange=RangeToLoc(u,mBaseLoc)
@@ -3479,10 +3479,10 @@ function GetFarestAllyFromBaseInMiddleLine takes nothing returns unit
         set ru=u
       endif
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   if(ru==null)then
   endif
   set u=null
@@ -3494,10 +3494,10 @@ function GetNearestEnemyFromBaseInMiddleLine takes nothing returns unit
   local real NearestRange=999999
   local unit u=null
   local unit ru=null
-  local group g=CreateGroup()
-  call GroupEnumUnitsInRangeOfLoc(g,mBaseLoc,999999,null)
+  local group NearestEnemyBubing=CreateGroup()
+  call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,mBaseLoc,999999,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(IsEnemyBingAttaker(u)and isUnitInMiddleLine(u))then
       set TheRange=RangeToLoc(u,mBaseLoc)
@@ -3506,10 +3506,10 @@ function GetNearestEnemyFromBaseInMiddleLine takes nothing returns unit
         set ru=u
       endif
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   if(ru==null)then
   endif
   set u=null
@@ -3567,14 +3567,14 @@ function N4 takes nothing returns unit
     set r1=T
     set B4=r1
   endif
-  if G!=null then
-    set r2=RangeTo(mHero,G)
+  if NearestEnemyBubing!=null then
+    set r2=RangeTo(mHero,NearestEnemyBubing)
   endif
   if NearestHeroD!=null then
     set r3=KH
   endif
   if r2<r1 then
-    set ru=G
+    set ru=NearestEnemyBubing
     set B4=r2
   endif
   if r3<B4 then
@@ -3594,14 +3594,14 @@ function C4 takes nothing returns unit
     set r1=T-DB
     set B4=r1
   endif
-  if G!=null then
-    set r2=RangeTo(mHero,G)-zs_SafeLocRangeToEnemy
+  if NearestEnemyBubing!=null then
+    set r2=RangeTo(mHero,NearestEnemyBubing)-zs_SafeLocRangeToEnemy
   endif
   if NearestHeroD!=null then
     set r3=KH-900
   endif
   if r2<r1 then
-    set ru=G
+    set ru=NearestEnemyBubing
     set B4=r2
   endif
   if r3<B4 then
@@ -3649,16 +3649,16 @@ function GetEnemyNearestBubingNearHero takes unit TheUnit,real Radius,boolean in
   local real fareastRange=999999
   local unit u=null
   local unit ru=null
-  local group g=CreateGroup()
+  local group NearestEnemyBubing=CreateGroup()
   if(TheUnit==null)or(not IsAlive(TheUnit))then
     return null
   endif
   set Loc=GetUnitLoc(TheUnit)
-  call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+  call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
   call RemoveLocation(Loc)
   set Loc=null
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(IsEnemyBing(u)and IsAlive(u))then
       if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
@@ -3669,10 +3669,10 @@ function GetEnemyNearestBubingNearHero takes unit TheUnit,real Radius,boolean in
         endif
       endif
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   if(ru!=null)then
   endif
   set u=null
@@ -3685,17 +3685,17 @@ function GetEnemyWeakestBubingNearHero takes unit TheUnit,real Radius,boolean in
   local real fareastRange=999999
   local unit u=null
   local unit ru=null
-  local group g=CreateGroup()
+  local group NearestEnemyBubing=CreateGroup()
   if(TheUnit==null)or(not IsAlive(TheUnit))then
     call debugstr(" unit null")
     return null
   endif
   set Loc=GetUnitLoc(TheUnit)
-  call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
+  call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
   call RemoveLocation(Loc)
   set Loc=null
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(IsEnemyBing(u)and IsAlive(u))then
       if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
@@ -3706,10 +3706,10 @@ function GetEnemyWeakestBubingNearHero takes unit TheUnit,real Radius,boolean in
         endif
       endif
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   if(ru!=null)then
   endif
   set u=null
@@ -3920,8 +3920,8 @@ function resetParam takes nothing returns nothing
   set zs_NearestEnemyBingFromRetreatLocMinRange=9999999
   set budaobingD=null
   set budaobingW=null
-  set C=null
-  set N=null
+  set budaobingD2=null
+  set budaobingW2=null
   set YH=null
   set ZH=null
   set VJ=null
@@ -3965,7 +3965,7 @@ function resetParam takes nothing returns nothing
   if IsDead(zs_nearestMinHpEnemyBing)then
     set zs_nearestMinHpEnemyBing=null
   endif
-  set G=null
+  set NearestEnemyBubing=null
   set ZhongliEnemy=null
   set FarestAllyBubing=null
   set FarestAllyBubingFromRetreatLoc=null
@@ -3982,14 +3982,14 @@ function X5 takes nothing returns nothing
   if IsDead(budaobingW)then
     set budaobingW=null
   endif
-  if IsDead(C)then
-    set C=null
+  if IsDead(budaobingD2)then
+    set budaobingD2=null
   endif
   if IsDead(HeroD)then
     set HeroD=null
   endif
-  if IsDead(N)then
-    set N=null
+  if IsDead(budaobingW2)then
+    set budaobingW2=null
   endif
 endfunction
 
@@ -4105,7 +4105,7 @@ function setEnemyBingNearHero takes unit TheUnit returns nothing
     endif
     if RangeTo(TheUnit,mHero)<ZB and GetUnitTypeId(TheUnit)!=uid_toushiche then
       set ZB=RangeTo(TheUnit,mHero)
-      set G=TheUnit
+      set NearestEnemyBubing=TheUnit
     endif
     if GetHP(TheUnit)>ND and(zs_attackEnemyBing==null or RangeTo(TheUnit,mHero)<RangeTo(zs_attackEnemyBing,mHero))then
       if not isZhongLiEnemy(TheUnit)then
@@ -4194,11 +4194,11 @@ endfunction
 
 function enumUnitsNearMyHero takes nothing returns nothing
   local unit u=null
-  local group g=CreateGroup()
+  local group NearestEnemyBubing=CreateGroup()
   local integer i=0
-  call GroupEnumUnitsInRange(g,GetUnitX(mHero),GetUnitY(mHero),zs_gardRange,null)
+  call GroupEnumUnitsInRange(NearestEnemyBubing,GetUnitX(mHero),GetUnitY(mHero),zs_gardRange,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if(IsAlive(u)and CanAttack(u))then
       if not IsUnitInvisible(u,ai_player)then
@@ -4215,10 +4215,10 @@ function enumUnitsNearMyHero takes nothing returns nothing
       call setEnemyNonAttackStructureNearMyHero(u)
     endif
     call F5(u)
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   set u=null
 endfunction
 
@@ -4284,18 +4284,18 @@ endfunction
 function getfirstHeroOfPlayer takes player p returns unit
   local unit u=null
   local unit ru=null
-  local group g=CreateGroup()
-  call GroupEnumUnitsOfPlayer(g,p,null)
+  local group NearestEnemyBubing=CreateGroup()
+  call GroupEnumUnitsOfPlayer(NearestEnemyBubing,p,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null or ru!=null
     if(IsUnitType(u,UNIT_TYPE_HERO) and GetUnitUserData(u)<100)then
       set ru=u
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   set u=null
   return ru
 endfunction
@@ -4386,18 +4386,18 @@ endfunction
 function getGSOfPlayer takes player p returns unit
   local unit u=null
   local unit ru=null
-  local group g=CreateGroup()
-  call GroupEnumUnitsOfPlayer(g,p,null)
+  local group NearestEnemyBubing=CreateGroup()
+  call GroupEnumUnitsOfPlayer(NearestEnemyBubing,p,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null or ru!=null
     if(IsImmune(u)and IsNotHero(u)and UnitHasBuffsEx(u,false,false,false,false,true,false,false))then
       set ru=u
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   set u=null
   return ru
 endfunction
@@ -7408,11 +7408,11 @@ function dadi_cast_c takes nothing returns nothing
 endfunction
 
 function IYV takes unit u returns nothing
-  if(L==null)then
+  if(safeLoc==null)then
     call gotoLocation(u,zs_cr_attackLoc,50)
     call EZ(.8)
   else
-    if not gotoLocation(u,L,50)then
+    if not gotoLocation(u,safeLoc,50)then
       call EZ(.8)
     else
       call EZ(.5)
@@ -7490,15 +7490,15 @@ function I1V takes unit Target returns boolean
     call EZ(.9)
   endif
   if VB>=500 then
-    if RangeTo(mHero,Target)<=390 and(G==null or RangeTo(mHero,G)>500)then
+    if RangeTo(mHero,Target)<=390 and(NearestEnemyBubing==null or RangeTo(mHero,NearestEnemyBubing)>500)then
       return true
     endif
   endif
-  if G==null then
+  if NearestEnemyBubing==null then
     set loc=GetLocBetweenTwoUnitsRangeToFirst(mHero,Target,600)
   endif
-  if G!=null then
-    set loc=GetLocBetweenTwoUnitsRangeToFirst(Target,G,-500)
+  if NearestEnemyBubing!=null then
+    set loc=GetLocBetweenTwoUnitsRangeToFirst(Target,NearestEnemyBubing,-500)
   endif
   call gotoLocation(mHero,loc,50)
   call RemoveLocation(loc)
@@ -7902,7 +7902,7 @@ function zs_buchonghp_condition takes nothing returns nothing
   if MyHeroHP<300 then
     set zs_action_prioty_arry[2]=60
   endif
-  if HeroD!=null and MyHeroHP<500 and EnemyHeroMP>320 and Y>5 then
+  if HeroD!=null and MyHeroHP<500 and EnemyHeroMP>320 and EnemyHeroLevel>5 then
     set zs_action_prioty_arry[2]=63
   endif
   if GetHPVoided(mHero)>800 and not X2V(HeroD,760)then
@@ -7915,7 +7915,7 @@ function zs_buchonghp_action takes integer index returns nothing
     return
   endif
   call HeroRetreat(1600)
-  if(G==null or(not X2V(G,500)and AllyCount>0))and(TowerD==null or not X2V(TowerD,900))and(HeroD==null or not X2V(HeroD,800))then
+  if(NearestEnemyBubing==null or(not X2V(NearestEnemyBubing,500)and AllyCount>0))and(TowerD==null or not X2V(TowerD,900))and(HeroD==null or not X2V(HeroD,800))then
     call UseItemTargetByID(mHero,'hslv',mHero,.15)
   endif
 endfunction
@@ -7939,7 +7939,7 @@ function zs_buchongmp_action takes integer index returns nothing
     return
   endif
   call HeroRetreat(1600)
-  if(G==null or not X2V(G,500))and(TowerD==null or not X2V(TowerD,900))and(HeroD==null or not X2V(HeroD,800))then
+  if(NearestEnemyBubing==null or not X2V(NearestEnemyBubing,500))and(TowerD==null or not X2V(TowerD,900))and(HeroD==null or not X2V(HeroD,800))then
     call UseItemByID(mHero,'pclr',.15)
   endif
 endfunction
@@ -7947,8 +7947,8 @@ endfunction
 function AUV takes nothing returns nothing
   local integer AWV=8
   set EH=0
-  if Y<8 then
-    set AWV=Y
+  if EnemyHeroLevel<8 then
+    set AWV=EnemyHeroLevel
   endif
   if HeroD==null then
     if mHeroLevel<8 then
@@ -7961,7 +7961,7 @@ function AUV takes nothing returns nothing
   if EnemyHeroMP>295 then
     set EH=AWV*70+50
   endif
-  set EH=EH+Y*10
+  set EH=EH+EnemyHeroLevel*10
   if V6(HeroD)!=0 then
     set EH=R2I(EH*.8)
   endif
@@ -7999,7 +7999,7 @@ function AUV takes nothing returns nothing
       set OG=false
       set RG=false
     endif
-    if zs_HeroPower<0 and(ZG<0 or(K6(mHero,800)>1 and Y>3))then
+    if zs_HeroPower<0 and(ZG<0 or(K6(mHero,800)>1 and EnemyHeroLevel>3))then
       set OG=false
       set RG=false
     endif
@@ -8011,7 +8011,7 @@ function AUV takes nothing returns nothing
       set OG=true
       set RG=true
     endif
-    if(zs_HeroPower==1 and YG>-5 and zs_AllyHeroNearMeCount>0)and(zs_allyHeroToHeroDMinRange<700 or not WL(mHero,zs_AllyHeroNearestToHeroD,HeroD))and MyHeroHP>EH and(TowerD==null or RangeTo(TowerD,HeroD)>700)then
+    if(zs_HeroPower==1 and YG>-5 and zs_AllyHeroNearMeCount>0)and(zs_allyHeroToHeroDMinRange<700 or not AngleBetweenThreeUnits(mHero,zs_AllyHeroNearestToHeroD,HeroD))and MyHeroHP>EH and(TowerD==null or RangeTo(TowerD,HeroD)>700)then
       set OG=true
       set RG=true
     endif
@@ -8143,7 +8143,7 @@ function A_V takes nothing returns nothing
   if isdadi()then
     set YG=YG+5
   endif
-  if RangeTo(mHero,G)<260 and VB>=500 then
+  if RangeTo(mHero,NearestEnemyBubing)<260 and VB>=500 then
     set FV=FV-1
     set zs_action_prioty_arry[4]=38
     set YG=YG-1
@@ -8170,7 +8170,7 @@ function A_V takes nothing returns nothing
     set FV=FV+3
     set YG=YG+3
   endif
-  if HeroD!=null and rangeToHeroD<1000 and G!=null and RangeTo(mHero,G)<400 then
+  if HeroD!=null and rangeToHeroD<1000 and NearestEnemyBubing!=null and RangeTo(mHero,NearestEnemyBubing)<400 then
     set zs_action_prioty_arry[4]=47
   endif
   set FV=FV+(AllyCount-EnemyCount)/3
@@ -8198,7 +8198,7 @@ function A_V takes nothing returns nothing
   if HeroD==null and(zs_myhero_hpchanged<-10 or(AllyCount==0 and EnemyCount>0 and ZhongliEnemy==null))then
     set zs_action_prioty_arry[5]=47
   endif
-  if MyHeroHP<500 and HeroD!=null and EnemyHeroMP>350 and Y>5 and rangeToHeroD<900 then
+  if MyHeroHP<500 and HeroD!=null and EnemyHeroMP>350 and EnemyHeroLevel>5 and rangeToHeroD<900 then
     set zs_action_prioty_arry[5]=49
   endif
   if VB<=400 and T<600 and mHeroLevel<11 then
@@ -8221,7 +8221,7 @@ function A_V takes nothing returns nothing
   endif
   if HeroD!=null then
     set FV=FV+mHeroLevel/5
-    set FV=FV+R2I((mHeroLevel-Y)/2)
+    set FV=FV+R2I((mHeroLevel-EnemyHeroLevel)/2)
     set FV=FV+R2I((MyHeroHP-EnemyHeroHP)/100)
     set A0V=R2I((MyHeroMP-EnemyHeroMP)/200)
     if A0V>3 then
@@ -8242,7 +8242,7 @@ function A_V takes nothing returns nothing
     set FV=FV+A0V
     set FV=FV
     set FV=FV+(zs_HeroPower)*5
-    if MyHeroHP<600 and Y>5 then
+    if MyHeroHP<600 and EnemyHeroLevel>5 then
       set FV=FV-4
     endif
     if EnemyHeroHP<600 and mHeroLevel>5 then
@@ -8282,31 +8282,31 @@ function A_V takes nothing returns nothing
   if HeroD!=null and NV>500 and EnemyCount>2 and mHeroLevel<10 and MyHeroHP<800 and zs_HeroPower<1 then
     set zs_action_prioty_arry[5]=60
   endif
-  if MyHeroHP<400 and HeroD!=null and(EnemyHeroMP>280 or IsManaAlmostFull(HeroD))and rangeToHeroD<800 and Y>3 then
+  if MyHeroHP<400 and HeroD!=null and(EnemyHeroMP>280 or IsManaAlmostFull(HeroD))and rangeToHeroD<800 and EnemyHeroLevel>3 then
     set zs_action_prioty_arry[5]=62
   endif
   if zs_AllyHeroNearMeCount==0 and zs_EnemyHeroNearMeCount==2 and KH<900 then
     set zs_action_prioty_arry[5]=64
   endif
-  if MyHeroHP<400 and HeroD!=null and(EnemyHeroMP>350 or IsManaAlmostFull(HeroD))and rangeToHeroD<800 and Y>3 then
+  if MyHeroHP<400 and HeroD!=null and(EnemyHeroMP>350 or IsManaAlmostFull(HeroD))and rangeToHeroD<800 and EnemyHeroLevel>3 then
     set zs_action_prioty_arry[5]=65
   endif
   if HeroD!=null and((AllyCount==0 and EnemyCount>2)or(AllyCount==1 and EnemyCount>5))and MyHeroHP<600 then
     set zs_action_prioty_arry[5]=65
   endif
-  if MyHeroHP<300 and HeroD!=null and(EnemyHeroMP>260 or IsManaAlmostFull(HeroD))and rangeToHeroD<800 and Y>1 then
+  if MyHeroHP<300 and HeroD!=null and(EnemyHeroMP>260 or IsManaAlmostFull(HeroD))and rangeToHeroD<800 and EnemyHeroLevel>1 then
     set zs_action_prioty_arry[5]=66
   endif
-  if MyHeroHP<600 and HeroD!=null and(EnemyHeroMP>290 or IsManaAlmostFull(HeroD))and Y>7 and rangeToHeroD<1000 then
+  if MyHeroHP<600 and HeroD!=null and(EnemyHeroMP>290 or IsManaAlmostFull(HeroD))and EnemyHeroLevel>7 and rangeToHeroD<1000 then
     set zs_action_prioty_arry[5]=67
   endif
-  if zs_HeroPower<0 and Y>6 and KH<600 then
+  if zs_HeroPower<0 and EnemyHeroLevel>6 and KH<600 then
     set zs_action_prioty_arry[5]=69
   endif
   if HeroD==null and zs_myhero_hpchanged<-80 and MyHeroHP<1000 then
     set zs_action_prioty_arry[5]=70
   endif
-  if HeroD!=null and MyHeroHP+300<EnemyHeroHP and MyHeroHP<800 and EnemyHeroMP>350 and Y>4 and rangeToHeroD<1000 then
+  if HeroD!=null and MyHeroHP+300<EnemyHeroHP and MyHeroHP<800 and EnemyHeroMP>350 and EnemyHeroLevel>4 and rangeToHeroD<1000 then
     set zs_action_prioty_arry[5]=69
   endif
   if AllyCount==0 and EnemyCount>2 and MyHeroHP<500 then
@@ -8323,16 +8323,16 @@ function A_V takes nothing returns nothing
       set zs_action_prioty_arry[8]=72
     endif
   endif
-  if zs_HeroPower<-1 and Y>7 and KH<900 then
+  if zs_HeroPower<-1 and EnemyHeroLevel>7 and KH<900 then
     set zs_action_prioty_arry[8]=72
   endif
   if MyHeroHP<EH and HeroD!=null and(EnemyHeroMP>300 or IsManaAlmostFull(HeroD))and X2V(HeroD,800)then
     set zs_action_prioty_arry[5]=73
   endif
-  if MyHeroHP<600 and HeroD!=null and(EnemyHeroMP>290 or IsManaAlmostFull(HeroD))and Y>10 and rangeToHeroD<1000 then
+  if MyHeroHP<600 and HeroD!=null and(EnemyHeroMP>290 or IsManaAlmostFull(HeroD))and EnemyHeroLevel>10 and rangeToHeroD<1000 then
     set zs_action_prioty_arry[5]=74
   endif
-  if MyHeroHP<300 and HeroD!=null and rangeToHeroD<800 and Y>4 then
+  if MyHeroHP<300 and HeroD!=null and rangeToHeroD<800 and EnemyHeroLevel>4 then
     set zs_action_prioty_arry[5]=74
   endif
   if zs_myhero_hpchanged<-80 and BH then
@@ -8341,13 +8341,13 @@ function A_V takes nothing returns nothing
   if HeroD!=null and((AllyCount==0 and EnemyCount>5)or(AllyCount==1 and EnemyCount>8))and MyHeroHP<600 then
     set zs_action_prioty_arry[5]=74
   endif
-  if MyHeroHP<500 and HeroD!=null and MyHeroHP<EnemyHeroHP-200 and rangeToHeroD<800 and Y>5 then
+  if MyHeroHP<500 and HeroD!=null and MyHeroHP<EnemyHeroHP-200 and rangeToHeroD<800 and EnemyHeroLevel>5 then
     set zs_action_prioty_arry[5]=74
   endif
-  if MyHeroHP<600 and HeroD!=null and rangeToHeroD<800 and Y>7 and EnemyHeroMP>290 then
+  if MyHeroHP<600 and HeroD!=null and rangeToHeroD<800 and EnemyHeroLevel>7 and EnemyHeroMP>290 then
     set zs_action_prioty_arry[5]=74
   endif
-  if MyHeroHP<Y*75 and HeroD!=null and rangeToHeroD<700 and Y<8 and EnemyHeroMP>290 then
+  if MyHeroHP<EnemyHeroLevel*75 and HeroD!=null and rangeToHeroD<700 and EnemyHeroLevel<8 and EnemyHeroMP>290 then
     set zs_action_prioty_arry[5]=74
   endif
   if VJ!=null and RangeTo(mHero,VJ)<930 then
@@ -8359,7 +8359,7 @@ function A_V takes nothing returns nothing
   if BH and VB<500 and zs_cr_fightline!=1 then
     set zs_action_prioty_arry[8]=75
   endif
-  if zs_HeroPower<-2 and Y>7 then
+  if zs_HeroPower<-2 and EnemyHeroLevel>7 then
     set zs_action_prioty_arry[8]=78
     if ZG<0 then
       set zs_action_prioty_arry[8]=100
@@ -8404,14 +8404,14 @@ function A_V takes nothing returns nothing
       endif
     endif
   endif
-  if zs_HeroPower<-1 and Y>10 then
+  if zs_HeroPower<-1 and EnemyHeroLevel>10 then
     set zs_action_prioty_arry[8]=82
     if KH<800 then
       set CR=true
       set VH=1
     endif
   endif
-  if zs_HeroPower<-2 and Y>11 then
+  if zs_HeroPower<-2 and EnemyHeroLevel>11 then
     set zs_action_prioty_arry[8]=92
     if KH<900 then
       set CR=true
@@ -8444,7 +8444,7 @@ function A_V takes nothing returns nothing
   if HeroD!=null and MyHeroHP<1000 and IsImmune(HeroD)and not CW(HeroD)and V6(mHero)==0 then
     set zs_action_prioty_arry[8]=99
   endif
-  if HeroD!=null and MyHeroHP<800 and IsImmune(HeroD)and not CW(HeroD)and V6(mHero)==0 and V6(HeroD)==1 and Y>15 then
+  if HeroD!=null and MyHeroHP<800 and IsImmune(HeroD)and not CW(HeroD)and V6(mHero)==0 and V6(HeroD)==1 and EnemyHeroLevel>15 then
     set zs_action_prioty_arry[8]=99
   endif
   if IG and zs_IsTimeOut(31,10)then
@@ -8479,10 +8479,10 @@ function A_V takes nothing returns nothing
   if CW(mHero)and(not LF)and(not isHeroHasHong(mHero))and not IsRestoreHP(mHero)then
     set zs_action_prioty_arry[6]=82
   endif
-  if MyHeroHP<300 and(not LF)and(not isHeroHasHong(mHero))and not IsRestoreHP(mHero)and Y>4 then
+  if MyHeroHP<300 and(not LF)and(not isHeroHasHong(mHero))and not IsRestoreHP(mHero)and EnemyHeroLevel>4 then
     set zs_action_prioty_arry[6]=83
   endif
-  if MyHeroHP<600 and(not LF)and(not isHeroHasHong(mHero))and not IsRestoreHP(mHero)and EnemyHeroMP>350 and Y>7 then
+  if MyHeroHP<600 and(not LF)and(not isHeroHasHong(mHero))and not IsRestoreHP(mHero)and EnemyHeroMP>350 and EnemyHeroLevel>7 then
     set zs_action_prioty_arry[6]=84
   endif
   if MyHeroHP<800 and mHeroLevel>13 and(not isHeroHasHong(mHero))and not IsRestoreHP(mHero)and zs_HeroPower<1 then
@@ -8533,7 +8533,7 @@ function A_V takes nothing returns nothing
     set zs_action_prioty_arry[9]=73
   endif
   if(IsRestoreHP(mHero)or IsRestoreMP(mHero))then
-    if((HeroD!=null and X2V(HeroD,930))or T<BV or RangeTo(mHero,G)<600)then
+    if((HeroD!=null and X2V(HeroD,930))or T<BV or RangeTo(mHero,NearestEnemyBubing)<600)then
       set zs_action_prioty_arry[9]=73
     endif
     if zs_HeroPower<0 then
@@ -8551,10 +8551,10 @@ function A_V takes nothing returns nothing
   if HeroD!=null and zs_MyFireLoc!=null and(EnemyCount>AllyCount+3 or AllyCount<2)and(TowerD!=null and RangeToLoc(TowerD,zs_MyFireLoc)<800)then
     set zs_action_prioty_arry[12]=54
   endif
-  if C!=null then
+  if budaobingD2!=null then
     set zs_action_prioty_arry[13]=41
   endif
-  if HeroD!=null and N!=null then
+  if HeroD!=null and budaobingW2!=null then
     set zs_action_prioty_arry[14]=40
   endif
   if zs_suguoyinbing and HN==2 and mForceId==1 and mHeroLevel<10 and not isweiyan()then
@@ -8564,7 +8564,7 @@ function A_V takes nothing returns nothing
     set zs_action_prioty_arry[16]=62
   endif
   set LH=rangeToHeroD>800 and(zs_HeroPower>1 or(zs_HeroPower==1 and zs_EnemyHeroNearMeCount==1))and ZG<=0 and zs_AllyHeroNearestToHeroD!=null and zs_allyHeroToHeroDMinRange>700 and KH>700 and MyHeroHP>EH-50 and MyHeroMP>135
-  if HN!=zs_cr_fightline and LH and WL(mHero,zs_AllyHeroNearestToHeroD,HeroD)then
+  if HN!=zs_cr_fightline and LH and AngleBetweenThreeUnits(mHero,zs_AllyHeroNearestToHeroD,HeroD)then
     if zs_IsTimeOut(50,2)then
       if FP(zs_AllyHeroNearestToHeroD,HeroD)!=null then
         set CH=1
@@ -8587,7 +8587,7 @@ function A_V takes nothing returns nothing
     set FH=H6(mHero)
     if FH!=null and RangeTo(mHero,FH)<NJ then
       set GH=D6(FH)
-      if GH!=null and RangeTo(GH,FH)<1300 and not WL(mHero,FH,GH)then
+      if GH!=null and RangeTo(GH,FH)<1300 and not AngleBetweenThreeUnits(mHero,FH,GH)then
         set HH=1
       endif
     endif
@@ -8596,7 +8596,7 @@ function A_V takes nothing returns nothing
       if GH!=null and RangeTo(mHero,GH)<NJ then
         set FH=D6(GH)
         if FH!=null and FH!=mHero then
-          if RangeTo(GH,FH)<1300 and not WL(mHero,FH,GH)then
+          if RangeTo(GH,FH)<1300 and not AngleBetweenThreeUnits(mHero,FH,GH)then
             set HH=1
           endif
           if RangeTo(GH,FH)<NJ and RangeTo(GH,FH)>1300 and RangeTo(GH,mHero)>1300 and RangeToLoc(GH,TH)>900 then
@@ -8685,7 +8685,7 @@ function A1V takes integer index returns nothing
     set SA=true
   endif
   if index==13 then
-    if IQ(mHero,C,VB)then
+    if IQ(mHero,budaobingD2,VB)then
       call HeroStop(mHero)
       call EZ(.2)
     else
@@ -8693,7 +8693,7 @@ function A1V takes integer index returns nothing
     endif
   endif
   if index==14 then
-    if IQ(mHero,N,VB)then
+    if IQ(mHero,budaobingW2,VB)then
       call HeroStop(mHero)
       call EZ(.5)
     else
@@ -8813,7 +8813,7 @@ function A2V takes nothing returns nothing
       set zs_action_prioty_arry[42]=49
     endif
   endif
-  if HeroD==null and T>BV and EnemyCount==1 and G!=null and MyHeroHP>500 and mHeroLevel>3 then
+  if HeroD==null and T>BV and EnemyCount==1 and NearestEnemyBubing!=null and MyHeroHP>500 and mHeroLevel>3 then
     if AllyCount>0 then
       set zs_action_prioty_arry[46]=38
     else
@@ -8823,14 +8823,14 @@ function A2V takes nothing returns nothing
   if HeroD==null and mHeroLevel>10 and ZhongliEnemy!=null and GetUnitLevel(ZhongliEnemy)<8 and MyHeroHP>300 then
     set zs_action_prioty_arry[45]=72
   endif
-  if HeroD==null and T>BV and EnemyCount<3 and G!=null and MyHeroHP>500 and mHeroLevel>11 then
+  if HeroD==null and T>BV and EnemyCount<3 and NearestEnemyBubing!=null and MyHeroHP>500 and mHeroLevel>11 then
     if AllyCount>0 then
       set zs_action_prioty_arry[46]=46
     else
       set zs_action_prioty_arry[46]=54
     endif
   endif
-  if HeroD==null and T>BV and mHeroLevel>16 and G!=null and MyHeroHP>500 then
+  if HeroD==null and T>BV and mHeroLevel>16 and NearestEnemyBubing!=null and MyHeroHP>500 then
     if AllyCount>0 then
       set zs_action_prioty_arry[46]=46
     else
@@ -8898,8 +8898,8 @@ function A3V takes integer index returns nothing
     call HeroAttack(ZhongliEnemy)
     call EZ(.9)
   endif
-  if index==46 and intoUnitRange(G,600)then
-    call HeroAttack(G)
+  if index==46 and intoUnitRange(NearestEnemyBubing,600)then
+    call HeroAttack(NearestEnemyBubing)
     call EZ(.9)
   endif
   if index==47 then
@@ -8985,14 +8985,14 @@ function zs_attack_condition_zhanshi takes nothing returns nothing
   if HeroD==null and mHeroLevel>10 and ZhongliEnemy!=null and GetUnitLevel(ZhongliEnemy)<8 and MyHeroHP>300 then
     set zs_action_prioty_arry[45]=72
   endif
-  if HeroD==null and EnemyCount<3 and G!=null and MyHeroHP>500 and mHeroLevel>11 then
+  if HeroD==null and EnemyCount<3 and NearestEnemyBubing!=null and MyHeroHP>500 and mHeroLevel>11 then
     if AllyCount>0 then
       set zs_action_prioty_arry[46]=40
     else
       set zs_action_prioty_arry[46]=54
     endif
   endif
-  if HeroD==null and mHeroLevel>16 and G!=null and MyHeroHP>500 then
+  if HeroD==null and mHeroLevel>16 and NearestEnemyBubing!=null and MyHeroHP>500 then
     if AllyCount>0 then
       set zs_action_prioty_arry[46]=40
     else
@@ -9050,8 +9050,8 @@ function zs_attack_action_zhanshi takes integer index returns nothing
     call HeroAttack(ZhongliEnemy)
     call EZ(.9)
   endif
-  if index==46 and intoUnitRange(G,260)then
-    call HeroAttack(G)
+  if index==46 and intoUnitRange(NearestEnemyBubing,260)then
+    call HeroAttack(NearestEnemyBubing)
     call EZ(.9)
   endif
   if index==47 then
@@ -9130,8 +9130,8 @@ function A7V takes integer index returns nothing
       call EZ(.9)
       return
     endif
-    if G!=null and RangeTo(mHero,G)<600 then
-      call HeroAttack(G)
+    if NearestEnemyBubing!=null and RangeTo(mHero,NearestEnemyBubing)<600 then
+      call HeroAttack(NearestEnemyBubing)
       call EZ(.9)
       return
     endif
@@ -9186,8 +9186,8 @@ function A7V takes integer index returns nothing
   if index==72 then
     if not isguanyu()then
       if zs_AllyHeroNearMeCount==0 then
-        if G!=null then
-          call HeroAttack(G)
+        if NearestEnemyBubing!=null then
+          call HeroAttack(NearestEnemyBubing)
           call debugstr("NearestEnemyBubing")
         endif
         call Sleep(.8)
@@ -9223,9 +9223,9 @@ function A9V takes nothing returns nothing
   local location loc=null
   local location NVV=null
   local integer AAV=0
-  set AAV=GetStoredInteger(DV,"maintimer","testtime")
+  set AAV=GetStoredInteger(zs_gamecache2,"maintimer","testtime")
   if isZhugeCastingE()then
-    set AAV=GetStoredInteger(DV,"maintimer","testtime")
+    set AAV=GetStoredInteger(zs_gamecache2,"maintimer","testtime")
     if K1(SG)then
       return
     endif
@@ -9357,7 +9357,7 @@ function zs_useitem_condition takes nothing returns nothing
   if GD!=null and isguanyu()and GetItemTypeId(GD)==iid_longzhixin and QH then
     set zs_action_prioty_arry[32]=102
   endif
-  if zs_allyHeroToMeMinRange<800 and GetHPVoided(zs_AllyHeroNearestToMe)>500 and YK(zs_AllyHeroNearestToMe)and not IsRestoreHP(zs_AllyHeroNearestToMe)and GetItemChargesById(zs_AllyHeroNearestToMe,'hslv')<1 and KH>800 and RangeTo(mHero,G)>600 then
+  if zs_allyHeroToMeMinRange<800 and GetHPVoided(zs_AllyHeroNearestToMe)>500 and YK(zs_AllyHeroNearestToMe)and not IsRestoreHP(zs_AllyHeroNearestToMe)and GetItemChargesById(zs_AllyHeroNearestToMe,'hslv')<1 and KH>800 and RangeTo(mHero,NearestEnemyBubing)>600 then
     set zs_action_prioty_arry[35]=70
   endif
   if GD!=null and isguanyu()and GetItemTypeId(GD)==iid_longzhixue and QH and GetWidgetLife(GD)>0 then
@@ -10069,7 +10069,7 @@ function sima_spell_condition takes nothing returns nothing
       set zs_action_prioty_arry[50]=81
     endif
     if index>=0 and YG>-4 and(rangeToHeroD<900 or ZG>0)then
-      set K=true
+      set zs_kickoff=true
       set zs_action_prioty_arry[50+index]=99
     endif
     if zs_action_prioty_arry[55]>90 then
@@ -10093,7 +10093,7 @@ function sima_spell_condition takes nothing returns nothing
     set zs_action_prioty_arry[51]=0
     set zs_action_prioty_arry[52]=0
   endif
-  if HeroD==null and G!=null and EnemyCount>2 and mHeroLevel>6 and can_sima_cast_ef()then
+  if HeroD==null and NearestEnemyBubing!=null and EnemyCount>2 and mHeroLevel>6 and can_sima_cast_ef()then
     if MyHeroMP>1200 or IsManaAlmostFull(mHero)then
       set zs_action_prioty_arry[59]=58
     endif
@@ -10120,7 +10120,7 @@ function sima_spell_action takes integer index returns nothing
     return
   endif
   if index==50 and intoUnitRange(HeroD,600)then
-    if K then
+    if zs_kickoff then
       if can_UseFeiXie(mHero)then
         call X0V(HeroD)
       endif
@@ -10133,7 +10133,7 @@ function sima_spell_action takes integer index returns nothing
     call Sleep(.9)
   endif
   if index==51 and intoUnitRange(HeroD,600)then
-    if K then
+    if zs_kickoff then
       if can_UseFeiXie(mHero)then
         call X0V(HeroD)
       endif
@@ -10145,13 +10145,13 @@ function sima_spell_action takes integer index returns nothing
     call HeroAttack(HeroD)
   endif
   if index==52 then
-    if K and can_UseFeiXie(mHero)and intoUnitRange(HeroD,1300)then
+    if zs_kickoff and can_UseFeiXie(mHero)and intoUnitRange(HeroD,1300)then
       call X0V(HeroD)
     endif
     if zs_HeroPower>1 and can_UseFeiXie(mHero)and rangeToHeroD>650 and intoUnitRange(HeroD,1200)then
       call X0V(HeroD)
     endif
-    if K and intoUnitRange(HeroD,600)then
+    if zs_kickoff and intoUnitRange(HeroD,600)then
       if can_UseBianXing(mHero)then
         call UseBianXing(HeroD)
       endif
@@ -10189,9 +10189,9 @@ function sima_spell_action takes integer index returns nothing
       call sima_cast_ef_feng_n_feng_fe(HeroD)
     endif
   endif
-  if index==59 and G!=null then
-    if intoUnitRange(G,590)then
-      call sima_cast_ef(G)
+  if index==59 and NearestEnemyBubing!=null then
+    if intoUnitRange(NearestEnemyBubing,590)then
+      call sima_cast_ef(NearestEnemyBubing)
     endif
   endif
   if index==60 and intoUnitRange(TowerD,600)then
@@ -10244,7 +10244,7 @@ function zhuge_spell_condition takes nothing returns nothing
       set zs_action_prioty_arry[50]=83
     endif
     if index>=0 and YG>-8 and(rangeToHeroD<900 or ZG>0)then
-      set K=true
+      set zs_kickoff=true
       set zs_action_prioty_arry[50+index]=99
     endif
   endif
@@ -10298,7 +10298,7 @@ function zhuge_spell_action takes integer index returns nothing
     return
   endif
   if index==50 then
-    if K then
+    if zs_kickoff then
       if can_UseFeiXie(mHero)then
         call X0V(HeroD)
       endif
@@ -10310,7 +10310,7 @@ function zhuge_spell_action takes integer index returns nothing
     call HeroAttack(HeroD)
   endif
   if index==51 then
-    if K then
+    if zs_kickoff then
       if can_UseFeiXie(mHero)then
         call X0V(HeroD)
       endif
@@ -10415,7 +10415,7 @@ function zhangliao_spell_condition takes nothing returns nothing
       set zs_action_prioty_arry[52]=81
     endif
   endif
-  if HeroD==null and G!=null and EnemyCount>2 and mHeroLevel>7 and can_zhangliao_cast_w()then
+  if HeroD==null and NearestEnemyBubing!=null and EnemyCount>2 and mHeroLevel>7 and can_zhangliao_cast_w()then
     if MyHeroMP>300 or IsManaAlmostFull(mHero)then
       set zs_action_prioty_arry[50]=52
     endif
@@ -10429,8 +10429,8 @@ function zhangliao_spell_action takes integer index returns nothing
   if not iszhangliao()then
     return
   endif
-  if index==50 and intoUnitRange(G,120)then
-    call zhangliao_cast_wu(G)
+  if index==50 and intoUnitRange(NearestEnemyBubing,120)then
+    call zhangliao_cast_wu(NearestEnemyBubing)
   endif
   if index==51 then
     if zs_HeroPower>0 and rangeToHeroD>400 and can_UseFeiXie(mHero)then
@@ -10851,7 +10851,7 @@ function weiyan_spell_condition takes nothing returns nothing
   if HeroD!=null and can_weiyan_cast_r()and(IsManaAlmostFull(mHero)and mHeroLevel>10)and rangeToHeroD<300 then
     set zs_action_prioty_arry[52]=81
   endif
-  if EnemyCount>AllyCount+8 and can_weiyan_cast_r()and G!=null then
+  if EnemyCount>AllyCount+8 and can_weiyan_cast_r()and NearestEnemyBubing!=null then
     set zs_action_prioty_arry[53]=80
   endif
   if zs_canspelltoHerod and can_weiyan_cast_t()and can_UseFeiXie(mHero)and MyHeroMP>400 and can_weiyan_cast_r()then
@@ -10916,7 +10916,7 @@ function weiyan_spell_action takes integer index returns nothing
     set EF=null
     set EF=SelectUnitsByIlussion(ai_player)
   endif
-  if index==53 and intoUnitRange(G,500)then
+  if index==53 and intoUnitRange(NearestEnemyBubing,500)then
     call weiyan_cast_r()
     call Sleep(.5)
     call DestroyGroup(EF)
@@ -11018,7 +11018,7 @@ function dianwei_spell_condition takes nothing returns nothing
   if HeroD!=null and(isHeroHasJinglinghuo(HeroD)or IsStunned(HeroD))and MyHeroHP>500 and(YG>-5 and T>1000)and(zs_prioty_index!=5 and zs_prioty_index!=8)then
     set zs_action_prioty_arry[52]=73
   endif
-  if G!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1000)or(HeroD==null and MyHeroMP>400 and EnemyCount>2)or ZhongliEnemy!=null)and can_dianwei_cast_t()then
+  if NearestEnemyBubing!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1000)or(HeroD==null and MyHeroMP>400 and EnemyCount>2)or ZhongliEnemy!=null)and can_dianwei_cast_t()then
     set zs_action_prioty_arry[53]=80
   endif
 endfunction
@@ -11053,7 +11053,7 @@ function dianwei_spell_action takes integer index returns nothing
     call HeroAttack(HeroD)
     call Sleep(1)
   endif
-  if index==53 and IsAlive(G)and intoUnitRange(G,120)then
+  if index==53 and IsAlive(NearestEnemyBubing)and intoUnitRange(NearestEnemyBubing,120)then
     call dianwei_cast_t()
   endif
 endfunction
@@ -11062,10 +11062,10 @@ function xun_spell_condition takes nothing returns nothing
   if not isxun()then
     return
   endif
-  if EnemyCount>2 and G!=null and can_xun_cast_g()and(not can_xun_cast_w()or(can_xun_cast_w()and MyHeroMP>300))then
+  if EnemyCount>2 and NearestEnemyBubing!=null and can_xun_cast_g()and(not can_xun_cast_w()or(can_xun_cast_w()and MyHeroMP>300))then
     set zs_action_prioty_arry[50]=57
   endif
-  if can_xun_cast_t()and T>700 and G!=null and(not can_xun_cast_w()or(can_xun_cast_w()and MyHeroMP>300))then
+  if can_xun_cast_t()and T>700 and NearestEnemyBubing!=null and(not can_xun_cast_w()or(can_xun_cast_w()and MyHeroMP>300))then
     set zs_action_prioty_arry[51]=62
   endif
   if HeroD!=null and can_xun_cast_w()and EnemyHeroHP>300 then
@@ -11100,14 +11100,14 @@ function xun_spell_action takes integer index returns nothing
   if not isxun()then
     return
   endif
-  if index==50 and intoUnitRange(G,500)then
-    set loc=GetUnitLoc(G)
+  if index==50 and intoUnitRange(NearestEnemyBubing,500)then
+    set loc=GetUnitLoc(NearestEnemyBubing)
     call xun_cast_g(loc)
     call RemoveLocation(loc)
     set loc=null
   endif
   if index==51 then
-    set loc=GetUnitToOuterLocAngle(G,mHero,498,90*GetRandomInt(-1,1))
+    set loc=GetUnitToOuterLocAngle(NearestEnemyBubing,mHero,498,90*GetRandomInt(-1,1))
     call xun_cast_t(loc)
     call RemoveLocation(loc)
     set loc=null
@@ -11178,7 +11178,7 @@ function zhangfei_spell_condition takes nothing returns nothing
   if HeroD!=null and can_zhangfei_cast_v()and RQV()then
     set zs_action_prioty_arry[54]=92
   endif
-  if G!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1000)or(HeroD==null and MyHeroMP>400 and EnemyCount>2))and RMV()then
+  if NearestEnemyBubing!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1000)or(HeroD==null and MyHeroMP>400 and EnemyCount>2))and RMV()then
     set zs_action_prioty_arry[55]=80
   endif
 endfunction
@@ -11219,7 +11219,7 @@ function zhangfei_spell_action takes integer index returns nothing
     call zhangfei_cast_v()
     call zhangfei_cast_b()
   endif
-  if index==55 and IsAlive(G)and intoUnitRange(G,160)then
+  if index==55 and IsAlive(NearestEnemyBubing)and intoUnitRange(NearestEnemyBubing,160)then
     call RPV()
   endif
 endfunction
@@ -11240,7 +11240,7 @@ function guojia_spell_condition takes nothing returns nothing
   if zs_canspelltoHerod and can_guojia_cast_c()and can_guojia_cast_n()and MyHeroMP>520 and(EnemyHeroHP<800 or zs_HeroPower>0)then
     set zs_action_prioty_arry[53]=99
   endif
-  if HeroD==null and G!=null and EnemyCount>1 and can_guojia_cast_n()and mHeroLevel>6 then
+  if HeroD==null and NearestEnemyBubing!=null and EnemyCount>1 and can_guojia_cast_n()and mHeroLevel>6 then
     if MyHeroMP>1500 or IsManaAlmostFull(mHero)then
       set zs_action_prioty_arry[59]=58
     endif
@@ -11274,8 +11274,8 @@ function guojia_spell_action takes integer index returns nothing
     call Sleep(1.6)
     call guojia_cast_n(HeroD)
   endif
-  if index==59 and intoUnitRange(G,600)then
-    call guojia_cast_n(G)
+  if index==59 and intoUnitRange(NearestEnemyBubing,600)then
+    call guojia_cast_n(NearestEnemyBubing)
   endif
   if index==60 and intoUnitRange(HeroD,800)then
     call guojia_cast_c(HeroD)
@@ -11304,16 +11304,16 @@ function caoren_spell_condition takes nothing returns nothing
     if zs_canspelltoHerod and zs_HeroPower>0 and MyHeroHP>400 and can_caoren_cast_e()and rangeToHeroD>400 and OG then
       set zs_action_prioty_arry[52]=71
     endif
-    if G!=null and(EnemyCount>AllyCount+6 or((HeroD==null and EnemyCount>2)and MyHeroMP>400)or(GetHP(G)<300 and MyHeroMP>300))and can_caoren_cast_c()then
+    if NearestEnemyBubing!=null and(EnemyCount>AllyCount+6 or((HeroD==null and EnemyCount>2)and MyHeroMP>400)or(GetHP(NearestEnemyBubing)<300 and MyHeroMP>300))and can_caoren_cast_c()then
       set zs_action_prioty_arry[53]=80
     endif
     if zs_canspelltoHerod and(((EnemyHeroHP<600 or zs_HeroPower>0)and EnemyHeroHP>220)or MyHeroHP<330 or CW(mHero))and can_caoren_cast_g()then
       set zs_action_prioty_arry[54]=83
     endif
-    if TowerD!=null and G!=null and((AllyCount>3 and EnemyCount>3)or MyHeroHP<330 or CW(mHero))and can_caoren_cast_g()then
+    if TowerD!=null and NearestEnemyBubing!=null and((AllyCount>3 and EnemyCount>3)or MyHeroHP<330 or CW(mHero))and can_caoren_cast_g()then
       set zs_action_prioty_arry[60]=82
     endif
-    if(EnemyCount>8 or MyHeroHP<330 or CW(mHero))and G!=null and can_caoren_cast_g()then
+    if(EnemyCount>8 or MyHeroHP<330 or CW(mHero))and NearestEnemyBubing!=null and can_caoren_cast_g()then
       set zs_action_prioty_arry[60]=82
     endif
   endif
@@ -11324,10 +11324,10 @@ function caoren_spell_condition takes nothing returns nothing
     if zs_canspelltoHerod and rangeToHeroD<400 and can_caozixiao_cast_t()then
       set zs_action_prioty_arry[56]=86
     endif
-    if G!=null and rangeToHeroD>600 and EnemyCount>2 and can_caozixiao_cast_t()then
+    if NearestEnemyBubing!=null and rangeToHeroD>600 and EnemyCount>2 and can_caozixiao_cast_t()then
       set zs_action_prioty_arry[57]=84
     endif
-    if G!=null and rangeToHeroD>600 and MyHeroHP>500 then
+    if NearestEnemyBubing!=null and rangeToHeroD>600 and MyHeroHP>500 then
       set zs_action_prioty_arry[58]=80
     endif
     if TowerD!=null and rangeToHeroD>600 and MyHeroHP>800 and AllyCount>0 and EnemyCount<10 then
@@ -11356,14 +11356,14 @@ function caoren_spell_action takes integer index returns nothing
   if index==52 and intoUnitRange(HeroD,600)then
     call caoren_cast_e(HeroD)
   endif
-  if index==53 and intoUnitRange(G,600)then
-    call caoren_cast_c(G)
+  if index==53 and intoUnitRange(NearestEnemyBubing,600)then
+    call caoren_cast_c(NearestEnemyBubing)
   endif
   if index==54 and intoUnitRange(HeroD,700)then
     call caoren_cast_gu(HeroD)
   endif
-  if index==60 and intoUnitRange(G,700)then
-    call caoren_cast_gu(G)
+  if index==60 and intoUnitRange(NearestEnemyBubing,700)then
+    call caoren_cast_gu(NearestEnemyBubing)
   endif
   if index==55 then
     set loc=GetLocBetweenTwoUnitsRangeToFirst(HeroD,mHero,-180)
@@ -11379,11 +11379,11 @@ function caoren_spell_action takes integer index returns nothing
   if index==56 and intoUnitRange(HeroD,200)then
     call caozixiao_cast_t()
   endif
-  if index==57 and intoUnitRange(G,160)then
+  if index==57 and intoUnitRange(NearestEnemyBubing,160)then
     call caozixiao_cast_t()
   endif
   if index==58 then
-    call HeroAttack(G)
+    call HeroAttack(NearestEnemyBubing)
     call Sleep(.9)
   endif
   if index==59 then
@@ -11405,7 +11405,7 @@ function dadi_spell_condition takes nothing returns nothing
   if zs_canspelltoHerod and can_UseFeiXie(mHero)and can_dadi_cast_c()and rangeToHeroD<1200 and GetUnitCurrentOrder(HeroD)!=851986 then
     set zs_action_prioty_arry[52]=95
   endif
-  if G!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1000)or(HeroD==null and EnemyCount>10))and can_dadi_cast_c()then
+  if NearestEnemyBubing!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1000)or(HeroD==null and EnemyCount>10))and can_dadi_cast_c()then
     set zs_action_prioty_arry[53]=85
   endif
   if ZhongliEnemy!=null and mHeroLevel>5 and MyHeroHP>300 then
@@ -11452,7 +11452,7 @@ function dadi_spell_action takes integer index returns nothing
     call dadi_cast_t()
     call Sleep(4.3)
   endif
-  if index==53 and intoUnitRange(G,200)then
+  if index==53 and intoUnitRange(NearestEnemyBubing,200)then
     call dadi_cast_c()
     call Sleep(7)
   endif
@@ -11482,7 +11482,7 @@ function madai_spell_condition takes nothing returns nothing
       set zs_action_prioty_arry[51]=90
     endif
   endif
-  if G!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1300)or(HeroD==null and EnemyCount>10))and BTV then
+  if NearestEnemyBubing!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1300)or(HeroD==null and EnemyCount>10))and BTV then
     set zs_action_prioty_arry[52]=85
   endif
   if ZhongliEnemy!=null and mHeroLevel>5 and mHeroLevel<15 and MyHeroHP>300 and BSV then
@@ -11503,8 +11503,8 @@ function madai_spell_action takes integer index returns nothing
     call CastTargetSkillByOderStr(mHero,aid_madai_zhuihun,"chainlightning",HeroD)
     call Sleep(.8)
   endif
-  if index==52 and intoUnitRange(G,500)then
-    call CastTargetSkillByOderStr(mHero,aid_madai_zhuihun,"chainlightning",G)
+  if index==52 and intoUnitRange(NearestEnemyBubing,500)then
+    call CastTargetSkillByOderStr(mHero,aid_madai_zhuihun,"chainlightning",NearestEnemyBubing)
     call Sleep(.8)
   endif
 endfunction
@@ -11530,7 +11530,7 @@ function zhanghe_spell_condition takes nothing returns nothing
       set zs_action_prioty_arry[52]=89
     endif
   endif
-  if BYV and G!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1300)or(HeroD==null and EnemyCount>10)or IsManaAlmostFull(mHero))then
+  if BYV and NearestEnemyBubing!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1300)or(HeroD==null and EnemyCount>10)or IsManaAlmostFull(mHero))then
     set zs_action_prioty_arry[53]=85
   endif
   if BYV and ZhongliEnemy!=null and mHeroLevel>5 and mHeroLevel<15 and MyHeroHP>300 then
@@ -11579,8 +11579,8 @@ function zhanghe_spell_action takes integer index returns nothing
     call CastTargetSkillByOderStr(mHero,aid_zhanghe_juduji,"shadowstrike",HeroD)
     call Sleep(3)
   endif
-  if index==53 and intoUnitRange(G,500)then
-    set loc=GetUnitLoc(G)
+  if index==53 and intoUnitRange(NearestEnemyBubing,500)then
+    set loc=GetUnitLoc(NearestEnemyBubing)
     call CastPointSkillByOderStr(mHero,aid_zhanghe_duwu,"healingward",loc)
     call RemoveLocation(loc)
     set loc=null
@@ -11656,7 +11656,7 @@ function gongben_spell_condition takes nothing returns nothing
       set zs_action_prioty_arry[52]=89
     endif
   endif
-  if B_V and G!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1300)or(HeroD==null and EnemyCount>10)or IsManaAlmostFull(mHero))and mHeroLevel>2 then
+  if B_V and NearestEnemyBubing!=null and((EnemyCount>AllyCount+9 and rangeToHeroD>1300)or(HeroD==null and EnemyCount>10)or IsManaAlmostFull(mHero))and mHeroLevel>2 then
     set zs_action_prioty_arry[53]=81
   endif
   if B_V and HeroD==null and ZhongliEnemy!=null and mHeroLevel>5 and mHeroLevel<15 and MyHeroHP>300 and mHeroLevel>2 then
@@ -11693,8 +11693,8 @@ function gongben_spell_action takes integer index returns nothing
       call Sleep(1)
     endif
   endif
-  if index==53 and intoUnitRange(G,700)then
-    set loc=GetUnitLoc(G)
+  if index==53 and intoUnitRange(NearestEnemyBubing,700)then
+    set loc=GetUnitLoc(NearestEnemyBubing)
     call CastPointSkillByOderStr(mHero,aid_gongben_longzuishan,"dispel",loc)
     call RemoveLocation(loc)
     set loc=null
@@ -11736,10 +11736,10 @@ function CEV takes nothing returns nothing
   local integer id=0
   loop
     set index=GetRandomInt(1,16)
-    exitwhen GetStoredInteger(CV,"heros",ITS(index))>0
+    exitwhen GetStoredInteger(zs_gamecache,"heros",ITS(index))>0
   endloop
-  if GetStoredInteger(CV,"heros",ITS(index))>0 then
-    call CVV(GetStoredInteger(CV,"heros",ITS(index)))
+  if GetStoredInteger(zs_gamecache,"heros",ITS(index))>0 then
+    call CVV(GetStoredInteger(zs_gamecache,"heros",ITS(index)))
   endif
 endfunction
 
@@ -12013,11 +12013,11 @@ endfunction
 function CJV takes nothing returns integer
   local integer ri=0
   if LC<=WC and LC>0 then
-    set N=zs_nearestMinHpAllyBing
+    set budaobingW2=zs_nearestMinHpAllyBing
     set ri=1
   endif
   if KC<=TC and KC>0 then
-    set C=zs_nearestMinHpEnemyBing
+    set budaobingD2=zs_nearestMinHpEnemyBing
     set ri=2
   endif
   if LC<=UC and LC>0 then
@@ -12034,11 +12034,11 @@ endfunction
 function CKV takes nothing returns integer
   local integer ri=0
   if zs_nearestAllyBingMinHp<OB then
-    set N=zs_nearestMinHpAllyBing
+    set budaobingW2=zs_nearestMinHpAllyBing
     set ri=3
   endif
   if zs_nearestEnemyBingMinHp<RB then
-    set C=zs_nearestMinHpEnemyBing
+    set budaobingD2=zs_nearestMinHpEnemyBing
     set ri=4
   endif
   if zs_nearestAllyBingMinHp<XB then
@@ -12057,8 +12057,8 @@ function CLV takes nothing returns integer
   call CHV()
   set budaobingD=null
   set budaobingW=null
-  set C=null
-  set N=null
+  set budaobingD2=null
+  set budaobingW2=null
   if U<600 then
     set CMV=CJV()
   endif
@@ -12084,7 +12084,7 @@ function RefreshParam takes nothing returns nothing
   local integer CMV=0
   set lockflag=true
   call LearnSkill()
-  set K=false
+  set zs_kickoff=false
   call I2()
   set mHeroLevel=GetHeroLevel(mHero)
   if mHeroLevel>15 then
@@ -12133,7 +12133,7 @@ function RefreshParam takes nothing returns nothing
     if isZhuGeLiang()then
     endif
   endif
-  if C!=null then
+  if budaobingD2!=null then
   endif
   if zs_attackEnemyBing==null then
     set zs_attackEnemyBing=DD
@@ -12152,11 +12152,11 @@ function RefreshParam takes nothing returns nothing
     if(GetUnitX(TowerD)<-7000 and GetUnitY(TowerD)<-500 and GetUnitY(TowerD)>-2500)or(GetUnitX(TowerD)>6300 and GetUnitY(TowerD)<1300 and GetUnitY(TowerD)>0)then
     endif
   endif
-  call RemoveLocation(L)
-  set L=null
-  set L=D4()
+  call RemoveLocation(safeLoc)
+  set safeLoc=null
+  set safeLoc=D4()
   if HeroD!=null then
-    set Y=GetHeroLevel(HeroD)
+    set EnemyHeroLevel=GetHeroLevel(HeroD)
     set EnemyHeroHP=GetHP(HeroD)
     set EnemyHeroMP=GetMP(HeroD)
     set rangeToHeroD=RangeTo(mHero,HeroD)
@@ -12223,7 +12223,7 @@ function RefreshParam2 takes nothing returns nothing
     set EnemyHeroHP=999999
     set EnemyHeroMP=999999
     set rangeToHeroD=999999
-    set OV=GetUnitCurrentOrder(HeroD)
+    set crEnemyHeroOrder=GetUnitCurrentOrder(HeroD)
   endif
   if NearestHeroD!=null then
     set KH=RangeTo(mHero,NearestHeroD)
@@ -13011,7 +13011,7 @@ endfunction
 function RunOnceEveryDueTime takes nothing returns nothing
   local integer DDV=-1
   local boolean DFV=false
-  call StoreInteger(DV,"maintimer","1",AK(zs_timer1))
+  call StoreInteger(zs_gamecache2,"maintimer","1",AK(zs_timer1))
   call TimerStart(zs_timer1,999999,true,null)
   call inittimearry()
   loop
@@ -13263,7 +13263,7 @@ function DYV takes nothing returns nothing
   endif
   set u=CreateUnit(Player(12),D_V,hiddenX,hiddenY+2100,180)
   set r1=NS()
-  if DV==null then
+  if zs_gamecache2==null then
     call debugstr("zs_ucacheCommon==null")
   endif
   set DZV=DMV(u)
@@ -13284,7 +13284,7 @@ function main takes nothing returns nothing
   local integer AFV
   local unit C0V
   local unit u
-  local group g
+  local group NearestEnemyBubing
   local integer AAV
   set i=0
   set command=-1
@@ -13647,31 +13647,31 @@ function main takes nothing returns nothing
   call StartThread(function RunOnceEveryDueTime)
   if GetPlayerId(ai_player)==5 then
   endif
-  if GetStoredInteger(CV,"heros","1")<1 then
-    call StoreInteger(CV,"heros","1",hid_zhugeliang)
-    call StoreInteger(CV,"heros","2",hid_guanyu)
-    call StoreInteger(CV,"heros","3",hid_zhangfei)
-    call StoreInteger(CV,"heros","4",hid_weiyan)
-    call StoreInteger(CV,"heros","5",hid_zhaoyun)
-    call StoreInteger(CV,"heros","6",hid_dadi)
-    call StoreInteger(CV,"heros","7",hid_simayi)
-    call StoreInteger(CV,"heros","8",hid_guojia)
-    call StoreInteger(CV,"heros","9",hid_caoren)
-    call StoreInteger(CV,"heros","10",hid_dianwei)
-    call StoreInteger(CV,"heros","11",hid_xun)
-    call StoreInteger(CV,"heros","12",hid_zhangliao)
-    call StoreInteger(CV,"heros","13",hid_madai)
-    call StoreInteger(CV,"heros","14",hid_zhanghe)
-    call StoreInteger(CV,"heros","15",hid_gongben)
-    call StoreInteger(CV,"heros","16",hid_sunquan)
+  if GetStoredInteger(zs_gamecache,"heros","1")<1 then
+    call StoreInteger(zs_gamecache,"heros","1",hid_zhugeliang)
+    call StoreInteger(zs_gamecache,"heros","2",hid_guanyu)
+    call StoreInteger(zs_gamecache,"heros","3",hid_zhangfei)
+    call StoreInteger(zs_gamecache,"heros","4",hid_weiyan)
+    call StoreInteger(zs_gamecache,"heros","5",hid_zhaoyun)
+    call StoreInteger(zs_gamecache,"heros","6",hid_dadi)
+    call StoreInteger(zs_gamecache,"heros","7",hid_simayi)
+    call StoreInteger(zs_gamecache,"heros","8",hid_guojia)
+    call StoreInteger(zs_gamecache,"heros","9",hid_caoren)
+    call StoreInteger(zs_gamecache,"heros","10",hid_dianwei)
+    call StoreInteger(zs_gamecache,"heros","11",hid_xun)
+    call StoreInteger(zs_gamecache,"heros","12",hid_zhangliao)
+    call StoreInteger(zs_gamecache,"heros","13",hid_madai)
+    call StoreInteger(zs_gamecache,"heros","14",hid_zhanghe)
+    call StoreInteger(zs_gamecache,"heros","15",hid_gongben)
+    call StoreInteger(zs_gamecache,"heros","16",hid_sunquan)
   endif
   call StartThread(function mainLoop)
   call Sleep(2)
   set u=null
-  set g=CreateGroup()
-  call GroupEnumUnitsInRange(g,0,0,999999,null)
+  set NearestEnemyBubing=CreateGroup()
+  call GroupEnumUnitsInRange(NearestEnemyBubing,0,0,999999,null)
   loop
-    set u=FirstOfGroup(g)
+    set u=FirstOfGroup(NearestEnemyBubing)
     exitwhen u==null
     if IsAlive(u)then
       if IsUnitAlly(u,ai_player)then
@@ -13735,10 +13735,10 @@ function main takes nothing returns nothing
         endif
       endif
     endif
-    call GroupRemoveUnit(g,u)
+    call GroupRemoveUnit(NearestEnemyBubing,u)
   endloop
-  call DestroyGroup(g)
-  set g=null
+  call DestroyGroup(NearestEnemyBubing)
+  set NearestEnemyBubing=null
   set zs_firelines[101]=TG
   set zs_firelines[102]=TH
   call DYV()
