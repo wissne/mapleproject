@@ -7851,7 +7851,7 @@ function zs_budao_d_condition takes nothing returns nothing
     if budaobingD==null then
         set zs_action_prioty_arry[0]=0
     else
-        set zs_action_prioty_arry[0]=50
+        set zs_action_prioty_arry[0]=60
     endif
 endfunction
 
@@ -7871,7 +7871,7 @@ function zs_budao_w_condition takes nothing returns nothing
     if budaobingW==null or HeroD==null then
         set zs_action_prioty_arry[1]=0
     else
-        set zs_action_prioty_arry[1]=48
+        set zs_action_prioty_arry[1]=61
     endif
 endfunction
 
@@ -8285,7 +8285,7 @@ function zs_move_condition takes nothing returns nothing
     if MyHeroHP<400 and HeroD!=null and(EnemyHeroMP>280 or IsManaAlmostFull(HeroD))and rangeToHeroD<800 and EnemyHeroLevel>3 then
         set zs_action_prioty_arry[5]=62
     endif
-    if zs_AllyHeroNearMeCount==0 and zs_EnemyHeroNearMeCount==2 and KH<900 then
+    if zs_AllyHeroNearMeCount==0 and zs_EnemyHeroNearMeCount>=2 and KH<900 then
         set zs_action_prioty_arry[5]=64
     endif
     if MyHeroHP<400 and HeroD!=null and(EnemyHeroMP>350 or IsManaAlmostFull(HeroD))and rangeToHeroD<800 and EnemyHeroLevel>3 then
@@ -8372,7 +8372,7 @@ function zs_move_condition takes nothing returns nothing
     if HeroD!=null and EnemyCount>AllyCount+5 and MyHeroHP<500 and rangeToHeroD<900 then
         set zs_action_prioty_arry[5]=76
     endif
-    if zs_AllyHeroNearMeCount==0 and zs_EnemyHeroNearMeCount>=2 and MyHeroHP<600 and KH<660 then
+    if ((zs_AllyHeroNearMeCount==0 and zs_EnemyHeroNearMeCount>=2) or (zs_EnemyHeroNearMeCount - zs_AllyHeroNearMeCount) > 2) then
         set zs_action_prioty_arry[5]=77
         set OkSunZiBingFa=true
         set VH=1
@@ -8868,10 +8868,10 @@ function zs_attack_action_fashi takes integer index returns nothing
         call MoveAttackUnit(HeroD,attackRange)
     endif
     if index==41 then
-        if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_UseFeiXie(mHero) and gm_EnemyHeroCount <= 2 then
+        if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_UseFeiXie(mHero) and zs_EnemyHeroNearMeCount <= 2 then
             call UseFeiXieU(HeroD)
         endif
-        if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_SunZiBingFa(mHero) and gm_EnemyHeroCount <= gm_AllyHeroCount then
+        if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_SunZiBingFa(mHero) and zs_EnemyHeroNearMeCount <= zs_AllyHeroNearMeCount then
             set OkSunZiBingFa=true
         endif
         if zs_action_prioty_arry[41]>=75 and GetUnitMoveSpeed(HeroD)>380 and can_TuiMoDao(mHero) then
@@ -8880,7 +8880,7 @@ function zs_attack_action_fashi takes integer index returns nothing
         if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_TuiMoDao(mHero) then
             set OkTuiMoDao=true
         endif
-        if (MyHeroHP>700 or(MyHeroHP>EnemyHeroHP+60 and FV>1)) and gm_EnemyHeroCount <= gm_AllyHeroCount then
+        if (MyHeroHP>700 or(MyHeroHP>EnemyHeroHP+60 and FV>1)) and zs_EnemyHeroNearMeCount <= zs_AllyHeroNearMeCount then
             call ChaseAttackUnit(HeroD) //追击敌人 
         else
             call attackUnitAround(HeroD)		//绕兵打
@@ -10120,9 +10120,9 @@ function sima_spell_action takes integer index returns nothing
     if not isSiMaYi()then
         return
     endif
-    if index==50 and intoUnitRange(HeroD,600)then
+    if index==50 and intoUnitRange(HeroD,600)then	//EA
         if zs_kickoff then
-            if can_UseFeiXie(mHero)then
+            if can_UseFeiXie(mHero) and rangeToHeroD>650 then
                 call UseFeiXieU(HeroD)
             endif
             if can_UseBianXing(mHero)then
@@ -10133,9 +10133,9 @@ function sima_spell_action takes integer index returns nothing
         call HeroAttack(HeroD)
         call Sleep(.9)
     endif
-    if index==51 and intoUnitRange(HeroD,600)then
+    if index==51 and intoUnitRange(HeroD,600)then	//FA
         if zs_kickoff then
-            if can_UseFeiXie(mHero)then
+            if can_UseFeiXie(mHero) and rangeToHeroD>650 then
                 call UseFeiXieU(HeroD)
             endif
             if can_UseBianXing(mHero)then
@@ -10145,11 +10145,11 @@ function sima_spell_action takes integer index returns nothing
         call sima_cast_fu2(HeroD)
         call HeroAttack(HeroD)
     endif
-    if index==52 then
-        if zs_kickoff and can_UseFeiXie(mHero)and intoUnitRange(HeroD,1300)then
+    if index==52 then	//EFA
+        if zs_kickoff and can_UseFeiXie(mHero) and rangeToHeroD>650 and intoUnitRange(HeroD,1300) then
             call UseFeiXieU(HeroD)
         endif
-        if zs_HeroPower>1 and can_UseFeiXie(mHero)and rangeToHeroD>650 and intoUnitRange(HeroD,1200)then
+        if zs_HeroPower>1 and can_UseFeiXie(mHero) and rangeToHeroD>650 and intoUnitRange(HeroD,1200)then
             call UseFeiXieU(HeroD)
         endif
         if zs_kickoff and intoUnitRange(HeroD,600)then
@@ -10163,7 +10163,7 @@ function sima_spell_action takes integer index returns nothing
             call Sleep(.9)
         endif
     endif
-    if index==53 then
+    if index==53 then	//NEFA
         if intoUnitRange(HeroD,600)then
             if can_sima_cast_feng_n_ef()then
                 call sima_cast_feng_n_ef(HeroD)
@@ -10171,47 +10171,47 @@ function sima_spell_action takes integer index returns nothing
             endif
         endif
     endif
-    if index==54 then
+    if index==54 then	//BNEF
         if intoUnitRange(HeroD,600)and can_sima_cast_bian_n_ef()then
             call sima_cast_bian_n_ef(HeroD)
             call HeroAttack(HeroD)
             call Sleep(.9)
         endif
     endif
-    if index==55 then
+    if index==55 then	//NEFA
         if intoUnitRange(HeroD,900)then
             call sima_cast_n_ef(HeroD)
             call HeroAttack(HeroD)
             call Sleep(.9)
         endif
     endif
-    if index==56 then
+    if index==56 then	//EFFengNFengFE
         if intoUnitRange(HeroD,600)then
             call sima_cast_ef_feng_n_feng_fe(HeroD)
         endif
     endif
-    if index==59 and NearestEnemyBubing!=null then
+    if index==59 and NearestEnemyBubing!=null then	//EF Bing
         if intoUnitRange(NearestEnemyBubing,590)then
             call sima_cast_ef(NearestEnemyBubing)
         endif
     endif
-    if index==60 and intoUnitRange(TowerD,600)then
+    if index==60 and intoUnitRange(TowerD,600)then	//F Tower
         call sima_cast_fu(TowerD)
     endif
-    if index==61 and intoUnitRange(TowerD,600)then
+    if index==61 and intoUnitRange(TowerD,600)then	//F Tower
         call sima_cast_fu(TowerD)
     endif
-    if index==62 and intoUnitRange(HeroD,800)then
+    if index==62 and intoUnitRange(HeroD,800)then	//A F A
         call OOV(HeroD)
         call HeroAttack(HeroD)
         call Sleep(.9)
-        if can_sima_cast_f()and RangeTo(mHero,HeroD)<650 then
+        if can_sima_cast_f() and RangeTo(mHero,HeroD)<650 then
             call sima_cast_fu(HeroD)
         endif
         call HeroAttack(HeroD)
         call Sleep(.9)
     endif
-    if index==63 and intoUnitRange(EnemyBingYing,590)then
+    if index==63 and intoUnitRange(EnemyBingYing,590)then	//F bingYing
         call sima_cast_fu(EnemyBingYing)
     endif
     if index==64 and intoUnitRange(UnitTouShiChe,500)then
@@ -10294,11 +10294,11 @@ function zhuge_spell_condition takes nothing returns nothing
     endif
 endfunction
 
-function zhuge_spell_action takes integer index returns nothing
+function zhuge_spell_action takes integer index returns nothing	//诸葛
     if not isZhuGeLiang()then
         return
     endif
-    if index==50 then
+    if index==50 then	//GA
         if zs_kickoff then
             if can_UseFeiXie(mHero)then
                 call UseFeiXieU(HeroD)
@@ -10310,7 +10310,7 @@ function zhuge_spell_action takes integer index returns nothing
         call zhuge_cast_g(HeroD)
         call HeroAttack(HeroD)
     endif
-    if index==51 then
+    if index==51 then	//EGA
         if zs_kickoff then
             if can_UseFeiXie(mHero)then
                 call UseFeiXieU(HeroD)
@@ -10325,37 +10325,37 @@ function zhuge_spell_action takes integer index returns nothing
             call HeroAttack(HeroD)
         endif
     endif
-    if index==52 then
+    if index==52 then	//EXGA
         if intoUnitRange(HeroD,600)then
             call zhuge_cast_feng_e_x_g(HeroD)
             call HeroAttack(HeroD)
         endif
     endif
-    if index==53 then
+    if index==53 then	//FEXGA
         if intoUnitRange(HeroD,800)then
             call zhuge_cast_fei_e_x_g(HeroD)
             call HeroAttack(HeroD)
         endif
     endif
-    if index==54 then
+    if index==54 then	//BEXGA
         if intoUnitRange(HeroD,600)then
             call zhuge_cast_bian_e_x_g(HeroD)
             call HeroAttack(HeroD)
         endif
     endif
-    if index==55 then
+    if index==55 then	//XMA
         if intoUnitRange(HeroD,700)then
             call zhuge_cast_x_move(HeroD)
             call HeroAttack(HeroD)
         endif
     endif
-    if index==56 then
+    if index==56 then	//XMGA
         if intoUnitRange(HeroD,700)then
             call zhuge_cast_x_move_g(HeroD)
             call HeroAttack(HeroD)
         endif
     endif
-    if index==57 then
+    if index==57 then	//ChaseA
         if zs_HeroPower>1 and rangeToHeroD>650 and can_UseFeiXie(mHero)then
             call UseFeiXieU(HeroD)
         endif
@@ -10365,19 +10365,19 @@ function zhuge_spell_action takes integer index returns nothing
             endif
         endif
     endif
-    if index==58 and intoUnitRange(HeroD,600)then
+    if index==58 and intoUnitRange(HeroD,600)then	//ChaseAG
         if OMV(HeroD)then
             call ChaseAttackUnit(HeroD)
             call Sleep(.1)
             call zhuge_cast_g(HeroD)
         endif
     endif
-    if index==59 and zs_nearestMinHpEnemyBing!=null then
+    if index==59 and zs_nearestMinHpEnemyBing!=null then	//G Bing
         if intoUnitRange(zs_nearestMinHpEnemyBing,700)then
             call zhuge_cast_g(zs_nearestMinHpEnemyBing)
         endif
     endif
-    if index==60 and intoUnitRange(HeroD,600)then
+    if index==60 and intoUnitRange(HeroD,600)then	// XM
         if OMV(HeroD)then
             if can_zhuge_cast_x()then
                 call zhuge_cast_x_move(HeroD)
@@ -10387,13 +10387,13 @@ function zhuge_spell_action takes integer index returns nothing
             endif
         endif
     endif
-    if index==61 then
-        call zhuge_cast_lei()
+    if index==61 then	//Lei
+        call zhuge_cast_lei()	
     endif
-    if index==62 then
+    if index==62 then	//Wu
         call zhuge_cast_wu()
     endif
-    if index==63 then
+    if index==63 then	//Xue
         call zhuge_cast_xue()
     endif
 endfunction
