@@ -25,8 +25,6 @@ globals
     integer EnemyHeroLevel=0
     integer mHeroLevel=0
     integer EnemyCount=0
-    integer AllyHeroCount=0
-    integer EnemyHeroCount=0
     integer ZhongliEnemyCount=0
     integer AllyCount=0
     integer crEnemyHeroOrder=0
@@ -138,8 +136,8 @@ globals
     item AR=null
     item NR=null
     boolean zs_NeedToBuy=true
-    boolean CR=false
-    boolean DR=false
+    boolean OkSunZiBingFa=false
+    boolean OkTuiMoDao=false
     integer FR=0
     boolean GR=false
     timer zs_timer1=CreateTimer()
@@ -3912,8 +3910,6 @@ endfunction
 function resetParam takes nothing returns nothing
     set AllyCount=0
     set EnemyCount=0
-    set EnemyHeroCount=0
-    set AllyHeroCount=0
     set ZhongliEnemyCount=0
     set zs_nearestEnemyHeroMinRange=999999
     set zs_nearestEnemyTowerMinRange=999999
@@ -4092,12 +4088,6 @@ function setEnemyBingNearHero takes unit TheUnit returns nothing
     endif
     if IsUnitEnemy(TheUnit,ai_player)and GetUnitTypeId(TheUnit)=='orai' then
         set RJ=TheUnit
-    endif
-    if IsUnitHero(TheUnit) and IsUnitEnemy(TheUnit,ai_player) then
-        set EnemyHeroCount = EnemyHeroCount + 1
-    endif
-    if IsUnitHero(TheUnit) and (not IsUnitEnemy(TheUnit,ai_player)) then
-        set AllyHeroCount = AllyHeroCount + 1
     endif
     if(IsEnemyBing(TheUnit))then
         if RangeTo(mHero,TheUnit)<=1200 then
@@ -6456,7 +6446,7 @@ function UseSunZiBingFa takes nothing returns boolean
     local boolean result=false
     set result=UseItemByID(mHero,iid_sunzibingfa,.1)
     if result then
-        set CR=false
+        set OkSunZiBingFa=false
     endif
     return result
 endfunction
@@ -6607,7 +6597,7 @@ function X_V takes location Target returns boolean
     return result
 endfunction
 
-function X0V takes unit Target returns boolean
+function UseFeiXieU takes unit Target returns boolean
     local boolean result=false
     local location loc=GetLocBetweenTwoUnitsRangeToFirst(Target,mHero,-160)
     set result=UseFeiXie(loc)
@@ -8375,7 +8365,7 @@ function A_V takes nothing returns nothing
             set zs_action_prioty_arry[8]=100
         endif
         if KH<800 then
-            set CR=true
+            set OkSunZiBingFa=true
             set VH=1
         endif
     endif
@@ -8384,17 +8374,17 @@ function A_V takes nothing returns nothing
     endif
     if zs_AllyHeroNearMeCount==0 and zs_EnemyHeroNearMeCount>=2 and MyHeroHP<600 and KH<660 then
         set zs_action_prioty_arry[5]=77
-        set CR=true
+        set OkSunZiBingFa=true
         set VH=1
     endif
     if CW(mHero)and HeroD!=null then
         set zs_action_prioty_arry[8]=78
-        set CR=true
+        set OkSunZiBingFa=true
         set VH=1
     endif
     if NearestHeroD!=null and(isZhaoYunHasB(NearestHeroD)or(IsImmune(NearestHeroD)and GetUnitTypeId(NearestHeroD)==hid_guanyu))and(not CW(NearestHeroD))and rangeToHeroD<430 then
         set zs_action_prioty_arry[5]=79
-        set CR=true
+        set OkSunZiBingFa=true
         set VH=1
     endif
     if BH and(FarestAllyBubingFromRetreatLoc==null or(FarestAllyBubingFromRetreatLoc!=null and RangeTo(FarestAllyBubingFromRetreatLoc,TowerD)>500))then
@@ -8417,14 +8407,14 @@ function A_V takes nothing returns nothing
     if zs_HeroPower<-1 and EnemyHeroLevel>10 then
         set zs_action_prioty_arry[8]=82
         if KH<800 then
-            set CR=true
+            set OkSunZiBingFa=true
             set VH=1
         endif
     endif
     if zs_HeroPower<-2 and EnemyHeroLevel>11 then
         set zs_action_prioty_arry[8]=92
         if KH<900 then
-            set CR=true
+            set OkSunZiBingFa=true
             set VH=1
         endif
     endif
@@ -8433,22 +8423,22 @@ function A_V takes nothing returns nothing
     endif
     if HeroD!=null and AllyCount==0 and EnemyCount>5 and MyHeroHP<500 and zs_HeroPower<2 then
         set zs_action_prioty_arry[5]=85
-        set CR=true
+        set OkSunZiBingFa=true
         set VH=1
     endif
     if HeroD!=null and EnemyCount-AllyCount>10 and MyHeroHP<1000 and zs_HeroPower<2 then
         set zs_action_prioty_arry[8]=86
-        set CR=true
+        set OkSunZiBingFa=true
         set VH=1
     endif
     if HeroD!=null and AllyCount==0 and EnemyCount>6 and(MyHeroHP<800)and zs_HeroPower<2 then
         set zs_action_prioty_arry[5]=88
-        set CR=true
+        set OkSunZiBingFa=true
         set VH=1
     endif
     if HeroD==null and zs_myhero_hpchanged<-260 then
         set zs_action_prioty_arry[5]=99
-        set CR=true
+        set OkSunZiBingFa=true
         set VH=1
     endif
     if HeroD!=null and MyHeroHP<1000 and IsImmune(HeroD)and not CW(HeroD)and V6(mHero)==0 then
@@ -8529,7 +8519,7 @@ function A_V takes nothing returns nothing
         set zs_action_prioty_arry[8]=89
     endif
     if zs_AllyHeroNearMeCount==0 and zs_EnemyHeroNearMeCount>2 and KH<900 then
-        set CR=true
+        set OkSunZiBingFa=true
         set VH=1
         set zs_action_prioty_arry[8]=90
     endif
@@ -8667,7 +8657,7 @@ function A1V takes integer index returns nothing
             call UseFeiXie(zs_cr_retreatLoc)
         endif
         if RangeToLoc(mHero,mBaseLoc)>1800 then
-            set CR=true
+            set OkSunZiBingFa=true
         endif
         call ariveLoc(mHero,mBaseLoc,360)
     endif
@@ -8770,7 +8760,7 @@ function A1V takes integer index returns nothing
     endif
 endfunction
 
-function A2V takes nothing returns nothing
+function zs_attack_condition_fashi takes nothing returns nothing
     if HeroD!=null then
         if(FV>1 and YG>1)and OG then
             set zs_action_prioty_arry[40]=42
@@ -8806,9 +8796,9 @@ function A2V takes nothing returns nothing
             set zs_action_prioty_arry[41]=78
         endif
         if zs_HeroPower>1 and MyHeroHP>600 then
-            set CR=true
+            set OkSunZiBingFa=true
             if rangeToHeroD>560 and ZG<=0 then
-                set DR=true
+                set OkTuiMoDao=true
             endif
         endif
         if CW(HeroD)and OG then
@@ -8873,25 +8863,25 @@ function A2V takes nothing returns nothing
     endif
 endfunction
 
-function A3V takes integer index returns nothing
+function zs_attack_action_fashi takes integer index returns nothing
     if index==40 then
         call MoveAttackUnit(HeroD,VB)
     endif
     if index==41 then
         if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_UseFeiXie(mHero)then
-            call X0V(HeroD)
+            call UseFeiXieU(HeroD)
         endif
         if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_SunZiBingFa(mHero)then
-            set CR=true
+            set OkSunZiBingFa=true
         endif
         if zs_action_prioty_arry[41]>=75 and GetUnitMoveSpeed(HeroD)>380 and can_TuiMoDao(mHero)then
-            set DR=true
+            set OkTuiMoDao=true
         endif
         if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_TuiMoDao(mHero)then
-            set DR=true
+            set OkTuiMoDao=true
         endif
         if MyHeroHP>700 or(MyHeroHP>EnemyHeroHP+60 and FV>1)then
-            call ChaseAttackUnit(HeroD)
+            call ChaseAttackUnit(HeroD) //追击敌人 
         else
             call I1V(HeroD)
         endif
@@ -8925,7 +8915,7 @@ function A3V takes integer index returns nothing
         call EZ(.9)
     endif
     if index==70 and intoUnitRange(BG,600)then
-        call ChaseAttackUnit(BG)
+        call ChaseAttackUnit(BG)    //追击投石车 
     endif
     if index==73 then
         if zs_action_prioty_arry[73]==70 then
@@ -9035,16 +9025,16 @@ function zs_attack_action_zhanshi takes integer index returns nothing
     endif
     if index==41 then
         if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_UseFeiXie(mHero)then
-            call X0V(HeroD)
+            call UseFeiXieU(HeroD)
         endif
         if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 then
-            set CR=true
+            set OkSunZiBingFa=true
         endif
         if zs_action_prioty_arry[41]>=75 and GetUnitMoveSpeed(HeroD)>400 and can_TuiMoDao(mHero)then
-            set DR=true
+            set OkTuiMoDao=true
         endif
         if zs_action_prioty_arry[41]>=75 and rangeToHeroD>500 and can_TuiMoDao(mHero)then
-            set DR=true
+            set OkTuiMoDao=true
         endif
         call I2V(HeroD)
     endif
@@ -9084,13 +9074,13 @@ endfunction
 function A6V takes nothing returns nothing
     if not GG then
         if IsRangeAttacker(mHero)then
-            call A2V()
+            call zs_attack_condition_fashi()
         else
             call zs_attack_condition_zhanshi()
         endif
     endif
     if isZhuGeLiang()or isSiMaYi()or isguojia()or isxun()then
-        call A2V()
+        call zs_attack_condition_fashi()
     endif
     if iszhaoyun()or iszhangfei()or isguanyu()or isweiyan()or isdianwei()or iszhangliao()or iscaoren()or isdadi()then
         call zs_attack_condition_zhanshi()
@@ -9212,13 +9202,13 @@ endfunction
 function A8V takes integer index returns nothing
     if not GG then
         if IsRangeAttacker(mHero)then
-            call A3V(index)
+            call zs_attack_action_fashi(index)
         else
             call zs_attack_action_zhanshi(index)
         endif
     endif
     if isZhuGeLiang()or isSiMaYi()or isguojia()or isxun()or ismadai()or iszhanghe()then
-        call A3V(index)
+        call zs_attack_action_fashi(index)
     endif
     if iszhaoyun()or iszhangfei()or isguanyu()or isweiyan()or isdianwei()or iszhangliao()or iscaoren()or isdadi()then
         call zs_attack_action_zhanshi(index)
@@ -9270,7 +9260,7 @@ function zs_useitem_condition takes nothing returns nothing
             if can_UseFeiXie(mHero)then
                 set zs_action_prioty_arry[20]=105
             endif
-            set CR=true
+            set OkSunZiBingFa=true
             if can_UseFengZhang(mHero)then
                 set zs_action_prioty_arry[21]=102
             endif
@@ -9303,7 +9293,7 @@ function zs_useitem_condition takes nothing returns nothing
             if can_UseFeiXie(mHero)then
                 set zs_action_prioty_arry[24]=101
             endif
-            set CR=true
+            set OkSunZiBingFa=true
         endif
         if EnemyHeroHP>1000 and not can_sima_cast_n()and not can_zhuge_cast_x()then
             if can_UseBianXing(mHero)then
@@ -9324,22 +9314,22 @@ function zs_useitem_condition takes nothing returns nothing
     if VH==1 and can_UseFeiXie(mHero)then
         call UseFeiXie(zs_cr_retreatLoc)
         set VH=0
-        set CR=false
+        set OkSunZiBingFa=false
         set zs_action_prioty_arry[34]=104
     endif
     if VH==2 and can_UseFeiXie(mHero)then
-        call X0V(HeroD)
+        call UseFeiXieU(HeroD)
         set zs_action_prioty_arry[34]=104
         set VH=0
-        set CR=false
+        set OkSunZiBingFa=false
     endif
-    if CR then
+    if OkSunZiBingFa then
         if can_SunZiBingFa(mHero)then
             call UseSunZiBingFa()
         endif
     endif
     set VH=0
-    set CR=false
+    set OkSunZiBingFa=false
     if HeroD!=null and can_MengDe(mHero)then
         call UseMengDe(HeroD)
     endif
@@ -9349,10 +9339,10 @@ function zs_useitem_condition takes nothing returns nothing
     if can_ShenNongBenCao(mHero)and GetHPVoided(mHero)>300 then
         set zs_action_prioty_arry[29]=104
     endif
-    if DR and not can_TuiMoDao(mHero)then
-        set DR=false
+    if OkTuiMoDao and not can_TuiMoDao(mHero)then
+        set OkTuiMoDao=false
     endif
-    if HeroD!=null and DR and can_TuiMoDao(mHero)and zs_IsTimeOut(60,3)then
+    if HeroD!=null and OkTuiMoDao and can_TuiMoDao(mHero)and zs_IsTimeOut(60,3)then
         set zs_action_prioty_arry[30]=108
     endif
     if zs_allyHeroToMeMinRange<1100 and GetHPVoided(zs_AllyHeroNearestToMe)>300 and can_QingNangShu(mHero)and intoUnitRange(zs_AllyHeroNearestToMe,400)then
@@ -9442,7 +9432,7 @@ function NXV takes nothing returns nothing
             call zhangfei_cast_v()
             return
         endif
-        set CR=true
+        set OkSunZiBingFa=true
         if isZhugeCastingX()then
             if zs_canspelltoHerod then
                 if can_UseFengZhang(mHero)then
@@ -9508,7 +9498,7 @@ function NOV takes integer index returns nothing
     endif
     if index==30 and HeroD!=null and intoUnitRange(HeroD,700)then
         call UseTuiMoDao(HeroD)
-        set DR=false
+        set OkTuiMoDao=false
     endif
     if index==31 and intoUnitRange(zs_AllyHeroNearestToMe,400)then
         call UseQingNangShu()
@@ -10133,7 +10123,7 @@ function sima_spell_action takes integer index returns nothing
     if index==50 and intoUnitRange(HeroD,600)then
         if zs_kickoff then
             if can_UseFeiXie(mHero)then
-                call X0V(HeroD)
+                call UseFeiXieU(HeroD)
             endif
             if can_UseBianXing(mHero)then
                 call UseBianXing(HeroD)
@@ -10146,7 +10136,7 @@ function sima_spell_action takes integer index returns nothing
     if index==51 and intoUnitRange(HeroD,600)then
         if zs_kickoff then
             if can_UseFeiXie(mHero)then
-                call X0V(HeroD)
+                call UseFeiXieU(HeroD)
             endif
             if can_UseBianXing(mHero)then
                 call UseBianXing(HeroD)
@@ -10157,10 +10147,10 @@ function sima_spell_action takes integer index returns nothing
     endif
     if index==52 then
         if zs_kickoff and can_UseFeiXie(mHero)and intoUnitRange(HeroD,1300)then
-            call X0V(HeroD)
+            call UseFeiXieU(HeroD)
         endif
         if zs_HeroPower>1 and can_UseFeiXie(mHero)and rangeToHeroD>650 and intoUnitRange(HeroD,1200)then
-            call X0V(HeroD)
+            call UseFeiXieU(HeroD)
         endif
         if zs_kickoff and intoUnitRange(HeroD,600)then
             if can_UseBianXing(mHero)then
@@ -10311,7 +10301,7 @@ function zhuge_spell_action takes integer index returns nothing
     if index==50 then
         if zs_kickoff then
             if can_UseFeiXie(mHero)then
-                call X0V(HeroD)
+                call UseFeiXieU(HeroD)
             endif
             if can_UseBianXing(mHero)then
                 call UseBianXing(HeroD)
@@ -10323,7 +10313,7 @@ function zhuge_spell_action takes integer index returns nothing
     if index==51 then
         if zs_kickoff then
             if can_UseFeiXie(mHero)then
-                call X0V(HeroD)
+                call UseFeiXieU(HeroD)
             endif
             if can_UseBianXing(mHero)then
                 call UseBianXing(HeroD)
@@ -10367,7 +10357,7 @@ function zhuge_spell_action takes integer index returns nothing
     endif
     if index==57 then
         if zs_HeroPower>1 and rangeToHeroD>650 and can_UseFeiXie(mHero)then
-            call X0V(HeroD)
+            call UseFeiXieU(HeroD)
         endif
         if intoUnitRange(HeroD,600)then
             if OMV(HeroD)then
@@ -10522,7 +10512,7 @@ function zhaoyun_spell_action takes integer index returns nothing
     endif
     if index==52 then
         if(rangeToHeroD>500 or GetUnitMoveSpeed(HeroD)>390)and can_TuiMoDao(mHero)then
-            set DR=true
+            set OkTuiMoDao=true
         endif
         call HeroAttack(HeroD)
         call Sleep(1)
@@ -10729,7 +10719,7 @@ function guanyu_spell_action takes integer index returns nothing
             set loc=null
         endif
         if(rangeToHeroD>260 or GetUnitMoveSpeed(HeroD)>390)and can_TuiMoDao(mHero)then
-            set DR=true
+            set OkTuiMoDao=true
         endif
         set loc=GetLocBetweenTwoUnitsRangeToFirst(HeroD,mHero,-180)
         call gotoLocation(mHero,loc,30)
