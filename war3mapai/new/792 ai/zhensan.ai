@@ -67,7 +67,7 @@ globals
     integer uid_zhimingjiejieLv2='o00G'
     integer uid_zhimingjiejieLv3='o00E'
     integer uid_zhimingjiejieLv4='o00F'
-    integer PE='otot'
+    integer uid_yanjing='otot'
     integer uid_shexingjiejieLv1='o00I'
     integer uid_shexingjiejieLv2='o00J'
     integer uid_shexingjiejieLv3='o00H'
@@ -230,7 +230,7 @@ globals
     real WN=78
     real YN=78
     real ZN=1.8
-    real VB=600
+    real attackRange=600
     real EB=90
     real XB=90
     real OB=300
@@ -339,8 +339,8 @@ globals
     boolean IG=false
     boolean AG=true
     integer NG=0
-    unit BG=null
-    real CG=999999
+    unit UnitTouShiChe=null
+    real RangeToTouShiChe=999999
     integer zs_player_index=-1
     integer FG=0
     boolean GG=false
@@ -380,9 +380,9 @@ globals
     location TH=null
     unit UH=null
     location WH=null
-    unit YH=null
-    unit ZH=null
-    unit VJ=null
+    unit UnitZhiMingJieJie=null
+    unit UnitYanJin=null
+    unit UnitSheXingJieJie=null
     unit EJ=null
     unit XJ=null
     unit OJ=null
@@ -1528,7 +1528,7 @@ function IsEnemyBingAttaker takes unit TheUnit returns boolean
     return false
 endfunction
 
-function IY takes unit TheUnit returns boolean
+function IsUnitAlive takes unit TheUnit returns boolean
     if IsDead(TheUnit)then
         return false
     endif
@@ -1724,7 +1724,7 @@ function YY takes unit TheUnit,integer abilcode,string order returns boolean
     return canCast
 endfunction
 
-function EZ takes real time returns nothing
+function SleepCanBreak takes real time returns nothing
     local real t=time/.02
     local real r=0
     loop
@@ -2168,7 +2168,7 @@ endfunction
 
 function setAttackRange takes nothing returns nothing
     if iszhaoyun()or iszhangliao()or isguanyu()or iszhangfei()or isweiyan()or iscaoren()or isdianwei()or isdadi()or FG==2 then
-        set VB=220
+        set attackRange=220
         set WN=WN-16
         set YN=YN-16
         set SC=PC-.5
@@ -3268,7 +3268,7 @@ function G3 takes unit TheUnit,real Radius,boolean includeInvisible returns unit
             if GetUnitTypeId(u)==uid_zhimingjiejieLv1 or GetUnitTypeId(u)==uid_zhimingjiejieLv2 or GetUnitTypeId(u)==uid_zhimingjiejieLv3 or GetUnitTypeId(u)==uid_zhimingjiejieLv4 then
                 set EJ=u
             endif
-            if GetUnitTypeId(u)==PE then
+            if GetUnitTypeId(u)==uid_yanjing then
                 set XJ=u
             endif
             if GetUnitTypeId(u)==uid_shexingjiejieLv1 or GetUnitTypeId(u)==uid_shexingjiejieLv2 or GetUnitTypeId(u)==uid_shexingjiejieLv3 then
@@ -3922,9 +3922,9 @@ function resetParam takes nothing returns nothing
     set budaobingW=null
     set budaobingD2=null
     set budaobingW2=null
-    set YH=null
-    set ZH=null
-    set VJ=null
+    set UnitZhiMingJieJie=null
+    set UnitYanJin=null
+    set UnitSheXingJieJie=null
     set RJ=null
     set OC=9999999
     set RC=null
@@ -3971,8 +3971,8 @@ function resetParam takes nothing returns nothing
     set FarestAllyBubingFromRetreatLoc=null
     set NearestEnemyBubingFromRetreatLoc=null
     set zs_attackEnemyBing=null
-    set BG=null
-    set CG=999999
+    set UnitTouShiChe=null
+    set RangeToTouShiChe=999999
 endfunction
 
 function X5 takes nothing returns nothing
@@ -4100,7 +4100,7 @@ function setEnemyBingNearHero takes unit TheUnit returns nothing
                 endif
             endif
         endif
-        if IY(TheUnit)and RangeTo(mHero,TheUnit)<=1200 and GetUnitTypeId(TheUnit)!=uid_toushiche then
+        if IsUnitAlive(TheUnit) and RangeTo(mHero,TheUnit)<=1200 and GetUnitTypeId(TheUnit)!=uid_toushiche then
             set EnemyCount=EnemyCount+1
         endif
         if RangeTo(TheUnit,mHero)<ZB and GetUnitTypeId(TheUnit)!=uid_toushiche then
@@ -4113,9 +4113,9 @@ function setEnemyBingNearHero takes unit TheUnit returns nothing
                 set zs_attackEnemyBing=TheUnit
             endif
         endif
-        if GetUnitTypeId(TheUnit)==uid_toushiche and RangeTo(mHero,TheUnit)<CG then
-            set BG=TheUnit
-            set CG=RangeTo(mHero,TheUnit)
+        if GetUnitTypeId(TheUnit)==uid_toushiche and RangeTo(mHero,TheUnit)<RangeToTouShiChe then
+            set UnitTouShiChe=TheUnit
+            set RangeToTouShiChe=RangeTo(mHero,TheUnit)
         endif
     endif
 endfunction
@@ -4123,13 +4123,13 @@ endfunction
 function F5 takes unit TheUnit returns nothing
     if IsUnitEnemy(TheUnit,ai_player)and IsAlive(TheUnit)then
         if GetUnitTypeId(TheUnit)==uid_zhimingjiejieLv1 or GetUnitTypeId(TheUnit)==uid_zhimingjiejieLv2 or GetUnitTypeId(TheUnit)==uid_zhimingjiejieLv3 or GetUnitTypeId(TheUnit)==uid_zhimingjiejieLv4 then
-            set YH=TheUnit
+            set UnitZhiMingJieJie=TheUnit
         endif
-        if GetUnitTypeId(TheUnit)==PE then
-            set ZH=TheUnit
+        if GetUnitTypeId(TheUnit)==uid_yanjing then
+            set UnitYanJin=TheUnit
         endif
         if GetUnitTypeId(TheUnit)==uid_shexingjiejieLv1 or GetUnitTypeId(TheUnit)==uid_shexingjiejieLv2 or GetUnitTypeId(TheUnit)==uid_shexingjiejieLv3 then
-            set VJ=TheUnit
+            set UnitSheXingJieJie=TheUnit
         endif
     endif
 endfunction
@@ -6624,9 +6624,9 @@ function intoUnitRange takes unit Target,real range returns boolean
     call RemoveLocation(loc)
     set loc=null
     if rl-range>80 then
-        call EZ(.4)
+        call SleepCanBreak(.4)
     else
-        call EZ(.2)
+        call SleepCanBreak(.2)
     endif
     set rl=RangeTo(mHero,Target)
     if rl<range then
@@ -7407,15 +7407,15 @@ function dadi_cast_c takes nothing returns nothing
     call Sleep(.5)
 endfunction
 
-function IYV takes unit u returns nothing
+function GoToSaveLocation takes unit u returns nothing
     if(safeLoc==null)then
         call gotoLocation(u,zs_cr_attackLoc,50)
-        call EZ(.8)
+        call SleepCanBreak(.8)
     else
         if not gotoLocation(u,safeLoc,50)then
-            call EZ(.8)
+            call SleepCanBreak(.8)
         else
-            call EZ(.5)
+            call SleepCanBreak(.5)
         endif
     endif
 endfunction
@@ -7428,12 +7428,12 @@ function MoveAttackUnit takes unit Target,real range returns boolean
     endif
     if intoUnitRange(Target,range)then
         call HeroAttack(Target)
-        call EZ(.9)
+        call SleepCanBreak(.9)
         set loc=X3(mHero,500)
         call gotoLocation(mHero,loc,20)
         call RemoveLocation(loc)
         set loc=null
-        call EZ(.8)
+        call SleepCanBreak(.8)
     endif
     return true
 endfunction
@@ -7446,12 +7446,12 @@ function MoveAttackUnit2 takes unit Target,real range returns boolean
     endif
     if intoUnitRange(Target,range)then
         call HeroAttack(Target)
-        call EZ(1)
+        call SleepCanBreak(1)
         set loc=X3(mHero,500)
         call gotoLocation(mHero,loc,20)
         call RemoveLocation(loc)
         set loc=null
-        call EZ(.6)
+        call SleepCanBreak(.6)
     endif
     return true
 endfunction
@@ -7464,9 +7464,9 @@ function ChaseAttackUnit takes unit Target returns boolean
     endif
     if intoUnitRange(Target,600)then
         call HeroAttack(Target)
-        call EZ(.9)
+        call SleepCanBreak(.9)
     endif
-    if VB>=500 then
+    if attackRange>=500 then
         if RangeTo(mHero,Target)<=330 then
             return true
         endif
@@ -7475,11 +7475,11 @@ function ChaseAttackUnit takes unit Target returns boolean
     call gotoLocation(mHero,loc,50)
     call RemoveLocation(loc)
     set loc=null
-    call EZ(.5)
+    call SleepCanBreak(.5)
     return true
 endfunction
 
-function I1V takes unit Target returns boolean
+function attackUnitAround takes unit Target returns boolean
     local location loc=null
     local boolean rb=false
     if Target==null then
@@ -7487,9 +7487,9 @@ function I1V takes unit Target returns boolean
     endif
     if intoUnitRange(Target,600)then
         call HeroAttack(Target)
-        call EZ(.9)
+        call SleepCanBreak(.9)
     endif
-    if VB>=500 then
+    if attackRange>=500 then
         if RangeTo(mHero,Target)<=390 and(NearestEnemyBubing==null or RangeTo(mHero,NearestEnemyBubing)>500)then
             return true
         endif
@@ -7503,11 +7503,11 @@ function I1V takes unit Target returns boolean
     call gotoLocation(mHero,loc,50)
     call RemoveLocation(loc)
     set loc=null
-    call EZ(.5)
+    call SleepCanBreak(.5)
     return true
 endfunction
 
-function I2V takes unit Target returns boolean
+function attackUnitAround2 takes unit Target returns boolean
     local location loc=null
     local boolean rb=false
     if Target==null then
@@ -7515,7 +7515,7 @@ function I2V takes unit Target returns boolean
     endif
     if intoUnitRange(Target,220)then
         call HeroAttack(Target)
-        call EZ(.9)
+        call SleepCanBreak(.9)
     endif
     if RangeTo(mHero,Target)<180 then
         return true
@@ -7524,7 +7524,7 @@ function I2V takes unit Target returns boolean
     call gotoLocation(mHero,loc,50)
     call RemoveLocation(loc)
     set loc=null
-    call EZ(.5)
+    call SleepCanBreak(.5)
     return true
 endfunction
 
@@ -7838,10 +7838,10 @@ function HeroRetreat takes integer range returns nothing
     local location safeLoc2=F4(range)
     if(safeLoc2==null)then
         call gotoLocation(mHero,zs_cr_attackLoc,50)
-        call EZ(1)
+        call SleepCanBreak(1)
     else
         call gotoLocation(mHero,safeLoc2,50)
-        call EZ(.8)
+        call SleepCanBreak(.8)
     endif
     call RemoveLocation(safeLoc2)
     set safeLoc2=null
@@ -7883,7 +7883,7 @@ function zs_budao_w_action takes integer index returns nothing
         return
     else
         call HeroAttack(budaobingW)
-        call EZ(.9)
+        call SleepCanBreak(.9)
     endif
 endfunction
 
@@ -8076,9 +8076,9 @@ function AZV takes nothing returns nothing
     if gotoLocation(mHero,TH,500)then
         call debugstr("nearhuanglong")
         call HeroAttack(SH)
-        call EZ(.8)
+        call SleepCanBreak(.8)
     else
-        call EZ(.8)
+        call SleepCanBreak(.8)
         call debugstr("go1")
         return
     endif
@@ -8126,7 +8126,7 @@ function AZV takes nothing returns nothing
     endif
 endfunction
 
-function A_V takes nothing returns nothing
+function zs_move_condition takes nothing returns nothing
     local integer A0V=0
     set BH=false
     set BH=T<BV and(zs_HeroPower<1 or MyHeroHP<800 or mHeroLevel<11)
@@ -8143,7 +8143,7 @@ function A_V takes nothing returns nothing
     if isdadi()then
         set YG=YG+5
     endif
-    if RangeTo(mHero,NearestEnemyBubing)<260 and VB>=500 then
+    if RangeTo(mHero,NearestEnemyBubing)<260 and attackRange>=500 then
         set FV=FV-1
         set zs_action_prioty_arry[4]=38
         set YG=YG-1
@@ -8151,7 +8151,7 @@ function A_V takes nothing returns nothing
     if MyHeroHP<EH-100 then
         set zs_action_prioty_arry[2]=60
     endif
-    if VB>=500 and AllyCount>1 and R4()then
+    if attackRange>=500 and AllyCount>1 and R4()then
         set FV=FV-2
         call RemoveLocation(WF)
         set WF=null
@@ -8201,7 +8201,7 @@ function A_V takes nothing returns nothing
     if MyHeroHP<500 and HeroD!=null and EnemyHeroMP>350 and EnemyHeroLevel>5 and rangeToHeroD<900 then
         set zs_action_prioty_arry[5]=49
     endif
-    if VB<=400 and T<600 and mHeroLevel<11 then
+    if attackRange<=400 and T<600 and mHeroLevel<11 then
         set zs_action_prioty_arry[8]=51
         set FV=FV-2
         set YG=YG-2
@@ -8270,7 +8270,7 @@ function A_V takes nothing returns nothing
     if AllyCount==0 and EnemyCount>0 then
         set zs_action_prioty_arry[5]=50
     endif
-    if YH!=null and RangeTo(mHero,YH)<500 then
+    if UnitZhiMingJieJie!=null and RangeTo(mHero,UnitZhiMingJieJie)<500 then
         set zs_action_prioty_arry[5]=50
     endif
     if AllyCount==0 and EnemyCount>2 and MyHeroHP<600 then
@@ -8350,13 +8350,13 @@ function A_V takes nothing returns nothing
     if MyHeroHP<EnemyHeroLevel*75 and HeroD!=null and rangeToHeroD<700 and EnemyHeroLevel<8 and EnemyHeroMP>290 then
         set zs_action_prioty_arry[5]=74
     endif
-    if VJ!=null and RangeTo(mHero,VJ)<930 then
+    if UnitSheXingJieJie!=null and RangeTo(mHero,UnitSheXingJieJie)<930 then
         set zs_action_prioty_arry[5]=73
     endif
-    if ZH!=null and RangeTo(mHero,ZH)<530 and KH<1500 then
+    if UnitYanJin!=null and RangeTo(mHero,UnitYanJin)<530 and KH<1500 then
         set zs_action_prioty_arry[5]=77
     endif
-    if BH and VB<500 and zs_cr_fightline!=1 then
+    if BH and attackRange<500 and zs_cr_fightline!=1 then
         set zs_action_prioty_arry[8]=75
     endif
     if zs_HeroPower<-2 and EnemyHeroLevel>7 then
@@ -8636,7 +8636,7 @@ function A_V takes nothing returns nothing
             set zs_action_prioty_arry[5]=78
         endif
     endif
-    if VJ!=null and RangeTo(mHero,VJ)<100 then
+    if UnitSheXingJieJie!=null and RangeTo(mHero,UnitSheXingJieJie)<100 then
         call AYV()
     endif
     if DI then
@@ -8644,10 +8644,10 @@ function A_V takes nothing returns nothing
     endif
 endfunction
 
-function A1V takes integer index returns nothing
+function zs_move_action takes integer index returns nothing
     local location loc=null
     if index==4 then
-        call IYV(mHero)
+        call GoToSaveLocation(mHero)
     endif
     if index==5 then
         call HeroRetreat(1600)
@@ -8663,41 +8663,41 @@ function A1V takes integer index returns nothing
     endif
     if index==8 then
         call HeroRetreat(1800)
-        call EZ(1)
+        call SleepCanBreak(1)
     endif
     if index==9 then
         set FR=0
         set MG=0
         call HeroRetreat(1600)
-        call EZ(.5)
+        call SleepCanBreak(.5)
     endif
     if index==11 then
         if zs_action_prioty_arry[11]==32 then
             call gotoLocation(mHero,mdubingLoc,30)
-            call Sleep(.5)
+            //call Sleep(.2)
         else
             call dubing(mdubingLoc)
         endif
     endif
     if index==12 then
         call HeroRetreat(3000)
-        call EZ(3.8)
+        call SleepCanBreak(3.8)
         set SA=true
     endif
     if index==13 then
-        if IQ(mHero,budaobingD2,VB)then
+        if IQ(mHero,budaobingD2,attackRange)then
             call HeroStop(mHero)
-            call EZ(.2)
+            call SleepCanBreak(.2)
         else
-            call EZ(.5)
+            call SleepCanBreak(.5)
         endif
     endif
     if index==14 then
-        if IQ(mHero,budaobingW2,VB)then
+        if IQ(mHero,budaobingW2,attackRange)then
             call HeroStop(mHero)
-            call EZ(.5)
+            call SleepCanBreak(.5)
         else
-            call EZ(.5)
+            call SleepCanBreak(.5)
         endif
     endif
     if index==15 then
@@ -8711,19 +8711,19 @@ function A1V takes integer index returns nothing
             call debugLoc(DH,1)
             if gotoLocation(mHero,DH,100)then
                 set CH=0
-                call EZ(.5)
+                call SleepCanBreak(.5)
             else
-                call EZ(.8)
+                call SleepCanBreak(.8)
             endif
         else
             set CH=0
-            call EZ(.5)
+            call SleepCanBreak(.5)
         endif
     endif
     if index==18 then
         if HH==1 and((TowerD!=null and RangeTo(GH,TowerD)<900))then
             call HeroStop(mHero)
-            call EZ(.8)
+            call SleepCanBreak(.8)
         else
             set HH=2
         endif
@@ -8731,9 +8731,9 @@ function A1V takes integer index returns nothing
             set loc=GetUnitToOuterLocAngle(FH,GH,600,0)
             if gotoLocation(mHero,loc,600)or rangeToHeroD<800 or YG<-4 or zs_HeroPower<0 then
                 set HH=0
-                call EZ(.3)
+                call SleepCanBreak(.3)
             else
-                call EZ(.5)
+                call SleepCanBreak(.5)
             endif
             call RemoveLocation(loc)
             set loc=null
@@ -8741,11 +8741,11 @@ function A1V takes integer index returns nothing
     endif
     if index==19 and WF!=null then
         call gotoLocation(mHero,WF,20)
-        call EZ(.5)
+        call SleepCanBreak(.5)
     endif
     if index==75 then
         if TowerD!=null and RangeTo(NearestHeroD,TowerD)<600 then
-            call EZ(.8)
+            call SleepCanBreak(.8)
         else
             set JH=2
         endif
@@ -8754,7 +8754,7 @@ function A1V takes integer index returns nothing
             if gotoLocation(mHero,loc,600)or rangeToHeroD<700 then
                 set JH=0
             else
-                call EZ(.8)
+                call SleepCanBreak(.8)
             endif
         endif
     endif
@@ -8808,7 +8808,7 @@ function zs_attack_condition_fashi takes nothing returns nothing
             set zs_action_prioty_arry[41]=79
         endif
     endif
-    if TowerD!=null and MyHeroHP>300 and(FarestAllyBubingFromRetreatLoc!=null and RangeTo(FarestAllyBubingFromRetreatLoc,TowerD)<600)then
+    if TowerD!=null and MyHeroHP>300 and(FarestAllyBubingFromRetreatLoc!=null and RangeTo(FarestAllyBubingFromRetreatLoc,TowerD)<400)then
         if(HeroD==null or rangeToHeroD>1000)and mHeroLevel>7 then
             set zs_action_prioty_arry[42]=49
         endif
@@ -8852,79 +8852,79 @@ function zs_attack_condition_fashi takes nothing returns nothing
     if zs_attackEnemyBing!=null then
         set zs_action_prioty_arry[49]=36
     endif
-    if BG!=null and YG>0 then
+    if UnitTouShiChe!=null and YG>0 then
         set zs_action_prioty_arry[70]=52
     endif
-    if ZH!=null and DQ(mHero,ZH)then
+    if UnitYanJin!=null and DQ(mHero,UnitYanJin)then
         set zs_action_prioty_arry[73]=70
     endif
-    if YH!=null then
+    if UnitZhiMingJieJie!=null then
         set zs_action_prioty_arry[73]=50
     endif
 endfunction
 
 function zs_attack_action_fashi takes integer index returns nothing
     if index==40 then
-        call MoveAttackUnit(HeroD,VB)
+        call MoveAttackUnit(HeroD,attackRange)
     endif
     if index==41 then
-        if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_UseFeiXie(mHero)then
+        if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_UseFeiXie(mHero) and gm_EnemyHeroCount <= 2 then
             call UseFeiXieU(HeroD)
         endif
-        if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_SunZiBingFa(mHero)then
+        if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_SunZiBingFa(mHero) and gm_EnemyHeroCount <= gm_AllyHeroCount then
             set OkSunZiBingFa=true
         endif
-        if zs_action_prioty_arry[41]>=75 and GetUnitMoveSpeed(HeroD)>380 and can_TuiMoDao(mHero)then
+        if zs_action_prioty_arry[41]>=75 and GetUnitMoveSpeed(HeroD)>380 and can_TuiMoDao(mHero) then
             set OkTuiMoDao=true
         endif
-        if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_TuiMoDao(mHero)then
+        if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_TuiMoDao(mHero) then
             set OkTuiMoDao=true
         endif
-        if MyHeroHP>700 or(MyHeroHP>EnemyHeroHP+60 and FV>1)then
+        if (MyHeroHP>700 or(MyHeroHP>EnemyHeroHP+60 and FV>1)) and gm_EnemyHeroCount <= gm_AllyHeroCount then
             call ChaseAttackUnit(HeroD) //追击敌人 
         else
-            call I1V(HeroD)
+            call attackUnitAround(HeroD)		//绕兵打
         endif
     endif
     if index==42 then
-        call HeroAttack(TowerD)
-        call EZ(.9)
+        call HeroAttack(TowerD)		//打塔
+        call SleepCanBreak(.9)
     endif
     if index==43 then
-        call HeroAttack(HeroD)
-        call EZ(.9)
+        call HeroAttack(HeroD)		//打英雄
+        call SleepCanBreak(.9)
     endif
     if index==45 and intoUnitRange(ZhongliEnemy,600)then
-        call HeroAttack(ZhongliEnemy)
-        call EZ(.9)
+        call HeroAttack(ZhongliEnemy)	//打中兵
+        call SleepCanBreak(.9)
     endif
     if index==46 and intoUnitRange(NearestEnemyBubing,600)then
-        call HeroAttack(NearestEnemyBubing)
-        call EZ(.9)
+        call HeroAttack(NearestEnemyBubing)	//打近兵
+        call SleepCanBreak(.9)
     endif
     if index==47 then
-        call HeroAttack(zs_mutong)
-        call EZ(.9)
+        call HeroAttack(zs_mutong)	//打桶
+        call SleepCanBreak(.9)
     endif
     if index==48 then
-        call HeroAttack(TowerW)
-        call EZ(.9)
+        call HeroAttack(TowerW)	//打己方塔
+        call SleepCanBreak(.9)
     endif
     if index==49 and intoUnitRange(zs_attackEnemyBing,600)then
         call HeroAttack(zs_attackEnemyBing)
-        call EZ(.9)
+        call SleepCanBreak(.9)
     endif
-    if index==70 and intoUnitRange(BG,600)then
-        call ChaseAttackUnit(BG)    //追击投石车 
+    if index==70 and intoUnitRange(UnitTouShiChe,600)then
+        call ChaseAttackUnit(UnitTouShiChe)    //追击投石车 
     endif
     if index==73 then
         if zs_action_prioty_arry[73]==70 then
-            call HeroAttack(ZH)
-            call EZ(.9)
+            call HeroAttack(UnitYanJin)
+            call SleepCanBreak(.9)
         endif
         if zs_action_prioty_arry[73]==50 then
-            call HeroAttack(YH)
-            call EZ(.9)
+            call HeroAttack(UnitZhiMingJieJie)
+            call SleepCanBreak(.9)
         endif
     endif
 endfunction
@@ -9014,7 +9014,7 @@ function zs_attack_condition_zhanshi takes nothing returns nothing
     if zs_attackEnemyBing!=null and(mHeroLevel>6 or HeroD==null)then
         set zs_action_prioty_arry[49]=36
     endif
-    if BG!=null and YG>0 then
+    if UnitTouShiChe!=null and YG>0 then
         set zs_action_prioty_arry[70]=52
     endif
 endfunction
@@ -9036,42 +9036,42 @@ function zs_attack_action_zhanshi takes integer index returns nothing
         if zs_action_prioty_arry[41]>=75 and rangeToHeroD>500 and can_TuiMoDao(mHero)then
             set OkTuiMoDao=true
         endif
-        call I2V(HeroD)
+        call attackUnitAround2(HeroD)
     endif
     if index==42 then
         call HeroAttack(TowerD)
-        call EZ(.9)
+        call SleepCanBreak(.9)
     endif
     if index==43 then
         call HeroAttack(HeroD)
-        call EZ(.9)
+        call SleepCanBreak(.9)
     endif
     if index==45 and intoUnitRange(ZhongliEnemy,260)then
         call HeroAttack(ZhongliEnemy)
-        call EZ(.9)
+        call SleepCanBreak(.9)
     endif
     if index==46 and intoUnitRange(NearestEnemyBubing,260)then
         call HeroAttack(NearestEnemyBubing)
-        call EZ(.9)
+        call SleepCanBreak(.9)
     endif
     if index==47 then
         call HeroAttack(zs_mutong)
-        call EZ(.9)
+        call SleepCanBreak(.9)
     endif
     if index==48 then
         call HeroAttack(TowerW)
-        call EZ(.9)
+        call SleepCanBreak(.9)
     endif
     if index==49 and intoUnitRange(zs_attackEnemyBing,260)then
         call HeroAttack(zs_attackEnemyBing)
-        call EZ(.9)
+        call SleepCanBreak(.9)
     endif
-    if index==70 and intoUnitRange(BG,220)then
-        call I2V(BG)
+    if index==70 and intoUnitRange(UnitTouShiChe,220)then
+        call attackUnitAround2(UnitTouShiChe)
     endif
 endfunction
 
-function A6V takes nothing returns nothing
+function zs_attack_condition takes nothing returns nothing
     if not GG then
         if IsRangeAttacker(mHero)then
             call zs_attack_condition_fashi()
@@ -9127,20 +9127,20 @@ function A7V takes integer index returns nothing
     if index==44 then
         if TowerD!=null and RangeTo(mHero,TowerD)<771 then
             call HeroAttack(TowerD)
-            call EZ(.9)
+            call SleepCanBreak(.9)
             return
         endif
         if NearestEnemyBubing!=null and RangeTo(mHero,NearestEnemyBubing)<600 then
             call HeroAttack(NearestEnemyBubing)
-            call EZ(.9)
+            call SleepCanBreak(.9)
             return
         endif
         if EnemyBingYing!=null then
             call HeroAttack(EnemyBingYing)
-            call EZ(.9)
+            call SleepCanBreak(.9)
         else
             call HeroAttack(EnemyNonAttackStructure)
-            call EZ(.9)
+            call SleepCanBreak(.9)
         endif
     endif
     if index==45 then
@@ -9808,10 +9808,10 @@ function zs_gotoFL takes integer id returns nothing
             set YF=false
             set ZF=false
             set aim1=null
-            call EZ(.3)
+            call SleepCanBreak(.3)
             return
         else
-            call EZ(.8)
+            call SleepCanBreak(.8)
         endif
     endif
     if therange2>therange then
@@ -9820,7 +9820,7 @@ function zs_gotoFL takes integer id returns nothing
             if gotoLocation(mHero,aim1,800)then
                 set YF=true
             else
-                call EZ(.8)
+                call SleepCanBreak(.8)
             endif
         endif
         if YF and gotoLocation(mHero,zs_firelines[id],1200)then
@@ -9828,7 +9828,7 @@ function zs_gotoFL takes integer id returns nothing
             set YF=false
             set ZF=false
         else
-            call EZ(.8)
+            call SleepCanBreak(.8)
         endif
     endif
     set aim1=null
@@ -10111,7 +10111,7 @@ function sima_spell_condition takes nothing returns nothing
     if EnemyBingYing!=null and can_sima_cast_f()and RangeTo(mHero,EnemyBingYing)<1000 then
         set zs_action_prioty_arry[63]=50
     endif
-    if BG!=null and can_sima_cast_f()and YG>-2 and KH>900 then
+    if UnitTouShiChe!=null and can_sima_cast_f()and YG>-2 and KH>900 then
         set zs_action_prioty_arry[64]=59
     endif
 endfunction
@@ -10214,8 +10214,8 @@ function sima_spell_action takes integer index returns nothing
     if index==63 and intoUnitRange(EnemyBingYing,590)then
         call sima_cast_fu(EnemyBingYing)
     endif
-    if index==64 and intoUnitRange(BG,500)then
-        call OVV(BG)
+    if index==64 and intoUnitRange(UnitTouShiChe,500)then
+        call OVV(UnitTouShiChe)
     endif
 endfunction
 
@@ -10487,7 +10487,7 @@ function zhaoyun_spell_condition takes nothing returns nothing
     if HeroD!=null and can_zhaoyun_cast_b()and XXV(mHero)then
         set zs_action_prioty_arry[53]=97
     endif
-    if BG!=null and GetUnitMoveSpeed(BG)<350 and isZhaoYunHasB(mHero)and MyHeroHP>660 and KH>700 then
+    if UnitTouShiChe!=null and GetUnitMoveSpeed(UnitTouShiChe)<350 and isZhaoYunHasB(mHero)and MyHeroHP>660 and KH>700 then
         set zs_action_prioty_arry[54]=88
         if IsImmune(mHero)then
             set zs_action_prioty_arry[54]=96
@@ -10523,7 +10523,7 @@ function zhaoyun_spell_action takes integer index returns nothing
         call zhaoyun_cast_b()
     endif
     if index==54 then
-        call HeroAttack(BG)
+        call HeroAttack(UnitTouShiChe)
         call Sleep(1)
     endif
     if index==55 and intoUnitRange(NearestHeroD,220)then
@@ -10809,7 +10809,7 @@ function guanyu_spell_action takes integer index returns nothing
             set AO=I9V(mHero)
         endif
     else
-        call EZ(.8)
+        call SleepCanBreak(.8)
     endif
     if index==64 then
         if RangeTo(KI,mHero)>400 and can_UseFeiXie(mHero)then
@@ -10861,7 +10861,7 @@ function weiyan_spell_condition takes nothing returns nothing
     if zs_canspelltoHerod and can_weiyan_cast_t()and rangeToHeroD<200 and MyHeroMP>400 and can_weiyan_cast_r()then
         set zs_action_prioty_arry[55]=94
     endif
-    if VJ!=null and RangeTo(mHero,VJ)<160 and can_weiyan_cast_r()then
+    if UnitSheXingJieJie!=null and RangeTo(mHero,UnitSheXingJieJie)<160 and can_weiyan_cast_r()then
         set zs_action_prioty_arry[56]=86
     endif
     if mHeroLevel>15 and NF!=null and MyHeroHP>1000 and can_weiyan_cast_r()then
@@ -11548,7 +11548,7 @@ function B0V takes unit Target returns boolean
     if intoUnitRange(Target,620)then
         call CastTargetSkillByID(mHero,aid_zhanghe_dujian,852254,HeroD,1)
     endif
-    if VB>=500 then
+    if attackRange>=500 then
         if RangeTo(mHero,Target)<=330 then
             return true
         endif
@@ -11557,7 +11557,7 @@ function B0V takes unit Target returns boolean
     call gotoLocation(mHero,loc,50)
     call RemoveLocation(loc)
     set loc=null
-    call EZ(.5)
+    call SleepCanBreak(.5)
     return true
 endfunction
 
@@ -11850,7 +11850,7 @@ function isToLoop takes nothing returns boolean
         if NS()>2.2 then    //买英雄 的时间
             call COV()
         endif
-        call EZ(1)
+        call SleepCanBreak(1)
         return false
     endif
     if(not UnitAlive(mHero))then
@@ -12261,12 +12261,12 @@ function zs_ComputerPriot takes nothing returns nothing
     call zs_budao_w_condition()
     call zs_buchonghp_condition()
     call zs_buchongmp_condition()
-    call A_V()
+    call zs_move_condition()
     call zs_buyItems_condition()
     if zs_IsTimeOut(55,1.2)then
         call zs_buyunit_condition()
     endif
-    call A6V()
+    call zs_attack_condition()
     call zs_shiftLine_cdt()
     call zs_useitem_condition()
     call zhangliao_spell_condition()
@@ -12312,7 +12312,7 @@ function duizhan takes nothing returns nothing
     if GetPlayerId(ai_player)==5 then
     endif
     call A8V(zs_prioty_index)
-    call A1V(zs_prioty_index)
+    call zs_move_action(zs_prioty_index)
     call zs_budao_d_action(zs_prioty_index)
     call zs_budao_w_action(zs_prioty_index)
     call zs_buyunit_action(zs_prioty_index)
@@ -12438,7 +12438,7 @@ function C_V takes integer ai returns nothing
                 call HeroStop(mHero)
             endif
         endif
-        call EZ(2)
+        call SleepCanBreak(2)
     endloop
 endfunction
 
@@ -12498,7 +12498,7 @@ function testhero takes nothing returns nothing
             call sima_cast_feng_n_ef(HeroD)
             call HeroStop(mHero)
         endif
-        call EZ(2)
+        call SleepCanBreak(2)
     endloop
     call SetUnitUserData(C0V,100)
     call UnitRemoveAbility(C0V,'A088')
