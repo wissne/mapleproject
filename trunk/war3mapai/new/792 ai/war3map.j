@@ -765,8 +765,13 @@ function hV takes nothing returns nothing
         call dV(6300,R2I(GetOrderPointX()))
     endif
     if GetUnitUserData(GetOrderedUnit())==11 or GetUnitUserData(GetOrderedUnit())==13 then
-        if GetIssuedOrderId()>=852008 and GetIssuedOrderId()<=852013 then
-        endif
+		if GetUnitUserData(GetOrderedUnit())==11 then
+			if GetIssuedOrderId()>=852008 and GetIssuedOrderId()<=852013 then
+			call PauseUnit(GetOrderedUnit(),true)
+			call IssueImmediateOrder(GetOrderedUnit(),"stop")
+			call PauseUnit(GetOrderedUnit(),false)		
+			endif
+		endif
     endif
     if GetUnitUserData(GetOrderedUnit())==19 then
         call SetUnitUserData(GetOrderedUnit(),11)
