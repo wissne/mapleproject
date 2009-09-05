@@ -1285,7 +1285,7 @@ Name=中立
 Tip=建造小酒馆
 Description=能让你雇用各式各样的英雄。
 Art=ReplaceableTextures\CommandButtons\BTNTavern.blp
-Sellunits=H008,U00A
+Sellunits=U000,U00I
 [o00B]
 Name=疗愈结界lv3
 Art=ReplaceableTextures\CommandButtons\BTNHealingWard.blp
