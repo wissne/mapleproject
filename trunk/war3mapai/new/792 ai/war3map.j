@@ -1325,7 +1325,7 @@ function WE takes nothing returns nothing
         call Qn("中法1v1开启..................... -1v1k")
         call Qn("中法1v1关闭..................... -1v1g")
         call Qn("更改电脑强度系数................ -hl 加两个数字")
-        call Qn("全阵容选英雄可选英雄3秒后有效....... -ah")
+        call Qn("电脑英雄随机增加郭嘉跟荀彧....... -ah")
         call Qn("可以用巡逻技能【快捷键P】给电脑发送集结信号。直接发信号无效。")
         call Qn("-rv,-5v5")
     endif
@@ -1392,12 +1392,12 @@ function WE takes nothing returns nothing
         endif
         if Ga==0 then
             set Ga=1
-            call Qn("可选英雄3秒后自动开启！")
+            call Qn("电脑英雄随机增加郭嘉跟荀彧！")
         endif
         if Sn()>23 then
             call qE()
         else
-            call Qn("该命令在可选英雄3秒后有效")
+            call Qn("电脑英雄随机增加郭嘉跟荀彧！")
         endif
     endif
     if DV=="-nam" then
