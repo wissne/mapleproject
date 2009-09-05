@@ -6670,6 +6670,9 @@ endfunction
 
 function sima_cast_e takes unit TheTarget returns boolean
     local boolean rb=false
+    if TheTarget==null or IsDead(TheTarget)then
+        return false
+    endif
     set rb=CastTargetSkillByOderStr(mHero,'A07A',"impale",TheTarget)
     call Sleep(.77)
     return rb
@@ -6689,7 +6692,9 @@ endfunction
 function sima_cast_fu takes unit u returns boolean
     local boolean rb=false
     local location loc=GetUnitLoc(u)
-    set rb=sima_cast_f(loc)
+    if u!=null and IsAlive(u)then
+        set rb=sima_cast_f(loc)
+    endif
     call RemoveLocation(loc)
     set loc=null
     return rb
@@ -6698,7 +6703,9 @@ endfunction
 function sima_cast_fu2 takes unit u returns boolean
     local boolean rb=false
     local location loc=GetUnitFrontLoc(u,300)
-    set rb=sima_cast_f(loc)
+    if u!=null and IsAlive(u)then
+        set rb=sima_cast_f(loc)
+    endif    
     call RemoveLocation(loc)
     set loc=null
     return rb
@@ -6707,7 +6714,9 @@ endfunction
 function OVV takes unit u returns boolean
     local boolean rb=false
     local location loc=GetLocBetweenTwoUnitsRangeToFirst(u,mHero,-200)
-    set rb=sima_cast_f(loc)
+    if u!=null and IsAlive(u)then
+		set rb=sima_cast_f(loc)
+    endif
     call RemoveLocation(loc)
     set loc=null
     return rb
@@ -6719,22 +6728,20 @@ endfunction
 
 function sima_cast_n takes unit TheUnit returns boolean
     local boolean rb=false
-    if TheUnit==null or IsDead(TheUnit)then
-        return false
+    if TheUnit!=null and IsAlive(TheUnit)then
+		call SetUnitLookAt(mHero,"head",TheUnit,0,0,0)
+		set rb=CastTargetSkillByOderIdDelayed(mHero,'A041',852224,TheUnit,2.)
+		call Sleep(.3)
     endif
-    call SetUnitLookAt(mHero,"head",TheUnit,0,0,0)
-    set rb=CastTargetSkillByOderIdDelayed(mHero,'A041',852224,TheUnit,2.)
-    call Sleep(.3)
     return rb
 endfunction
 
 function sima_cast_nu takes unit TheUnit returns boolean
     local boolean rb=false
-    if TheUnit==null or IsDead(TheUnit)then
-        return false
+    if TheUnit!=null and IsAlive(TheUnit)then
+		call SetUnitLookAt(mHero,"head",TheUnit,0,0,0)
+		set rb=CastTargetSkillByOderIdDelayed2(mHero,'A041',852224,TheUnit,2.3)
     endif
-    call SetUnitLookAt(mHero,"head",TheUnit,0,0,0)
-    set rb=CastTargetSkillByOderIdDelayed2(mHero,'A041',852224,TheUnit,2.3)
     return rb
 endfunction
 
@@ -6744,10 +6751,12 @@ function sima_cast_ef takes unit TheTarget returns boolean
         return false
     endif
     call sima_cast_e(TheTarget)
-    set loc=GetUnitLoc(TheTarget)
-    call sima_cast_f(loc)
-    call RemoveLocation(loc)
-    set loc=null
+	if IsAlive(TheTarget) then
+		set loc=GetUnitLoc(TheTarget)
+		call sima_cast_f(loc)
+		call RemoveLocation(loc)
+		set loc=null
+	endif
     return true
 endfunction
 
@@ -6760,7 +6769,9 @@ function sima_cast_fe takes unit TheTarget returns boolean
     call sima_cast_f(loc)
     call RemoveLocation(loc)
     set loc=null
-    call sima_cast_e(TheTarget)	
+	if IsAlive(TheTarget) then	
+		call sima_cast_e(TheTarget)	
+	endif
     return true
 endfunction
 
@@ -6889,8 +6900,10 @@ function can_zhuge_cast_g takes nothing returns boolean
 endfunction
 
 function zhuge_cast_g takes unit TheTarget returns nothing
-    call CastTargetSkillByOderId(mHero,'A087',852119,TheTarget)
-    call Sleep(.5)
+    if TheTarget!=null and IsAlive(TheTarget)then
+		call CastTargetSkillByOderId(mHero,'A087',852119,TheTarget)
+		call Sleep(.5)        
+    endif
 endfunction
 
 function can_zhuge_cast_e takes nothing returns boolean
@@ -6900,6 +6913,9 @@ endfunction
 function zhuge_cast_e takes unit TheTarget returns boolean
     local location loc=null
     local boolean rb=false
+    if TheTarget==null or IsDead(TheTarget)then
+        return false
+    endif	
     set loc=GetUnitLoc(TheTarget)
     call SetUnitLookAt(mHero,"head",TheTarget,0,0,0)
     call CastPointSkillByOderStr(mHero,'A085',"silence",loc)
@@ -6914,7 +6930,10 @@ endfunction
 
 function OMV takes unit TheTarget returns boolean
     local location loc=null
-    local boolean rb=false
+	local boolean rb=false
+    if TheTarget==null or IsDead(TheTarget)then
+        return false
+    endif	
     set loc=GetUnitLoc(TheTarget)
     call SetUnitLookAt(mHero,"head",TheTarget,0,0,0)
     call CastPointSkillByOderStr(mHero,'A085',"silence",loc)
@@ -6938,13 +6957,13 @@ function can_zhuge_cast_x takes nothing returns boolean
 endfunction
 
 function can_zhuge_cast_w takes nothing returns boolean
-    return CanCastAbilityOrderById(mHero,'A08A',852127)
+    return CanCastAbilityOrder(mHero,'A08A',"evileye")
 endfunction
 
 function zhuge_cast_w2 takes location Loc returns boolean
     local boolean rb=false
-    set rb=CastPointSkillByOderStr(mHero,'A08A',"silence",Loc)
-    call Sleep(.5)
+    set rb=CastPointSkillByOderStr(mHero,'A08A',"evileye",Loc)
+    call Sleep(.8)
     return rb
 endfunction
 
@@ -6960,7 +6979,7 @@ endfunction
 function zhuge_cast_lei takes nothing returns nothing
     if not can_zhuge_cast_x()then
         return
-    endif
+    endif	
     call UnitAddAbility(mHero,'A089')
     call Sleep(.1)
     call IssueImmediateOrderById(mHero,852100)
@@ -6997,9 +7016,11 @@ function zhuge_cast_wu takes nothing returns nothing
 endfunction
 
 function zhuge_cast_x takes unit Target returns nothing
-    call SetUnitLookAt(mHero,"head",Target,0,0,0)
-    call CastImdSkillByID(mHero,'A083',852127)
-    call Sleep(.36)
+    if Target!=null and IsAlive(Target)then
+		call SetUnitLookAt(mHero,"head",Target,0,0,0)
+		call CastImdSkillByID(mHero,'A083',852127)
+		call Sleep(.36)
+    endif
 endfunction
 
 function zhuge_cast_x_move takes unit Target returns nothing
@@ -7890,7 +7911,7 @@ function zs_budao_d_condition takes nothing returns nothing
     if budaobingD==null then
         set zs_action_prioty_arry[0]=0
     else
-        set zs_action_prioty_arry[0]=60
+        set zs_action_prioty_arry[0]=50
     endif
 endfunction
 
@@ -7910,7 +7931,7 @@ function zs_budao_w_condition takes nothing returns nothing
     if budaobingW==null or HeroD==null then
         set zs_action_prioty_arry[1]=0
     else
-        set zs_action_prioty_arry[1]=61
+        set zs_action_prioty_arry[1]=51
     endif
 endfunction
 
@@ -7953,7 +7974,9 @@ function zs_buchonghp_action takes integer index returns nothing
     if index!=2 then
         return
     endif
-    call HeroRetreat(1600)
+	if rangeToHeroD<1000 or AllyCount<2 then
+		call HeroRetreat(1600)
+	endif
     if(NearestEnemyBubing==null or(not X2V(NearestEnemyBubing,500)and AllyCount>0))and(TowerD==null or not X2V(TowerD,900))and(HeroD==null or not X2V(HeroD,800))then
         call UseItemTargetByID(mHero,'hslv',mHero,.15)
     endif
@@ -8227,7 +8250,7 @@ function zs_move_condition takes nothing returns nothing
         set YG=YG-2
     endif
     if EnemyCount>AllyCount+3 and HeroD!=null then
-        set zs_action_prioty_arry[5]=45
+        set zs_action_prioty_arry[5]=48
     endif
     if EnemyCount>2 and AllyCount==1 and GetHP(FarestAllyBubingFromRetreatLoc)<200 then
         set zs_action_prioty_arry[5]=49
@@ -8307,7 +8330,7 @@ function zs_move_condition takes nothing returns nothing
         set zs_action_prioty_arry[8]=55
     endif
     if AllyCount==0 and EnemyCount>0 then
-        set zs_action_prioty_arry[5]=50
+        set zs_action_prioty_arry[5]=54
     endif
     if UnitZhiMingJieJie!=null and RangeTo(mHero,UnitZhiMingJieJie)<500 then
         set zs_action_prioty_arry[5]=50
@@ -8692,10 +8715,10 @@ function zs_move_action takes integer index returns nothing
         call HeroRetreat(1600)
     endif
     if index==6 then
-        if can_UseFeiXie(mHero)and RangeToLoc(mHero,mBaseLoc)>1800 then
+        if can_UseFeiXie(mHero)and RangeToLoc(mHero,mBaseLoc)>3800 then
             call UseFeiXie(zs_cr_retreatLoc)
         endif
-        if RangeToLoc(mHero,mBaseLoc)>1800 then
+        if RangeToLoc(mHero,mBaseLoc)>3800 then
             set OkSunZiBingFa=true
         endif
         call ariveLoc(mHero,mBaseLoc,360)
@@ -8823,7 +8846,7 @@ function zs_attack_condition_fashi takes nothing returns nothing
             set zs_action_prioty_arry[41]=71
         endif
         if canZhuGong(HeroD) and(zs_prioty_index!=5 and zs_prioty_index!=8)then
-            set zs_action_prioty_arry[41]=74
+            set zs_action_prioty_arry[41]=60
         endif
         if EnemyHeroHP<300 and(IsLifeAlmostFull(mHero)or MyHeroHP>=600)and OG then
             set zs_action_prioty_arry[41]=76
@@ -9630,12 +9653,12 @@ function zs_shiftLine_cdt takes nothing returns nothing
     endif
     if ShangluAllyHeroCountNearFL>0 and ShangluEnemyHeroCountNearFL>0 and((zs_cr_fightline==1 and mHeroLevel>7 and MyHeroHP>500 and MyHeroMP>300)or likaizhonglu)then
         if(TowerD!=null and RangeToLoc(TowerD,zs_MyFireLoc)<1000)or(RF[0]==null or RangeToLoc(RF[0],zs_firelines[0])>2000)then
-            set NDV=0
+            set NDV=1
         endif
     endif
     if XialuAllyHeroCountNearFL>0 and XialuEnemyHeroCountNearFL>0 and((zs_cr_fightline==1 and mHeroLevel>7 and MyHeroHP>500 and MyHeroMP>300)or likaizhonglu)then
         if(TowerD!=null and RangeToLoc(TowerD,zs_MyFireLoc)<1000)or(RF[2]==null or RangeToLoc(RF[2],zs_firelines[2])>2000)then
-            set NDV=2
+            set NDV=1
         endif
     endif
     if zs_cr_fightline==0 and HN!=0 and(ShangluEnemyHeroCountNearFL==0 or MyHeroHP<500 or MyHeroMP<100 or RangeToLoc(TowerD,zs_MyFireLoc)<1000)then
@@ -9722,11 +9745,12 @@ function zs_shiftLine_cdt takes nothing returns nothing
             set NDV=1
         endif
         if DF[2]!=null and IsAlive(DF[2])then
-            set NDV=2
+            set NDV=1
         endif
         if DF[0]!=null and IsAlive(DF[0])then
-            set NDV=0
+            set NDV=1
         endif
+		set nearestfl=1
         if nearestfl>-1 and nearestfl!=zs_cr_fightline and RangeLocToLoc(mBaseLoc,zs_firelines[nearestfl])<9000 and J6(zs_firelines[nearestfl],2500)>1 then
             set NDV=nearestfl
         endif
@@ -9743,6 +9767,7 @@ function zs_shiftLine_cdt takes nothing returns nothing
     endif
     if nearestfl>-1 and nearestfl!=zs_cr_fightline and RangeLocToLoc(mBaseLoc,zs_firelines[nearestfl])<5000 then
         set priority=56
+		set nearestfl = 1
         if nearestfl==0 and ShangluEnemyHeroCountNearFL>1 then
             set NGV=nearestfl
         endif
@@ -10109,7 +10134,7 @@ function sima_spell_condition takes nothing returns nothing
         if (not canZhuGong(HeroD)) and (EnemyHeroHP>600 or IsLifeAlmostFull(HeroD)or(EnemyHeroHP>300 and mHeroLevel<5))and rangeToTowerD>1100 and MyHeroMP>300 and rangeToHeroD<710 and can_sima_cast_e()and OG then
             set zs_action_prioty_arry[50]=81	//EA
         endif
-        if index>=0 and YG>-4 and(rangeToHeroD<900 or ZG>0)then
+        if index>=0 and YG>-4 and(rangeToHeroD<900 or ZG>0) then
             set zs_kickoff=true
             set zs_action_prioty_arry[50+index]=99
         endif
@@ -10119,13 +10144,13 @@ function sima_spell_condition takes nothing returns nothing
         if GetUnitCurrentOrder(HeroD)==851986 then	//NEFA
             set zs_action_prioty_arry[55]=0
         endif
-        if zs_EnemyHeroNearMeCount>=2 and zs_AllyHeroNearMeCount>=2 and canZhuGong(HeroD) then	//NEFA
+        if zs_EnemyHeroNearMeCount>=2 and zs_AllyHeroNearMeCount>=2 and canZhuGong(HeroD) and can_sima_cast_n_ef() then	//NEFA
             set zs_action_prioty_arry[55]=86
     endif
-		if EnemyCount==0 and AllyCount > 1 then
+		if EnemyCount==0 and AllyCount > 1 and can_sima_cast_e() then
 			set zs_action_prioty_arry[50]=84	//有兵E
 		endif
-		if zs_EnemyHeroNearMeCount>=2 and zs_AllyHeroNearMeCount>=2 and (not canZhuGong(HeroD)) then
+		if zs_EnemyHeroNearMeCount>=2 and zs_AllyHeroNearMeCount>=2 and (not canZhuGong(HeroD)) and can_sima_cast_n_ef() then
 			set zs_action_prioty_arry[67]=86	//ENFA
 		endif
 		if rangeToHeroD<700 and MyHeroHP<200 and (can_UseBianXing(mHero) or can_sima_cast_e()) then	//EorBian逃
@@ -10180,7 +10205,7 @@ function sima_spell_action takes integer index returns nothing
     endif
     if index==50 and intoUnitRange(HeroD,600)then	//EA
         if zs_kickoff then
-            if can_UseFeiXie(mHero) and rangeToHeroD>1000 and zs_HeroPower>1 then
+            if can_UseFeiXie(mHero) and rangeToHeroD>1400 and zs_HeroPower>1 then
                 call UseFeiXieU(HeroD)
             endif
             if can_UseBianXing(mHero) and (not canZhuGong(HeroD)) then
@@ -10197,7 +10222,7 @@ function sima_spell_action takes integer index returns nothing
     endif
     if index==51 and intoUnitRange(HeroD,600)then	//FA
         if zs_kickoff then
-            if can_UseFeiXie(mHero) and rangeToHeroD>1000 and zs_HeroPower>1 then
+            if can_UseFeiXie(mHero) and rangeToHeroD>1400 and zs_HeroPower>1 then
                 call UseFeiXieU(HeroD)
             endif
             if can_UseBianXing(mHero) and (not canZhuGong(HeroD)) then
@@ -10208,7 +10233,7 @@ function sima_spell_action takes integer index returns nothing
         call HeroAttack(HeroD)
     endif
     if index==52 then	//EFA
-        if zs_kickoff and can_UseFeiXie(mHero) and rangeToHeroD>1000 and intoUnitRange(HeroD,1200)then
+        if zs_kickoff and can_UseFeiXie(mHero) and rangeToHeroD>1400 and intoUnitRange(HeroD,1200)then
             call UseFeiXieU(HeroD)
         endif
         if zs_kickoff and intoUnitRange(HeroD,600) and (not IsBianXing(HeroD)) then
@@ -10296,9 +10321,9 @@ function sima_spell_action takes integer index returns nothing
         endif
     endif	
 	if index==67 and intoUnitRange(HeroD,600)then	//ENFA 助攻
-        call sima_cast_e(HeroD)
+        call sima_cast_e(HeroD)		
 		call sima_cast_n(HeroD)
-		if can_sima_cast_f() then
+		if can_sima_cast_f() and IsAlive(HeroD) then
 			call sima_cast_fu(HeroD)
 		endif
         call HeroAttack(HeroD)
@@ -10344,7 +10369,7 @@ function zhuge_spell_condition takes nothing returns nothing
 		if canZhuGong(HeroD) and can_zhuge_cast_x() and zs_EnemyHeroNearMeCount>=2 and (EnemyHeroHP>900 or zs_HeroPower<1)then
 			set zs_action_prioty_arry[60]=100	// XM
 		endif
-		if canZhuGong(HeroD) and zs_HeroPower>0 then
+		if canZhuGong(HeroD) and zs_HeroPower>0 and can_zhuge_cast_e() then
 			set zs_action_prioty_arry[64]=83	//AA EA
 		endif
 		if MyHeroHP>EH and can_zhuge_cast_g()and EnemyHeroHP<zs_get_zhuge_g_damage()+zs_get_zhuge_e_damage()+120+mHeroLevel*10 and MyHeroMP>295 and rangeToTowerD>1000 and zs_action_prioty_arry[5]<60 and OG then
@@ -10354,7 +10379,7 @@ function zhuge_spell_condition takes nothing returns nothing
             set zs_kickoff=true
             set zs_action_prioty_arry[50+index]=99
         endif
-		if zs_EnemyHeroNearMeCount>=2 and zs_AllyHeroNearMeCount>=2 and (not canZhuGong(HeroD)) then
+		if can_zhuge_cast_x() and zs_EnemyHeroNearMeCount>=2 and zs_AllyHeroNearMeCount>=2 and (not canZhuGong(HeroD)) then
 			set zs_action_prioty_arry[60]=88	//XMoveA
     endif
 		if rangeToHeroD<700 and MyHeroHP<200 and (can_UseBianXing(mHero) or can_zhuge_cast_e()) then	//EorBian逃
@@ -10367,7 +10392,7 @@ function zhuge_spell_condition takes nothing returns nothing
     if(AllyCount==0 and EnemyCount>3)or(AllyCount==1 and EnemyCount>6)then
         set zs_action_prioty_arry[53]=0		//FEXGA
     endif
-    if zs_HeroPower>0 and zs_EnemyHeroNearMeCount >=2 and RangeTo(NearestHeroD,zs_AllyHeroNearestToHeroD)<600 then
+    if can_zhuge_cast_fei_e_x_g() and zs_HeroPower>0 and zs_EnemyHeroNearMeCount >=2 and RangeTo(NearestHeroD,zs_AllyHeroNearestToHeroD)<600 then
         set zs_action_prioty_arry[53]=86		//FEXGA
     endif	
     if HeroD==null and zs_nearestMinHpEnemyBing!=null and zs_nearestEnemyBingMinHp<zs_get_zhuge_g_damage()and EnemyCount>2 and mHeroLevel>7 and can_zhuge_cast_g()then
@@ -10394,7 +10419,7 @@ function zhuge_spell_condition takes nothing returns nothing
     if HeroD!=null and IsImmune(HeroD)and rangeToHeroD<300 and can_zhuge_cast_x()and MyHeroHP>800 and(zs_action_prioty_arry[5]<60 and zs_action_prioty_arry[8]<60)and OG then
         set zs_action_prioty_arry[63]=99	//Xue
     endif
-    if((EnemyHeroHP<500 or(zs_HeroPower>1 and EnemyHeroHP<1000))and zs_EnemyHeroNearMeCount==1)or(not IsUnitType(HeroD,UNIT_TYPE_HERO))then
+    if can_zhuge_cast_eg() and can_zhuge_cast_x() and ((EnemyHeroHP<500 or(zs_HeroPower>1 and EnemyHeroHP<1000))and zs_EnemyHeroNearMeCount==1)or(not IsUnitType(HeroD,UNIT_TYPE_HERO))then
         set zs_action_prioty_arry[52]=0		//EXGA
     endif
     if(YG<-5 and zs_HeroPower<=0)then
@@ -10403,8 +10428,8 @@ function zhuge_spell_condition takes nothing returns nothing
     if MyHeroHP<EH-20 and zs_HeroPower<=0 and(rangeToHeroD>620)then
         set zs_action_prioty_arry[56]=0
     endif
-    if (EnemyBingYing!=null or TowerD!=null) and can_zhuge_cast_w() and RangeTo(mHero,EnemyBingYing)<1000 and rangeToHeroD>1100 then
-        set zs_action_prioty_arry[68]=68	//F bingYing
+    if (EnemyBingYing!=null or TowerD!=null) and can_zhuge_cast_w() and RangeTo(mHero,EnemyBingYing)<700 and rangeToHeroD>1100 then
+        set zs_action_prioty_arry[68]=68	//W bingYing
     endif	
 endfunction
 
@@ -10414,7 +10439,7 @@ function zhuge_spell_action takes integer index returns nothing	//诸葛
     endif
     if index==50 then	//GA
         if zs_kickoff then
-            if can_UseFeiXie(mHero) and rangeToHeroD>1000 and zs_HeroPower>1 then
+            if can_UseFeiXie(mHero) and rangeToHeroD>1400 and zs_HeroPower>1 then
                 call UseFeiXieU(HeroD)
             endif
             if can_UseBianXing(mHero) and (not canZhuGong(HeroD))then
@@ -10430,7 +10455,7 @@ function zhuge_spell_action takes integer index returns nothing	//诸葛
     endif
     if index==51 then	//EGA
         if zs_kickoff then
-            if can_UseFeiXie(mHero) and rangeToHeroD>1000 and zs_HeroPower>1 then
+            if can_UseFeiXie(mHero) and rangeToHeroD>1400 and zs_HeroPower>1 then
                 call UseFeiXieU(HeroD)
             endif
             if can_UseBianXing(mHero) and (not canZhuGong(HeroD)) then
@@ -10474,7 +10499,7 @@ function zhuge_spell_action takes integer index returns nothing	//诸葛
         endif
     endif
     if index==57 then	//ChaseA
-        if zs_HeroPower>1 and rangeToHeroD>1200 and can_UseFeiXie(mHero)then
+        if zs_HeroPower>1 and rangeToHeroD>1400 and can_UseFeiXie(mHero)then
             call UseFeiXieU(HeroD)
         endif
         if intoUnitRange(HeroD,600)then
@@ -10555,10 +10580,9 @@ function zhuge_spell_action takes integer index returns nothing	//诸葛
 	if index==68 then		
 		if TowerD != null then
 			call zhuge_cast_w(TowerD)			
-		else
-			if EnemyBingYing != null then
-				call zhuge_cast_w(EnemyBingYing)
-			endif
+		elseif EnemyBingYing != null then
+			call debugstr("zhuge_cast_w")
+			call zhuge_cast_w(EnemyBingYing)
 		endif
 	endif
 endfunction
@@ -12498,6 +12522,7 @@ function duizhan takes nothing returns nothing
     call zs_buchongmp_action(zs_prioty_index)
     call NOV(zs_prioty_index)
     if isZhuGeLiang()then
+		//call debugindex("zhuge")
         call zhuge_spell_action(zs_prioty_index)
     endif
     if iszhaoyun()then
