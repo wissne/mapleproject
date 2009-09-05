@@ -337,7 +337,7 @@ globals
     boolean OG=true
     boolean RG=true
     boolean IG=false
-    boolean AG=true
+    boolean canBuyFireCar=false
     integer NG=0
     unit UnitTouShiChe=null
     real RangeToTouShiChe=999999
@@ -387,10 +387,10 @@ globals
     unit XJ=null
     unit OJ=null
     unit RJ=null
-    boolean IJ=true
+    boolean quanZheYingMoShi=false
     boolean AJ=false
     integer NJ=2600
-    boolean BJ=false
+    boolean zhuLiMoShi=true
 endglobals
 
 function AK takes handle h returns integer
@@ -2225,7 +2225,7 @@ function setFightLine takes nothing returns nothing
     if ismadai()or iszhanghe()or isgongben()or issunquan()then
         set GG=true
     endif
-    if XH or IJ then
+    if XH or quanZheYingMoShi then
         if FG==0 or FG==1 then
             if CS("zhongehc"+ITS(mForceId))==0 then
                 set zs_cr_fightline=1
@@ -2271,15 +2271,15 @@ function initSkillArry_zhugeliang takes nothing returns nothing
     set mSkillArray[0]='A087'
     set mSkillArray[1]='A085'
     set mSkillArray[2]='A087'
-    set mSkillArray[3]='A085'
-    set mSkillArray[4]='A087'
+    set mSkillArray[3]='A087'
+    set mSkillArray[4]='A08I'
     set mSkillArray[5]='A083'
     set mSkillArray[6]='A087'
-    set mSkillArray[7]='A085'
-    set mSkillArray[8]='A085'
+    set mSkillArray[7]='A08I'
+    set mSkillArray[8]='A08I'
     set mSkillArray[9]='A08I'
     set mSkillArray[10]='A083'
-    set mSkillArray[11]='A08I'
+    set mSkillArray[11]='A085'
     set mSkillArray[12]='A08I'
     set mSkillArray[13]='A08I'
     set mSkillArray[14]='A08I'
@@ -2287,12 +2287,12 @@ function initSkillArry_zhugeliang takes nothing returns nothing
     set mSkillArray[16]='A08I'
     set mSkillArray[17]='A08I'
     set mSkillArray[18]='A08I'
-    set mSkillArray[19]='A08A'
-    set mSkillArray[20]='A08A'
+    set mSkillArray[19]='A085'
+    set mSkillArray[20]='A085'
     set mSkillArray[21]='A08A'
     set mSkillArray[22]='A08A'
-    set mSkillArray[23]='A08I'
-    set mSkillArray[24]='A08I'
+    set mSkillArray[23]='A08A'
+    set mSkillArray[24]='A08A'
 endfunction
 
 function initSkillArry_simayi takes nothing returns nothing
@@ -2301,11 +2301,11 @@ function initSkillArry_simayi takes nothing returns nothing
     set mSkillArray[2]='A07A'
     set mSkillArray[3]='A03O'
     set mSkillArray[4]='A07A'
-    set mSkillArray[5]='A041'
+    set mSkillArray[5]='A03O'
     set mSkillArray[6]='A07A'
     set mSkillArray[7]='A03O'
-    set mSkillArray[8]='A03O'
-    set mSkillArray[9]='Aamk'
+    set mSkillArray[8]='A03P'
+    set mSkillArray[9]='A041'
     set mSkillArray[10]='A041'
     set mSkillArray[11]='Aamk'
     set mSkillArray[12]='Aamk'
@@ -2315,7 +2315,7 @@ function initSkillArry_simayi takes nothing returns nothing
     set mSkillArray[16]='A03P'
     set mSkillArray[17]='A03P'
     set mSkillArray[18]='A03P'
-    set mSkillArray[19]='A03P'
+    set mSkillArray[19]='Aamk'
     set mSkillArray[20]='Aamk'
     set mSkillArray[21]='Aamk'
     set mSkillArray[22]='Aamk'
@@ -4332,9 +4332,9 @@ function getfirstHero takes nothing returns unit
         call initSkillArry()
         call SetUnitAcquireRange(mHero,60)
         call setFightLine()
-        if not XH then
-            call setAIPlayerName()
-        endif
+        // if not XH then
+            // call setAIPlayerName()
+        // endif
         call setAttackRange()
         call T0()
     endif
@@ -6280,7 +6280,7 @@ function zs_buyunit_condition takes nothing returns nothing
         set zs_action_prioty_arry[85]=91
     endif
     if mGold>=220 and lumber>=12 then
-        if NG>0 and AG then
+        if NG>0 and canBuyFireCar then
             set YD=W1(zs_toushiche_group)
             set YD=YD+W1(VF)
             if YD<NG then
@@ -7793,7 +7793,7 @@ function handleCommands takes nothing returns nothing
         endif
         if command==4002 then
             set IG=true
-            set AG=false
+            set canBuyFireCar=false
             call DisplayToAll("中法1v1开启!")
         endif
         if command==4003 then
@@ -7801,18 +7801,18 @@ function handleCommands takes nothing returns nothing
             call DisplayToAll("中法1v1关闭!")
         endif
         if command==4004 then
-            set AG=false
+            set canBuyFireCar=false
             call DisplayToAll("禁止出车!")
         endif
         if command==4005 then
-            set AG=true
+            set canBuyFireCar=true
             call DisplayToAll("允许出车!")
         endif
         if command==4006 then
-            set IJ=true
+            set quanZheYingMoShi=true
         endif
         if command==4007 then
-            set BJ=true
+            set zhuLiMoShi=true
             call DisplayToAll("真三主力英雄模式开启！")
         endif
         if command==5000 then
@@ -7888,7 +7888,7 @@ function zs_budao_d_condition takes nothing returns nothing
     if budaobingD==null then
         set zs_action_prioty_arry[0]=0
     else
-        set zs_action_prioty_arry[0]=60
+        set zs_action_prioty_arry[0]=70
     endif
 endfunction
 
@@ -7908,7 +7908,7 @@ function zs_budao_w_condition takes nothing returns nothing
     if budaobingW==null or HeroD==null then
         set zs_action_prioty_arry[1]=0
     else
-        set zs_action_prioty_arry[1]=61
+        set zs_action_prioty_arry[1]=71
     endif
 endfunction
 
@@ -9882,6 +9882,7 @@ function zs_shiftLine_action takes integer index returns nothing
         call zs_gotoFL(1)
     endif
     if index==93 then
+		call zs_gotoFL(1)
     endif
     if index==99 then
         //call zs_gotoFL(AO)
@@ -11898,7 +11899,7 @@ function CEV takes nothing returns nothing
     local integer index=0
     local integer id=0
     loop
-        set index=GetRandomInt(1,16)
+        set index=GetRandomInt(1,4)
         exitwhen GetStoredInteger(zs_gamecache,"heros",ITS(index))>0
     endloop
     if GetStoredInteger(zs_gamecache,"heros",ITS(index))>0 then
@@ -11971,17 +11972,16 @@ function COV takes nothing returns nothing
     if zs_CCPlayerID<0 then
         return
     endif
-    //  if BJ then
-    //    call CXV()
-    //    return
-    //  endif
-    //  if IJ then
-    //    if NS()>24 then
-    //      call CEV()
-    //    endif
-    //    return
-    //  endif
-    call CXV()
+     if zhuLiMoShi then	// 主力 主要是诸葛跟司马
+       call CXV()
+       return
+     endif
+     if quanZheYingMoShi then	// 全部 包括国家跟荀
+       if NS()>21 then
+         call CEV()
+       endif
+       return
+     endif
 endfunction
 
 function isToLoop takes nothing returns boolean
@@ -13545,7 +13545,7 @@ function main takes nothing returns nothing
             if ismadai()or iszhanghe()or isgongben()or issunquan()then
                 set GG=true
             endif
-            if XH or IJ then
+            if XH or quanZheYingMoShi then
                 if FG==0 or FG==1 then
                     if CS("zhongehc"+ITS(mForceId))==0 then
                         set zs_cr_fightline=1
@@ -13589,7 +13589,7 @@ function main takes nothing returns nothing
         endif
         if command==4002 then
             set IG=true
-            set AG=false
+            set canBuyFireCar=false
             call DisplayToAll("中法1v1开启!")
         endif
         if command==4003 then
@@ -13597,18 +13597,20 @@ function main takes nothing returns nothing
             call DisplayToAll("中法1v1关闭!")
         endif
         if command==4004 then
-            set AG=false
+            set canBuyFireCar=false
             call DisplayToAll("禁止出车!")
         endif
         if command==4005 then
-            set AG=true
+            set canBuyFireCar=true
             call DisplayToAll("允许出车!")
         endif
         if command==4006 then
-            set IJ=true
+            set quanZheYingMoShi=true
+			set zhuLiMoShi=false
         endif
         if command==4007 then
-            set BJ=true
+            set zhuLiMoShi=true
+			set quanZheYingMoShi=false
             call DisplayToAll("真三主力英雄模式开启！")
         endif
         if command==5000 then
@@ -13825,21 +13827,21 @@ function main takes nothing returns nothing
     endif
     if GetStoredInteger(zs_gamecache,"heros","1")<1 then
         call StoreInteger(zs_gamecache,"heros","1",hid_zhugeliang)
-        call StoreInteger(zs_gamecache,"heros","2",hid_guanyu)
-        call StoreInteger(zs_gamecache,"heros","3",hid_zhangfei)
-        call StoreInteger(zs_gamecache,"heros","4",hid_weiyan)
-        call StoreInteger(zs_gamecache,"heros","5",hid_zhaoyun)
-        call StoreInteger(zs_gamecache,"heros","6",hid_dadi)
-        call StoreInteger(zs_gamecache,"heros","7",hid_simayi)
-        call StoreInteger(zs_gamecache,"heros","8",hid_guojia)
-        call StoreInteger(zs_gamecache,"heros","9",hid_caoren)
-        call StoreInteger(zs_gamecache,"heros","10",hid_dianwei)
-        call StoreInteger(zs_gamecache,"heros","11",hid_xun)
-        call StoreInteger(zs_gamecache,"heros","12",hid_zhangliao)
-        call StoreInteger(zs_gamecache,"heros","13",hid_madai)
-        call StoreInteger(zs_gamecache,"heros","14",hid_zhanghe)
-        call StoreInteger(zs_gamecache,"heros","15",hid_gongben)
-        call StoreInteger(zs_gamecache,"heros","16",hid_sunquan)
+		// call StoreInteger(zs_gamecache,"heros","2",hid_guanyu)
+		// call StoreInteger(zs_gamecache,"heros","3",hid_zhangfei)
+        // call StoreInteger(zs_gamecache,"heros","4",hid_weiyan)
+        // call StoreInteger(zs_gamecache,"heros","5",hid_zhaoyun)
+        // call StoreInteger(zs_gamecache,"heros","6",hid_dadi)
+        call StoreInteger(zs_gamecache,"heros","2",hid_simayi)
+        call StoreInteger(zs_gamecache,"heros","3",hid_guojia)
+        // call StoreInteger(zs_gamecache,"heros","9",hid_caoren)
+        // call StoreInteger(zs_gamecache,"heros","10",hid_dianwei)
+        call StoreInteger(zs_gamecache,"heros","4",hid_xun)
+        // call StoreInteger(zs_gamecache,"heros","12",hid_zhangliao)
+        // call StoreInteger(zs_gamecache,"heros","13",hid_madai)
+        // call StoreInteger(zs_gamecache,"heros","14",hid_zhanghe)
+        // call StoreInteger(zs_gamecache,"heros","15",hid_gongben)
+        // call StoreInteger(zs_gamecache,"heros","16",hid_sunquan)
     endif
     call StartThread(function mainLoop)
     call Sleep(2)
