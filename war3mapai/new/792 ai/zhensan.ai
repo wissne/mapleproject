@@ -156,7 +156,7 @@ globals
     location zs_xialu_WeiGuoyinbingLoc=Location(4250,-688)
     location zs_xialu_WeiGuoyinbingLoc2=Location(6600,-688)
     location zs_xialu_mutong=Location(2900,-3100)
-    boolean isdebug=true
+    boolean isdebug=false
     integer MaxSlot=6
     string array digit_str
     unit mHero=null
