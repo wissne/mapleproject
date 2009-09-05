@@ -156,7 +156,7 @@ globals
     location zs_xialu_WeiGuoyinbingLoc=Location(4250,-688)
     location zs_xialu_WeiGuoyinbingLoc2=Location(6600,-688)
     location zs_xialu_mutong=Location(2900,-3100)
-    boolean isdebug=false
+    boolean isdebug=true
     integer MaxSlot=6
     string array digit_str
     unit mHero=null
@@ -2473,11 +2473,11 @@ function initSkillArry_guojia takes nothing returns nothing
     set mSkillArray[6]='A00W'
     set mSkillArray[7]='A022'
     set mSkillArray[8]='A022'
-    set mSkillArray[9]='AUfu'
+    set mSkillArray[9]='Aamk'
     set mSkillArray[10]='A01F'
-    set mSkillArray[11]='AUfu'
-    set mSkillArray[12]='AUfu'
-    set mSkillArray[13]='AUfu'
+    set mSkillArray[11]='Aamk'
+    set mSkillArray[12]='Aamk'
+    set mSkillArray[13]='Aamk'
     set mSkillArray[14]='Aamk'
     set mSkillArray[15]='A01F'
     set mSkillArray[16]='Aamk'
@@ -2485,10 +2485,10 @@ function initSkillArry_guojia takes nothing returns nothing
     set mSkillArray[18]='Aamk'
     set mSkillArray[19]='Aamk'
     set mSkillArray[20]='Aamk'
-    set mSkillArray[21]='Aamk'
-    set mSkillArray[22]='Aamk'
-    set mSkillArray[23]='Aamk'
-    set mSkillArray[24]='Aamk'
+    set mSkillArray[21]='AUfu'
+    set mSkillArray[22]='AUfu'
+    set mSkillArray[23]='AUfu'
+    set mSkillArray[24]='AUfu'
 endfunction
 
 function initSkillArry_caoren takes nothing returns nothing
@@ -5652,7 +5652,7 @@ endfunction
 function zs_buyItems_Action_fashi takes nothing returns nothing
     if GetSlotsFreeOnUnit(mHero)==6 then
         if isguojia()or isxun()then
-            call Sleep(21)
+            //call Sleep(21)
         endif
         call zs_buyHong(4)
         call zs_buyLan(2)
@@ -7810,9 +7810,11 @@ function handleCommands takes nothing returns nothing
         endif
         if command==4006 then
             set quanZheYingMoShi=true
+			set zhuLiMoShi=false
         endif
         if command==4007 then
             set zhuLiMoShi=true
+			set quanZheYingMoShi=false
             call DisplayToAll("真三主力英雄模式开启！")
         endif
         if command==5000 then
@@ -7888,7 +7890,7 @@ function zs_budao_d_condition takes nothing returns nothing
     if budaobingD==null then
         set zs_action_prioty_arry[0]=0
     else
-        set zs_action_prioty_arry[0]=70
+        set zs_action_prioty_arry[0]=60
     endif
 endfunction
 
@@ -7908,7 +7910,7 @@ function zs_budao_w_condition takes nothing returns nothing
     if budaobingW==null or HeroD==null then
         set zs_action_prioty_arry[1]=0
     else
-        set zs_action_prioty_arry[1]=71
+        set zs_action_prioty_arry[1]=61
     endif
 endfunction
 
@@ -8905,7 +8907,7 @@ function zs_attack_action_fashi takes integer index returns nothing
         call MoveAttackUnit(HeroD,attackRange)
     endif
     if index==41 then
-        if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_UseFeiXie(mHero) and zs_EnemyHeroNearMeCount <= 2 then
+        if zs_action_prioty_arry[41]>=75 and rangeToHeroD>1000 and can_UseFeiXie(mHero) and zs_EnemyHeroNearMeCount <= 2 then
             call UseFeiXieU(HeroD)
         endif
         if zs_action_prioty_arry[41]>=75 and rangeToHeroD>600 and can_SunZiBingFa(mHero) and zs_EnemyHeroNearMeCount <= zs_AllyHeroNearMeCount then
@@ -11896,30 +11898,35 @@ function CVV takes integer id returns boolean
 endfunction
 
 function CEV takes nothing returns nothing
-    local integer index=0
-    local integer id=0
-    loop
-        set index=GetRandomInt(1,4)
-        exitwhen GetStoredInteger(zs_gamecache,"heros",ITS(index))>0
-    endloop
-    if GetStoredInteger(zs_gamecache,"heros",ITS(index))>0 then
-        call CVV(GetStoredInteger(zs_gamecache,"heros",ITS(index)))
-    endif
+    // local integer index=0
+    // local integer id=0
+    // loop
+        // set index=GetRandomInt(1,4)
+        // exitwhen GetStoredInteger(zs_gamecache,"heros",ITS(index))>0
+    // endloop
+    // if GetStoredInteger(zs_gamecache,"heros",ITS(index))>0 then
+        // call CVV(GetStoredInteger(zs_gamecache,"heros",ITS(index)))
+    // endif
+    local integer rs=0
+    set rs = GetRandomInt(1,4)
+    if rs == 1 then
+        call CVV(hid_zhugeliang)
+    elseif rs == 2 then
+		call CVV(hid_simayi)
+	elseif rs == 3 then
+		call CVV(hid_guojia)
+	else
+		call CVV(hid_xun)
+    endif	
 endfunction
 
 function CXV takes nothing returns nothing
     local integer rs=0
-    set rs = GetRandomInt(0,9)
-    if rs > 4 then
-        call BuyHero('n001',hid_zhugeliang)
+    set rs = GetRandomInt(1,2)
+    if rs == 1 then
+        call CVV(hid_zhugeliang)
     else
-        call BuyHero('n001',hid_simayi)
-    endif
-    set rs = GetRandomInt(0,9)
-    if rs > 4 then
-        call BuyHero('n000',hid_zhugeliang)
-    else
-        call BuyHero('n000',hid_simayi)
+        call CVV(hid_simayi)
     endif
     //  if zs_player_index==1 then
     //    if BuyHero('n001',hid_zhugeliang)then
@@ -11973,11 +11980,13 @@ function COV takes nothing returns nothing
         return
     endif
      if zhuLiMoShi then	// 主力 主要是诸葛跟司马
+		call debugstr("zhuli")
        call CXV()
        return
      endif
      if quanZheYingMoShi then	// 全部 包括国家跟荀
        if NS()>21 then
+		call debugstr("quanzhenyin")
          call CEV()
        endif
        return
@@ -13827,16 +13836,19 @@ function main takes nothing returns nothing
     endif
     if GetStoredInteger(zs_gamecache,"heros","1")<1 then
         call StoreInteger(zs_gamecache,"heros","1",hid_zhugeliang)
+        call StoreInteger(zs_gamecache,"heros","2",hid_simayi)
+        call StoreInteger(zs_gamecache,"heros","3",hid_guojia)
+        call StoreInteger(zs_gamecache,"heros","4",hid_xun)		
 		// call StoreInteger(zs_gamecache,"heros","2",hid_guanyu)
 		// call StoreInteger(zs_gamecache,"heros","3",hid_zhangfei)
         // call StoreInteger(zs_gamecache,"heros","4",hid_weiyan)
         // call StoreInteger(zs_gamecache,"heros","5",hid_zhaoyun)
         // call StoreInteger(zs_gamecache,"heros","6",hid_dadi)
-        call StoreInteger(zs_gamecache,"heros","2",hid_simayi)
-        call StoreInteger(zs_gamecache,"heros","3",hid_guojia)
+        // call StoreInteger(zs_gamecache,"heros","2",hid_simayi)
+        // call StoreInteger(zs_gamecache,"heros","3",hid_guojia)
         // call StoreInteger(zs_gamecache,"heros","9",hid_caoren)
         // call StoreInteger(zs_gamecache,"heros","10",hid_dianwei)
-        call StoreInteger(zs_gamecache,"heros","4",hid_xun)
+        // call StoreInteger(zs_gamecache,"heros","4",hid_xun)
         // call StoreInteger(zs_gamecache,"heros","12",hid_zhangliao)
         // call StoreInteger(zs_gamecache,"heros","13",hid_madai)
         // call StoreInteger(zs_gamecache,"heros","14",hid_zhanghe)
