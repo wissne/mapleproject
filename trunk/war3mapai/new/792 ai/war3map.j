@@ -7071,8 +7071,6 @@ function main takes nothing returns nothing
     call TriggerAddAction(ia,function If)
     call ConditionalTriggerExecute(ke)
     call ConditionalTriggerExecute(Ke)
-    call SetPlayerName(Player(0),"蜀国")
-    call SetPlayerName(Player(6),"魏国")
     call FlushGameCache(Ba)
 	call initPlayNameArray()
     set Ba=InitGameCache("zhensan.w3v")
@@ -7092,6 +7090,8 @@ function main takes nothing returns nothing
         set ln=ln+1
         exitwhen ln==12
     endloop
+    call SetPlayerName(Player(0),"蜀国")
+    call SetPlayerName(Player(6),"魏国")	
     set Vi=CreateTrigger()
     call TriggerRegisterTimerEventPeriodic(Vi,60)
     call TriggerAddAction(Vi,function lE)
