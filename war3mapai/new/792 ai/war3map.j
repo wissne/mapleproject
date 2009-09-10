@@ -5911,8 +5911,8 @@ function Ef takes nothing returns boolean
     return(((1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))>6))
 endfunction
 function Xf takes nothing returns nothing
-    call StartTimerBJ(o[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))],false,(I2R(GetUnitLevel(GetTriggerUnit()))*0. + 3))	////重生时间由5改为3秒
-    call wa((I2R(GetUnitLevel(GetTriggerUnit()))*0. + 3))
+    call StartTimerBJ(o[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))],false,(I2R(GetUnitLevel(GetTriggerUnit()))*3.))	////重生时间由5改为3秒
+    call wa((I2R(GetUnitLevel(GetTriggerUnit()))*3.))
     if(Vf())then
         call ReviveHeroLoc(GetTriggerUnit(),GetRandomLocInRect(Yv),true)
     endif
