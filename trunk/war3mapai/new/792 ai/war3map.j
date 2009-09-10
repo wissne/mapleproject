@@ -1863,7 +1863,7 @@ endfunction
 function OO takes nothing returns nothing
     call DestroyTrigger(GetTriggeringTrigger())
     call SetTimeOfDay(5.59)
-    call QuestMessageBJ(bj_FORCE_ALL_PLAYERS,6,"|c00ff0000真|r|c00ff0913．|r|c00ff1327三|r|c00ff1d3a国|r|c00ff274e无|r|c00ff3162双|r|c00ff3b75V|r|c00ff44893|r|c00ff4e9c.|r|c00ff58b09d|r  |c00ff58b0简体中文版|R\n\n|c000000ffM|r|c00000fffa|r|c00001fffp|r|c00002fff |r|c00003fffb|r|c00004fffy|r|c00005fff |r|c00006fffL|r|c00007fffo|r|c00008fffv|r|c00009fffe|r|c0000afffm|r|c0000bfffo|r|c0000cfffo|r|c0000dfffn|r|c0000efff0|r|c0000ffff3|r  |c0000ffffU9:ZWS简体化|r\n\n|c0000ffff论坛地址 繁体http://war3.custom.idv.tw/ 简体http://bbs.uuu9.com/|r\n\n|c00ddffcc真三AI论坛:bbs.wow8.org 真三国无双AI专区  |r\n|c00dd00cc友情链接:http://www.izhensan.cn 爱真三中文网  |r\n\n|c0055ff33输入-h获得命令帮助! |r\n\n|c0055ff33输入-ah开启四英雄模式! |r\n\n|c0000ff00                               ————made by maple |r\n")
+    call QuestMessageBJ(bj_FORCE_ALL_PLAYERS,6,"|c00ff0000真|r|c00ff0913．|r|c00ff1327三|r|c00ff1d3a国|r|c00ff274e无|r|c00ff3162双|r|c00ff3b75V|r|c00ff44893|r|c00ff4e9c.|r|c00ff58b09d|r  |c00ff58b0简体中文版|R\n\n|c000000ffM|r|c00000fffa|r|c00001fffp|r|c00002fff |r|c00003fffb|r|c00004fffy|r|c00005fff |r|c00006fffL|r|c00007fffo|r|c00008fffv|r|c00009fffe|r|c0000afffm|r|c0000bfffo|r|c0000cfffo|r|c0000dfffn|r|c0000efff0|r|c0000ffff3|r  |c0000ffffU9:ZWS简体化|r\n\n|c0000ffff论坛地址 繁体http://war3.custom.idv.tw/ 简体http://bbs.uuu9.com/|r\n\n|c00ddffcc真三AI论坛:bbs.wow8.org 真三国无双AI专区  |r\n|c00dd00cc友情链接:http://www.izhensan.cn 爱真三中文网  |r\n\n|c0055ff33输入-h获得命令帮助! |r\n\n|c0055ff33输入-ah开启四英雄模式! |r\n\n|c00ff0000                                           ————made by maple |r\n")
     call PlaySoundBJ(ge)
     call wa(19.)
     call DisableTrigger(vx)
