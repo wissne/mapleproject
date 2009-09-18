@@ -6,7 +6,7 @@ uses
    Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
    Dialogs, StdCtrls, sEdit, sSpinEdit, sCheckBox, sMemo, sAlphaListBox,
    RzPanel, RzSplit, Buttons, sBitBtn, ExtCtrls, sPanel, sButton,
-   sSkinProvider, sSkinManager, ImgList;
+   sSkinProvider, sSkinManager, ImgList, RzButton;
 
 type
    TMyData = record
@@ -55,6 +55,7 @@ type
       procedure dlgReplace1Replace(Sender: TObject);
       procedure dlgReplace1Find(Sender: TObject);
       function dlgFind1Find(Sender: TObject): Boolean;
+    procedure mmo1DblClick(Sender: TObject);
    private
     { Private declarations }
       hThread: THandle;
@@ -110,7 +111,7 @@ begin
                end;
 
             2:
-               if ((s > 'a') and (s < 'z')) or ((s > 'A') and (s < 'Z')) then
+               if ((s >= 'a') and (s <= 'z')) or ((s >= 'A') and (s <= 'Z')) then
                begin
                   inputStr(s, IntToStr(t));
                end
@@ -229,6 +230,8 @@ end;
 procedure TForm1.btn5Click(Sender: TObject);
 begin
    TerminateThread(hThread, 0);
+   btn5.Enabled := False;
+   btn4.Enabled := True;
 end;
 
 function MyThreadFunc(P: pointer): Longint; stdcall;
@@ -419,9 +422,8 @@ end;
 
 procedure TForm1.btn8Click(Sender: TObject);
 begin
-   dlgReplace1.Position := Point(mmo1.Left + mmo1.Width, mmo1.Top);
+//   dlgReplace1.Position := Point(Self.Left + mmo1.Width, mmo1.Top);
    dlgReplace1.Execute;
-
 end;
 
 procedure TForm1.dlgReplace1Replace(Sender: TObject);
@@ -450,6 +452,11 @@ end;
 procedure TForm1.dlgReplace1Find(Sender: TObject);
 begin
    dlgFind1Find(Sender);
+end;
+
+procedure TForm1.mmo1DblClick(Sender: TObject);
+begin
+  mmo1.SelectAll;
 end;
 
 end.
