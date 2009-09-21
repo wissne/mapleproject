@@ -29,12 +29,12 @@ type
       btn1: TsBitBtn;
       btn2: TsBitBtn;
       btn3: TsBitBtn;
-      il1: TImageList;
       btn4: TsBitBtn;
       btn5: TsBitBtn;
       btn7: TsBitBtn;
       btn8: TsBitBtn;
       btn6: TsBitBtn;
+    il1: TImageList;
       procedure btn1Click(Sender: TObject);
       procedure btn6Click(Sender: TObject);
       procedure inputStr(s, t: string);
