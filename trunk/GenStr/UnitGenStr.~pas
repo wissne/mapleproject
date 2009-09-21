@@ -26,15 +26,15 @@ type
       chk2: TsCheckBox;
       chk3: TsCheckBox;
       dlgReplace1: TReplaceDialog;
-    btn1: TsBitBtn;
-    btn2: TsBitBtn;
-    btn3: TsBitBtn;
-    il1: TImageList;
-    btn4: TsBitBtn;
-    btn5: TsBitBtn;
-    btn7: TsBitBtn;
-    btn8: TsBitBtn;
-    btn6: TsBitBtn;
+      btn1: TsBitBtn;
+      btn2: TsBitBtn;
+      btn3: TsBitBtn;
+      il1: TImageList;
+      btn4: TsBitBtn;
+      btn5: TsBitBtn;
+      btn7: TsBitBtn;
+      btn8: TsBitBtn;
+      btn6: TsBitBtn;
       procedure btn1Click(Sender: TObject);
       procedure btn6Click(Sender: TObject);
       procedure inputStr(s, t: string);
@@ -55,7 +55,7 @@ type
       procedure dlgReplace1Replace(Sender: TObject);
       procedure dlgReplace1Find(Sender: TObject);
       function dlgFind1Find(Sender: TObject): Boolean;
-    procedure mmo1DblClick(Sender: TObject);
+      procedure mmo1DblClick(Sender: TObject);
    private
     { Private declarations }
       hThread: THandle;
@@ -84,10 +84,10 @@ begin
    else if t = '2' then
       lst1.Items.Add(str1 + IntToStr(Number + 1) + ': ' + s + '  字' + #13)
    else lst1.Items.Add(str1 + IntToStr(Number + 1) + ': ' + s + '  常' + #13);
-   Inc(Count);
    Inc(Number);
    ArrRec[Count].val := s;
    ArrRec[Count].typ := t;
+   Inc(Count);
 end;
 
 procedure TForm1.DoInputBox(t: Integer);
@@ -202,7 +202,7 @@ var
    s: string;
    res: string;
 begin
-   for m := 1 to Form1.Count do
+   for m := 0 to Form1.Count do
    begin
       if ArrRec[m].typ = '1' then
       begin
@@ -239,35 +239,40 @@ var
    i: Longint;
    s: string;
 begin
-   Form1.mmo1.Clear;
-   Form1.btn4.Enabled := False;
-   Form1.btn5.Enabled := True;
-   for i := 0 to Form1.edt1.Value - 1 do
-   begin
-      s := getMmoValue(i);
-      if Form1.chk1.Checked then
-         s := s + #13;
-      Form1.mmo1.Lines.Text := Form1.mmo1.Lines.Text + s;
-   end;
-   Form1.btn4.Enabled := True;
-   Form1.btn5.Enabled := False;
+  try
+    Form1.mmo1.Clear;
+    Form1.btn4.Enabled := False;
+    Form1.btn5.Enabled := True;
+    for i := 0 to Form1.edt1.Value - 1 do
+    begin
+       s := getMmoValue(i);
+       if Form1.chk1.Checked then
+          s := s + #13;
+       Form1.mmo1.Lines.Text := Form1.mmo1.Lines.Text + s;
+    end;
+    Form1.btn4.Enabled := True;
+    Form1.btn5.Enabled := False;
+  except
+  end;
 end;
 
 procedure TForm1.btn4Click(Sender: TObject);
 var
    ThreadId: DWORD;
 begin
-   hThread := CreateThread(nil, 0, @MyThreadFunc, nil, 0, ThreadId);
+   try
+     hThread := CreateThread(nil, 0, @MyThreadFunc, nil, 0, ThreadId);
    if hThread = 0 then
       ShowMessage('Error!');
+   except
+   end;
 end;
 
 procedure TForm1.lst1DblClick(Sender: TObject);
 var
    index, i: Integer;
-
 begin
-   index := lst1.ItemIndex + 1;
+   index := lst1.ItemIndex;
    for i := index to Count do
    begin
       if i < length(ArrRec) then
@@ -293,35 +298,37 @@ begin
    begin
       StartPosition := ItemAtPos(StartingPoint, True);
       DropPosition := ItemAtPos(DropPoint, True);
-
-      Items.Move(StartPosition, DropPosition);
-      k := StartPosition + 1;
-      t := DropPosition + 1;
-      if k - t > 0 then
+      if (DropPosition >= 0) and (StartPosition >= 0) then
       begin
-         for i := 1 to abs(StartPosition - DropPosition) do
+         k := StartPosition;
+         t := DropPosition;
+         if k > t then
          begin
-            str1 := ArrRec[k].val;
-            ArrRec[k].val := ArrRec[k - 1].val;
-            ArrRec[k - 1].val := str1;
-            str2 := ArrRec[k].typ;
-            ArrRec[k].typ := ArrRec[k - 1].typ;
-            ArrRec[k - 1].typ := str2;
-            Dec(k);
+            for i := 1 to (StartPosition - DropPosition) do
+            begin
+               str1 := ArrRec[k].val;
+               ArrRec[k].val := ArrRec[k - 1].val;
+               ArrRec[k - 1].val := str1;
+               str2 := ArrRec[k].typ;
+               ArrRec[k].typ := ArrRec[k - 1].typ;
+               ArrRec[k - 1].typ := str2;
+               Dec(k);
+            end
          end
-      end
 
-      else for i := 1 to abs(StartPosition - DropPosition) do
-         begin
-            str1 := ArrRec[k].val;
-            ArrRec[k].val := ArrRec[k + 1].val;
-            ArrRec[k + 1].val := str1;
-            str2 := ArrRec[k].typ;
-            ArrRec[k].typ := ArrRec[k + 1].typ;
-            ArrRec[k + 1].typ := str2;
-            Inc(k);
-         end;
-
+         else for i := 1 to (DropPosition - StartPosition) do
+            begin
+               str1 := ArrRec[k].val;
+               ArrRec[k].val := ArrRec[k + 1].val;
+               ArrRec[k + 1].val := str1;
+               str2 := ArrRec[k].typ;
+               ArrRec[k].typ := ArrRec[k + 1].typ;
+               ArrRec[k + 1].typ := str2;
+               Inc(k);
+            end;
+         Items.Move(StartPosition, DropPosition);
+      end;
+      exit;
    end;
 end;
 
@@ -347,26 +354,26 @@ var
 begin
    if InputQuery('请输入追加内容', '', s) then
    begin
-     str2 := mmo1.Text;
-     if not (chk2.Checked or chk3.Checked) then
-     begin
-        ShowMessage('请选择追加的前或者后');
-        exit;
-     end;
-     for i := 1 to mmo1.Lines.Count do
-     begin
-        if chk2.Checked then
-        begin
-           str1 := str1 + s;
-        end;
-        str1 := str1 + mmo1.Lines[i - 1];
-        if chk3.Checked then
-        begin
-           str1 := str1 + s;
-        end;
-        str1 := str1 + #13#10;
-     end;
-     mmo1.Text := str1;
+      str2 := mmo1.Text;
+      if not (chk2.Checked or chk3.Checked) then
+      begin
+         ShowMessage('请选择追加的前或者后');
+         exit;
+      end;
+      for i := 1 to mmo1.Lines.Count do
+      begin
+         if chk2.Checked then
+         begin
+            str1 := str1 + s;
+         end;
+         str1 := str1 + mmo1.Lines[i - 1];
+         if chk3.Checked then
+         begin
+            str1 := str1 + s;
+         end;
+         str1 := str1 + #13#10;
+      end;
+      mmo1.Text := str1;
    end;
 end;
 
@@ -396,18 +403,18 @@ begin
                begin
                   mmo1.Selstart := 1;
                   mmo1.SetFocus;
-                  con := false;
+                  con := False;
                   i := -1;
                end
                else
                begin
-                  Result := false;
+                  Result := False;
                   exit;
                end;
             end
             else
             begin
-               con := false;
+               con := False;
             end;
          end;
       until (not con) and (i <> -1);
@@ -456,7 +463,7 @@ end;
 
 procedure TForm1.mmo1DblClick(Sender: TObject);
 begin
-  mmo1.SelectAll;
+   mmo1.SelectAll;
 end;
 
 end.
