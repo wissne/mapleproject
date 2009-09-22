@@ -1044,7 +1044,6 @@ object frmLoading: TfrmLoading
     Suffix = '%'
   end
   object con: TADOConnection
-    Connected = True
     ConnectionString = 
       'Provider=Microsoft.Jet.OLEDB.4.0;User ID=Admin;Data Source=D:\Ex' +
       'am\Data\examLib.mdb;Mode=Share Deny None;Extended Properties="";' +
