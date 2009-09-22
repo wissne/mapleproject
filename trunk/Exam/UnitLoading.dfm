@@ -1004,7 +1004,7 @@ object frmLoading: TfrmLoading
     Caption = #35797#39064#29983#25104#31995#32479
     ParentFont = False
     Font.Charset = GB2312_CHARSET
-    Font.Color = 8542779
+    Font.Color = clBlack
     Font.Height = -32
     Font.Name = #26999#20307'_GB2312'
     Font.Style = [fsBold, fsItalic]
@@ -1016,10 +1016,10 @@ object frmLoading: TfrmLoading
     Top = 192
     Width = 75
     Height = 22
-    Caption = 'v1.0 by maple'
+    Caption = 'v1.1 by maple'
     ParentFont = False
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = 8542779
+    Font.Color = clBlack
     Font.Height = -11
     Font.Name = 'MS Sans Serif'
     Font.Style = []
@@ -6788,7 +6788,7 @@ object frmLoading: TfrmLoading
     MenuSupport.ExtraLineFont.Name = 'MS Sans Serif'
     MenuSupport.ExtraLineFont.Style = []
     SkinDirectory = 'c:\Skins'
-    SkinName = 'Office2007 Blue (internal)'
+    SkinName = 'Beijing (internal)'
     SkinInfo = '6.14'
     ThirdParty.ThirdEdits = 
       'TEdit'#13#10'TMemo'#13#10'TMaskEdit'#13#10'TLabeledEdit'#13#10'THotKey'#13#10'TListBox'#13#10'TCheck' +

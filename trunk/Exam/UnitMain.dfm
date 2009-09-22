@@ -3,7 +3,7 @@ object frmMain: TfrmMain
   Top = 83
   Width = 811
   Height = 600
-  Caption = #35797#39064#29983#25104#31995#32479' v1.0'
+  Caption = #35797#39064#29983#25104#31995#32479' v1.1'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -105,6 +105,7 @@ object frmMain: TfrmMain
     object barQuestion: TToolButton
       Left = 368
       Top = 2
+      Hint = #24405#20837#38382#39064
       Caption = 'barQuestion'
       Enabled = False
       ImageIndex = 19
@@ -113,6 +114,7 @@ object frmMain: TfrmMain
     object barReplace: TToolButton
       Left = 428
       Top = 2
+      Hint = #35774#32622#23383#31526#26367#25442
       Caption = 'barReplace'
       Enabled = False
       ImageIndex = 21
@@ -129,7 +131,9 @@ object frmMain: TfrmMain
     object barGen: TToolButton
       Left = 496
       Top = 2
+      Hint = #29983#25104#35797#39064
       Caption = 'barGen'
+      Enabled = False
       ImageIndex = 20
       OnClick = barGenClick
     end
@@ -212,7 +216,6 @@ object frmMain: TfrmMain
               Width = 75
               Height = 25
               Caption = #29983#25104'[&O]'
-              Default = True
               TabOrder = 3
               OnClick = btnGenClick
               SkinData.SkinSection = 'BUTTON'
@@ -234,7 +237,7 @@ object frmMain: TfrmMain
               Caption = #31867#22411#65306
               ParentFont = False
               Font.Charset = DEFAULT_CHARSET
-              Font.Color = 8542779
+              Font.Color = clBlack
               Font.Height = -11
               Font.Name = 'MS Sans Serif'
               Font.Style = []
@@ -247,7 +250,7 @@ object frmMain: TfrmMain
               Caption = #39064#25968#65306
               ParentFont = False
               Font.Charset = DEFAULT_CHARSET
-              Font.Color = 8542779
+              Font.Color = clBlack
               Font.Height = -11
               Font.Name = 'MS Sans Serif'
               Font.Style = []
@@ -260,7 +263,7 @@ object frmMain: TfrmMain
               Caption = #26368#20302#13#10#38590#24230#65306
               ParentFont = False
               Font.Charset = DEFAULT_CHARSET
-              Font.Color = 8542779
+              Font.Color = clBlack
               Font.Height = -11
               Font.Name = 'MS Sans Serif'
               Font.Style = []
@@ -273,7 +276,7 @@ object frmMain: TfrmMain
               Caption = #22791#27880#65306
               ParentFont = False
               Font.Charset = DEFAULT_CHARSET
-              Font.Color = 8542779
+              Font.Color = clBlack
               Font.Height = -11
               Font.Name = 'MS Sans Serif'
               Font.Style = []
@@ -286,7 +289,7 @@ object frmMain: TfrmMain
               Caption = #19978#27425#13#10#26102#38388#65306
               ParentFont = False
               Font.Charset = DEFAULT_CHARSET
-              Font.Color = 8542779
+              Font.Color = clBlack
               Font.Height = -11
               Font.Name = 'MS Sans Serif'
               Font.Style = []
@@ -299,7 +302,7 @@ object frmMain: TfrmMain
               Caption = #26368#39640#13#10#38590#24230#65306
               ParentFont = False
               Font.Charset = DEFAULT_CHARSET
-              Font.Color = 8542779
+              Font.Color = clBlack
               Font.Height = -11
               Font.Name = 'MS Sans Serif'
               Font.Style = []
@@ -309,7 +312,7 @@ object frmMain: TfrmMain
               Top = 12
               Width = 121
               Height = 21
-              Color = 16511722
+              Color = clWhite
               DataField = 'typeId'
               DataSource = dsCase
               DropDownRows = 20
@@ -340,7 +343,7 @@ object frmMain: TfrmMain
               Width = 86
               Height = 21
               AutoSize = False
-              Color = 16511722
+              Color = clWhite
               EditMask = '!9999/99/99;1; '
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlack
@@ -372,7 +375,7 @@ object frmMain: TfrmMain
               Height = 21
               Hint = #38590#24230#26368#22823#21487#20026'10'
               AutoSize = False
-              Color = 16511722
+              Color = clWhite
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlack
               Font.Height = -11
@@ -403,7 +406,7 @@ object frmMain: TfrmMain
               Height = 21
               Hint = #26368#22810#21487#26377'1000'#39064' '
               AutoSize = False
-              Color = 16511722
+              Color = clWhite
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlack
               Font.Height = -11
@@ -433,7 +436,7 @@ object frmMain: TfrmMain
               Width = 726
               Height = 41
               Hint = #39064#30446#19968#24320#22987#30340#20171#32461#65292#24403#19968#31181#31867#22411#30340#39064#30446#20998#20026#22810#26465#35760#24405#26102#65292#35831#20165#22312#31532#19968#26465#35760#24405#37324#22635#20889#27492#34892#65281
-              Color = 16511722
+              Color = clWhite
               DataField = 'memo'
               DataSource = dsCase
               Font.Charset = DEFAULT_CHARSET
@@ -461,7 +464,7 @@ object frmMain: TfrmMain
               Height = 21
               Hint = #38590#24230#26368#22823#21487#20026'10'
               AutoSize = False
-              Color = 16511722
+              Color = clWhite
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlack
               Font.Height = -11
@@ -612,7 +615,7 @@ object frmMain: TfrmMain
             Caption = #31185#30446#65306
             ParentFont = False
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 8542779
+            Font.Color = clBlack
             Font.Height = -11
             Font.Name = 'MS Sans Serif'
             Font.Style = []
@@ -625,7 +628,7 @@ object frmMain: TfrmMain
             Caption = #26631#39064#65306
             ParentFont = False
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 8542779
+            Font.Color = clBlack
             Font.Height = -11
             Font.Name = 'MS Sans Serif'
             Font.Style = []
@@ -638,7 +641,7 @@ object frmMain: TfrmMain
             Caption = #24180#32423#65306
             ParentFont = False
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 8542779
+            Font.Color = clBlack
             Font.Height = -11
             Font.Name = 'MS Sans Serif'
             Font.Style = []
@@ -651,7 +654,7 @@ object frmMain: TfrmMain
             Caption = #20854#23427#65306
             ParentFont = False
             Font.Charset = DEFAULT_CHARSET
-            Font.Color = 8542779
+            Font.Color = clBlack
             Font.Height = -11
             Font.Name = 'MS Sans Serif'
             Font.Style = []
@@ -661,7 +664,7 @@ object frmMain: TfrmMain
             Top = 21
             Width = 121
             Height = 21
-            Color = 16511722
+            Color = clWhite
             DropDownRows = 20
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clBlack
@@ -701,7 +704,7 @@ object frmMain: TfrmMain
             Top = 48
             Width = 353
             Height = 21
-            Color = 16511722
+            Color = clWhite
             Enabled = False
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clBlack
@@ -727,7 +730,7 @@ object frmMain: TfrmMain
             Top = 21
             Width = 121
             Height = 21
-            Color = 16511722
+            Color = clWhite
             DropDownRows = 20
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clBlack
@@ -756,7 +759,7 @@ object frmMain: TfrmMain
             Top = 73
             Width = 353
             Height = 21
-            Color = 16511722
+            Color = clWhite
             Enabled = False
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clBlack
@@ -4166,7 +4169,6 @@ object frmMain: TfrmMain
     Top = 114
   end
   object qryType: TADOQuery
-    Active = True
     Connection = frmLoading.con
     CursorType = ctStatic
     Parameters = <>
