@@ -44,7 +44,7 @@ object frmQuestion: TfrmQuestion
         Caption = #31185#30446#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -57,7 +57,7 @@ object frmQuestion: TfrmQuestion
         Caption = #38382#39064#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -70,7 +70,7 @@ object frmQuestion: TfrmQuestion
         Caption = #31867#22411#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -83,7 +83,7 @@ object frmQuestion: TfrmQuestion
         Caption = #24180#32423#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -104,7 +104,7 @@ object frmQuestion: TfrmQuestion
         Top = 16
         Width = 250
         Height = 21
-        Color = 16511722
+        Color = clWhite
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -11
@@ -129,7 +129,7 @@ object frmQuestion: TfrmQuestion
         Top = 16
         Width = 89
         Height = 21
-        Color = 16511722
+        Color = clWhite
         DropDownRows = 20
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -158,7 +158,7 @@ object frmQuestion: TfrmQuestion
         Top = 16
         Width = 89
         Height = 21
-        Color = 16511722
+        Color = clWhite
         DropDownRows = 20
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -187,7 +187,7 @@ object frmQuestion: TfrmQuestion
         Top = 16
         Width = 89
         Height = 21
-        Color = 16511722
+        Color = clWhite
         DropDownRows = 20
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -295,7 +295,7 @@ object frmQuestion: TfrmQuestion
         Caption = #38382#39064#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -308,7 +308,7 @@ object frmQuestion: TfrmQuestion
         Caption = #31185#30446#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -321,7 +321,7 @@ object frmQuestion: TfrmQuestion
         Caption = #31867#22411#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -334,7 +334,7 @@ object frmQuestion: TfrmQuestion
         Caption = #20998#25968#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -347,7 +347,7 @@ object frmQuestion: TfrmQuestion
         Caption = #38590#24230#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -360,7 +360,7 @@ object frmQuestion: TfrmQuestion
         Caption = #22270#29255#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -373,7 +373,7 @@ object frmQuestion: TfrmQuestion
         Caption = #24180#32423#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -383,7 +383,7 @@ object frmQuestion: TfrmQuestion
         Top = 77
         Width = 217
         Height = 21
-        Color = 16511722
+        Color = clWhite
         DataField = 'subjId'
         DataSource = dsQues
         DropDownRows = 20
@@ -415,7 +415,7 @@ object frmQuestion: TfrmQuestion
         Top = 77
         Width = 201
         Height = 21
-        Color = 16511722
+        Color = clWhite
         DataField = 'typeId'
         DataSource = dsQues
         DropDownRows = 20
@@ -447,7 +447,7 @@ object frmQuestion: TfrmQuestion
         Top = 24
         Width = 722
         Height = 49
-        Color = 16511722
+        Color = clWhite
         DataField = 'question'
         DataSource = dsQues
         Enabled = False
@@ -476,7 +476,7 @@ object frmQuestion: TfrmQuestion
         Height = 21
         Hint = #26368#22823#20998#25968#20026'100'
         AutoSize = False
-        Color = 16511722
+        Color = clWhite
         Enabled = False
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -509,7 +509,7 @@ object frmQuestion: TfrmQuestion
         Height = 21
         Hint = #26368#39640#38590#24230#20026'10'
         AutoSize = False
-        Color = 16511722
+        Color = clWhite
         Enabled = False
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -552,7 +552,7 @@ object frmQuestion: TfrmQuestion
         Width = 722
         Height = 21
         AutoSize = False
-        Color = 16511722
+        Color = clWhite
         Enabled = False
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -580,7 +580,7 @@ object frmQuestion: TfrmQuestion
         Top = 77
         Width = 217
         Height = 21
-        Color = 16511722
+        Color = clWhite
         DataField = 'gradeId'
         DataSource = dsQues
         DropDownRows = 20

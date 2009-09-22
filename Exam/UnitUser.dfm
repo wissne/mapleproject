@@ -43,7 +43,7 @@ object frmUser: TfrmUser
         Caption = #21517#31216#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -54,7 +54,7 @@ object frmUser: TfrmUser
         Width = 722
         Height = 21
         Hint = #35831#36755#20837#20320#35201#26597#35810#30340#29992#25143#21517#31216
-        Color = 16511722
+        Color = clWhite
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -11
@@ -103,7 +103,7 @@ object frmUser: TfrmUser
         Caption = #21517#31216#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -116,7 +116,7 @@ object frmUser: TfrmUser
         Caption = #23494#30721#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -129,7 +129,7 @@ object frmUser: TfrmUser
         Caption = #22791#27880#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -142,7 +142,7 @@ object frmUser: TfrmUser
         Caption = #36523#20221#65306
         ParentFont = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 8542779
+        Font.Color = clBlack
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
@@ -153,7 +153,7 @@ object frmUser: TfrmUser
         Width = 425
         Height = 21
         Hint = #30331#20837#31995#32479#30340#29992#25143#21517
-        Color = 16511722
+        Color = clWhite
         DataField = 'name'
         DataSource = dsUser
         Enabled = False
@@ -182,7 +182,7 @@ object frmUser: TfrmUser
         Width = 425
         Height = 41
         Hint = #20854#20182#30456#20851#22791#27880#20449#24687
-        Color = 16511722
+        Color = clWhite
         DataField = 'memo'
         DataSource = dsUser
         Font.Charset = DEFAULT_CHARSET
@@ -210,7 +210,7 @@ object frmUser: TfrmUser
         Width = 345
         Height = 21
         Hint = #29992#25143#36523#20221
-        Color = 16511722
+        Color = clWhite
         DataField = 'identityId'
         DataSource = dsUser
         DropDownRows = 20
@@ -272,7 +272,7 @@ object frmUser: TfrmUser
             Height = 95
             Hint = #24403#21069#25152#26377#29992#25143#31867#22411
             Align = alLeft
-            Color = 16511722
+            Color = clWhite
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clBlack
             Font.Height = -11
@@ -340,7 +340,7 @@ object frmUser: TfrmUser
             Width = 153
             Height = 21
             Hint = #29992#25143#36523#20221
-            Color = 16511722
+            Color = clWhite
             DataField = 'identity'
             DataSource = dsIdentity
             Font.Charset = DEFAULT_CHARSET
@@ -370,7 +370,7 @@ object frmUser: TfrmUser
         Width = 345
         Height = 21
         Hint = #35831#36755#20837#23494#30721
-        Color = 16511722
+        Color = clWhite
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -11
