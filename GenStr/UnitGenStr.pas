@@ -6,7 +6,7 @@ uses
    Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
    Dialogs, StdCtrls, sEdit, sSpinEdit, sCheckBox, sMemo, sAlphaListBox,
    RzPanel, RzSplit, Buttons, sBitBtn, ExtCtrls, sPanel, sButton,
-   sSkinProvider, sSkinManager, ImgList, RzButton;
+   sSkinProvider, sSkinManager, ImgList, RzButton, sHintManager;
 
 type
    TMyData = record
@@ -35,6 +35,7 @@ type
       btn8: TsBitBtn;
       btn6: TsBitBtn;
       il1: TImageList;
+    shntmngr1: TsHintManager;
       procedure btn1Click(Sender: TObject);
       procedure btn6Click(Sender: TObject);
       procedure inputStr(s, t: string);
