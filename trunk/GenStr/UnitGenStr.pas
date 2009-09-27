@@ -34,7 +34,7 @@ type
       btn7: TsBitBtn;
       btn8: TsBitBtn;
       btn6: TsBitBtn;
-    il1: TImageList;
+      il1: TImageList;
       procedure btn1Click(Sender: TObject);
       procedure btn6Click(Sender: TObject);
       procedure inputStr(s, t: string);
@@ -42,7 +42,6 @@ type
       procedure btn2Click(Sender: TObject);
       procedure btn3Click(Sender: TObject);
       procedure btn5Click(Sender: TObject);
-      procedure handle;
       procedure btn4Click(Sender: TObject);
       procedure lst1DblClick(Sender: TObject);
       procedure lst1DragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -59,6 +58,7 @@ type
    private
     { Private declarations }
       hThread: THandle;
+      isWrap: Boolean;
    public
     { Public declarations }
       sign: Integer;
@@ -156,53 +156,13 @@ begin
 
 end;
 
-procedure TForm1.handle;
-var
-   i, m, t: Integer;
-   s: string;
-   str1: array[0..100] of string;
-begin
-   mmo1.Text := '';
-   for m := 0 to Count do
-      str1[m] := ArrRec[m].val;
-   for i := 0 to edt1.Value - 1 do
-   begin
-      for m := 1 to Count do
-      begin
-         if ArrRec[m].typ = '1' then
-         begin
-            mmo1.Text := mmo1.Text + str1[m];
-            str1[m] := IntToStr(StrToInt(str1[m]) + 1);
-         end
-
-         else if ArrRec[m].typ = '2' then
-         begin
-            s := str1[m];
-            for t := 1 to length(s) do
-            begin
-               mmo1.Text := mmo1.Text + str1[m];
-               str1[m] := Chr(Ord(s[t]) + 1);
-            end;
-         end
-         else mmo1.Text := mmo1.Text + str1[m];
-      end;
-
-      if chk1.Checked then
-
-      begin
-         mmo1.Text := mmo1.Text + #10#13;
-      end;
-   end;
-
-end;
-
 function getMmoValue(Count: Integer): string;
 var
    m, t, len1, len2, j: Integer;
    s: string;
    res: string;
 begin
-   for m := 0 to Form1.Count do
+   for m := 0 to Form1.Count - 1 do
    begin
       if ArrRec[m].typ = '1' then
       begin
@@ -239,21 +199,25 @@ var
    i: Longint;
    s: string;
 begin
-  try
-    Form1.mmo1.Clear;
-    Form1.btn4.Enabled := False;
-    Form1.btn5.Enabled := True;
-    for i := 0 to Form1.edt1.Value - 1 do
-    begin
-       s := getMmoValue(i);
-       if Form1.chk1.Checked then
-          s := s + #13;
-       Form1.mmo1.Lines.Add(s);
-    end;
-    Form1.btn4.Enabled := True;
-    Form1.btn5.Enabled := False;
-  except
-  end;
+   try
+      Form1.mmo1.Clear;
+      Form1.btn4.Enabled := False;
+      Form1.btn5.Enabled := True;
+      for i := 0 to Form1.edt1.Value - 1 do
+      begin
+         s := getMmoValue(i);
+         if Form1.isWrap then
+         begin
+           s := s + #13;
+           Form1.mmo1.Lines.Add(s);
+         end
+         else
+            Form1.mmo1.Lines.Text := Form1.mmo1.Lines.Text + s;
+      end;
+      Form1.btn4.Enabled := True;
+      Form1.btn5.Enabled := False;
+   except
+   end;
 end;
 
 procedure TForm1.btn4Click(Sender: TObject);
@@ -261,9 +225,10 @@ var
    ThreadId: DWORD;
 begin
    try
-     hThread := CreateThread(nil, 0, @MyThreadFunc, nil, 0, ThreadId);
-   if hThread = 0 then
-      ShowMessage('Error!');
+      isWrap := Form1.chk1.Checked;
+      hThread := CreateThread(nil, 1024, @MyThreadFunc, nil, 1, ThreadId);
+      if hThread = 0 then
+         ShowMessage('Error!');
    except
    end;
 end;
@@ -352,25 +317,30 @@ var
    s, str1, str2: string;
    i: Integer;
 begin
+   if not (chk2.Checked or chk3.Checked) then
+   begin
+      ShowMessage('请选择追加的前或者后');
+      exit;
+   end;
    if InputQuery('请输入追加内容', '', s) then
    begin
       str2 := mmo1.Text;
-      if not (chk2.Checked or chk3.Checked) then
-      begin
-         ShowMessage('请选择追加的前或者后');
-         exit;
-      end;
       for i := 1 to mmo1.Lines.Count do
       begin
-         if chk2.Checked then
+         if Trim(mmo1.Lines[i - 1]) <> '' then
          begin
-            str1 := str1 + s;
-         end;
-         str1 := str1 + mmo1.Lines[i - 1];
-         if chk3.Checked then
-         begin
-            str1 := str1 + s;
-         end;
+           if chk2.Checked then
+           begin
+              str1 := str1 + s;
+           end;
+           str1 := str1 + mmo1.Lines[i - 1];
+           if chk3.Checked then
+           begin
+              str1 := str1 + s;
+           end;
+         end
+         else
+            str1 := str1 + mmo1.Lines[i - 1];
          str1 := str1 + #13#10;
       end;
       mmo1.Text := str1;
@@ -392,8 +362,10 @@ begin
                Selstart := Selstart + length(dlgReplace1.FindText);
 
             s := Copy(Lines.Text, Selstart + 1, length(Lines.Text) - Selstart);
-
-            i := Pos(dlgReplace1.FindText, s);
+            if frMatchCase in dlgReplace1.Options then
+               i := Pos(dlgReplace1.FindText, s)
+            else
+               i := Pos(UpperCase(dlgReplace1.FindText), UpperCase(s));
 
             if i = 0 then
             begin
@@ -401,7 +373,7 @@ begin
   //            '查找', MB_ICONINFORMATION + MB_SYSTEMMODAL + MB_OK);
                if con then
                begin
-                  mmo1.Selstart := 1;
+                  mmo1.Selstart := 0;
                   mmo1.SetFocus;
                   con := False;
                   i := -1;
@@ -451,7 +423,8 @@ begin
    else
    begin
       Form1.dlgFind1Find(Form1.mmo1);
-      mmo1.SelText := dlgReplace1.ReplaceText;
+      if con then
+         mmo1.SelText := dlgReplace1.ReplaceText;
    end;
 
 end;
