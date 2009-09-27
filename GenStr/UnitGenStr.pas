@@ -18,7 +18,6 @@ type
       spnl2: TsPanel;
       rzszpnl1: TRzSizePanel;
       lst1: TsListBox;
-      mmo1: TsMemo;
       chk1: TsCheckBox;
       edt1: TsSpinEdit;
       sknmngr1: TsSkinManager;
@@ -36,6 +35,8 @@ type
       btn6: TsBitBtn;
       il1: TImageList;
     shntmngr1: TsHintManager;
+    spnl3: TsPanel;
+    mmo1: TsMemo;
       procedure btn1Click(Sender: TObject);
       procedure btn6Click(Sender: TObject);
       procedure inputStr(s, t: string);
@@ -213,7 +214,7 @@ begin
            Form1.mmo1.Lines.Add(s);
          end
          else
-            Form1.mmo1.Lines.Text := Form1.mmo1.Lines.Text + s;
+            Form1.mmo1.Lines.Text := Form1.mmo1.Lines.Text + s;         
       end;
       Form1.btn4.Enabled := True;
       Form1.btn5.Enabled := False;
