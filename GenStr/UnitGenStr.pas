@@ -248,7 +248,7 @@ begin
        s := getMmoValue(i);
        if Form1.chk1.Checked then
           s := s + #13;
-       Form1.mmo1.Lines.Text := Form1.mmo1.Lines.Text + s;
+       Form1.mmo1.Lines.Add(s);
     end;
     Form1.btn4.Enabled := True;
     Form1.btn5.Enabled := False;
