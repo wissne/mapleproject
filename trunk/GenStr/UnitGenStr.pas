@@ -12,6 +12,7 @@ type
    TMyData = record
       val: string;
       typ: string;
+      format: string;
    end;
    TForm1 = class(TForm)
       spnl1: TsPanel;
@@ -37,6 +38,7 @@ type
     shntmngr1: TsHintManager;
     spnl3: TsPanel;
     mmo1: TsMemo;
+    btn9: TsBitBtn;
       procedure btn1Click(Sender: TObject);
       procedure btn6Click(Sender: TObject);
       procedure inputStr(s, t: string);
@@ -57,6 +59,7 @@ type
       procedure dlgReplace1Find(Sender: TObject);
       function dlgFind1Find(Sender: TObject): Boolean;
       procedure mmo1DblClick(Sender: TObject);
+    procedure btn9Click(Sender: TObject);
    private
     { Private declarations }
       hThread: THandle;
@@ -76,6 +79,8 @@ var
 implementation
 
 {$R *.dfm}
+
+uses UnitTime;
 
 procedure TForm1.inputStr(s, t: string);
 var
@@ -163,6 +168,7 @@ var
    m, t, len1, len2, j: Integer;
    s: string;
    res: string;
+   data : TDateTime;
 begin
    for m := 0 to Form1.Count - 1 do
    begin
@@ -183,6 +189,13 @@ begin
          begin
             res := res + Chr(Ord(s[t]) + Count);
          end;
+      end
+      else if ArrRec[m].typ = '4' then
+      begin
+        data := StrToDatetime(ArrRec[m].val);
+        res := res + FormatDateTime(ArrRec[m].format, (date + Count));
+
+
       end
       else res := res + ArrRec[m].val;
    end;
@@ -424,7 +437,7 @@ begin
    end
    else
    begin
-      Form1.dlgFind1Find(Form1.mmo1);
+     con := Form1.dlgFind1Find(Form1.mmo1);
       if con then
          mmo1.SelText := dlgReplace1.ReplaceText;
    end;
@@ -439,6 +452,35 @@ end;
 procedure TForm1.mmo1DblClick(Sender: TObject);
 begin
    mmo1.SelectAll;
+end;
+
+procedure TForm1.btn9Click(Sender: TObject);
+var
+  time , fmat ,str1 : string;
+  data : TDateTime;
+begin
+  //Application.CreateForm(TForm2, Form2);
+
+  if Form2.ShowModal = mrOk then
+  begin
+    time := Form2.edt1.Text;
+    fmat := Form2.cbb1.Text;
+    data := StrToDatetime(time);
+
+    if (time <> '') and (fmat <>'') then
+    begin
+      lst1.Items.Add(str1 + IntToStr(Number + 1) + ': ' + FormatDateTime(fmat, date) + '  ÈÕÆÚ' + #13);
+      Inc(Number);
+      ArrRec[Count].val := time;
+      ArrRec[Count].format := fmat;
+      ArrRec[Count].typ := '4';
+      Inc(Count);
+    end;
+
+   // Form2.date;
+
+  end;
+
 end;
 
 end.
