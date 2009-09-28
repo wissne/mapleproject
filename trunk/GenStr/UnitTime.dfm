@@ -1,8 +1,8 @@
 object Form2: TForm2
   Left = 478
   Top = 320
-  Width = 263
-  Height = 116
+  Width = 262
+  Height = 89
   BorderIcons = [biSystemMenu]
   Caption = #36755#20837#26085#26399
   Color = clBtnFace
@@ -12,13 +12,14 @@ object Form2: TForm2
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
+  Position = poMainFormCenter
   PixelsPerInch = 96
   TextHeight = 13
   object edt1: TsDateEdit
     Left = 8
-    Top = 8
+    Top = 5
     Width = 105
-    Height = 25
+    Height = 21
     AutoSize = False
     Color = clWhite
     EditMask = '!9999/99/99;1; '
@@ -45,7 +46,7 @@ object Form2: TForm2
   end
   object cbb1: TsComboBox
     Left = 120
-    Top = 10
+    Top = 5
     Width = 121
     Height = 21
     Alignment = taLeftJustify
@@ -77,7 +78,7 @@ object Form2: TForm2
   end
   object btn1: TsBitBtn
     Left = 96
-    Top = 40
+    Top = 33
     Width = 73
     Height = 25
     Caption = #30830#23450
@@ -88,7 +89,7 @@ object Form2: TForm2
   end
   object btn2: TsBitBtn
     Left = 176
-    Top = 40
+    Top = 33
     Width = 73
     Height = 25
     Caption = #36864#20986
