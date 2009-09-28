@@ -87,10 +87,10 @@ var
    str1: string;
 begin
    if t = '1' then
-      lst1.Items.Add(str1 + IntToStr(Number + 1) + ': ' + s + '  数' + #13)
+      lst1.Items.Add(str1 + IntToStr(Number + 1) + ': ' + s + '  数字' + #13)
    else if t = '2' then
-      lst1.Items.Add(str1 + IntToStr(Number + 1) + ': ' + s + '  字' + #13)
-   else lst1.Items.Add(str1 + IntToStr(Number + 1) + ': ' + s + '  常' + #13);
+      lst1.Items.Add(str1 + IntToStr(Number + 1) + ': ' + s + '  字符' + #13)
+   else lst1.Items.Add(str1 + IntToStr(Number + 1) + ': ' + s + '  常量' + #13);
    Inc(Number);
    ArrRec[Count].val := s;
    ArrRec[Count].typ := t;
