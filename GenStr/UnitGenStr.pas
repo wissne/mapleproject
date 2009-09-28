@@ -99,11 +99,16 @@ end;
 
 procedure TForm1.DoInputBox(t: Integer);
 var
-   s: string;
+   s, q: string;
    m: Integer;
 begin
+   case t of 
+   		1: q := '请输入数字';
+      2: q := '请输入字母';
+      3: q := '请输入常量';
+   end;
    repeat
-      if InputQuery('请输入数据', '', s) then
+      if InputQuery(q, '', s) then
       begin
          case t of
             1:
@@ -124,7 +129,7 @@ begin
                end
                else
                begin
-                  ShowMessage('请输入一个字母');
+                  ShowMessage('请输入字母');
                   s := '';
                end;
             3:
