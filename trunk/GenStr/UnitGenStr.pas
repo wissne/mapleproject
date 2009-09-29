@@ -223,7 +223,7 @@ begin
       Form1.mmo1.Clear;
       Form1.btn4.Enabled := False;
       Form1.btn5.Enabled := True;
-      for i := 1 to Form1.edt1.Value - 1 do
+      for i := 0 to Form1.edt1.Value - 1 do
       begin
          s := getMmoValue(i);
          if Form1.isWrap then
