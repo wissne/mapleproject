@@ -94,6 +94,7 @@ begin
    Inc(Number);
    ArrRec[Count].val := s;
    ArrRec[Count].typ := t;
+   ArrRec[Count].format := '';
    Inc(Count);
 end;
 
@@ -195,14 +196,13 @@ begin
             res := res + Chr(Ord(s[t]) + Count);
          end;
       end
-      else if ArrRec[m].typ = '4' then
+      else if ArrRec[m].typ = '3' then
+           res := res + ArrRec[m].val
+      else
       begin
         data := StrToDatetime(ArrRec[m].val);
         res := res + FormatDateTime(ArrRec[m].format, (date + Count));
-
-
       end
-      else res := res + ArrRec[m].val;
    end;
    Result := res;
 end;
@@ -223,7 +223,7 @@ begin
       Form1.mmo1.Clear;
       Form1.btn4.Enabled := False;
       Form1.btn5.Enabled := True;
-      for i := 0 to Form1.edt1.Value - 1 do
+      for i := 1 to Form1.edt1.Value - 1 do
       begin
          s := getMmoValue(i);
          if Form1.isWrap then
@@ -275,7 +275,7 @@ var
    DropPosition, StartPosition: Integer;
    DropPoint: TPoint;
    k, t, i: Integer;
-   str1, str2: string;
+   str1, str2, str3: string;
 begin
    DropPoint.X := X;
    DropPoint.Y := Y;
@@ -294,9 +294,14 @@ begin
                str1 := ArrRec[k].val;
                ArrRec[k].val := ArrRec[k - 1].val;
                ArrRec[k - 1].val := str1;
+
                str2 := ArrRec[k].typ;
                ArrRec[k].typ := ArrRec[k - 1].typ;
                ArrRec[k - 1].typ := str2;
+
+               str3 := ArrRec[k].format;
+               ArrRec[k].format := ArrRec[k - 1].format;
+               ArrRec[k - 1].format := str3;
                Dec(k);
             end
          end
@@ -306,9 +311,14 @@ begin
                str1 := ArrRec[k].val;
                ArrRec[k].val := ArrRec[k + 1].val;
                ArrRec[k + 1].val := str1;
+
                str2 := ArrRec[k].typ;
                ArrRec[k].typ := ArrRec[k + 1].typ;
                ArrRec[k + 1].typ := str2;
+
+               str3 := ArrRec[k].format;
+               ArrRec[k].format := ArrRec[k + 1].format;
+               ArrRec[k + 1].format := str3;
                Inc(k);
             end;
          Items.Move(StartPosition, DropPosition);
