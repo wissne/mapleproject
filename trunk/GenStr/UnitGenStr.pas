@@ -275,7 +275,7 @@ var
    DropPosition, StartPosition: Integer;
    DropPoint: TPoint;
    k, t, i: Integer;
-   str1, str2, str3: string;
+   tmp: TMyData;
 begin
    DropPoint.X := X;
    DropPoint.Y := Y;
@@ -291,34 +291,18 @@ begin
          begin
             for i := 1 to (StartPosition - DropPosition) do
             begin
-               str1 := ArrRec[k].val;
-               ArrRec[k].val := ArrRec[k - 1].val;
-               ArrRec[k - 1].val := str1;
-
-               str2 := ArrRec[k].typ;
-               ArrRec[k].typ := ArrRec[k - 1].typ;
-               ArrRec[k - 1].typ := str2;
-
-               str3 := ArrRec[k].format;
-               ArrRec[k].format := ArrRec[k - 1].format;
-               ArrRec[k - 1].format := str3;
+               tmp := ArrRec[k];
+               ArrRec[k] := ArrRec[k - 1];
+               ArrRec[k - 1] := tmp;
                Dec(k);
             end
          end
 
          else for i := 1 to (DropPosition - StartPosition) do
             begin
-               str1 := ArrRec[k].val;
-               ArrRec[k].val := ArrRec[k + 1].val;
-               ArrRec[k + 1].val := str1;
-
-               str2 := ArrRec[k].typ;
-               ArrRec[k].typ := ArrRec[k + 1].typ;
-               ArrRec[k + 1].typ := str2;
-
-               str3 := ArrRec[k].format;
-               ArrRec[k].format := ArrRec[k + 1].format;
-               ArrRec[k + 1].format := str3;
+               tmp := ArrRec[k];
+               ArrRec[k] := ArrRec[k + 1];
+               ArrRec[k + 1] := tmp;
                Inc(k);
             end;
          Items.Move(StartPosition, DropPosition);
