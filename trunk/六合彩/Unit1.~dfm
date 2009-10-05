@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 228
   Top = 151
   AutoSize = True
-  BorderStyle = bsSingle
+  BorderStyle = bsToolWindow
   Caption = #20845#21512#24425
   ClientHeight = 305
   ClientWidth = 392
@@ -5534,6 +5534,7 @@ object Form1: TForm1
           B938975AED73699E3835FD9DCF18AA4CC15945057D413C0062E1DC73FAFA4FC9
           9ED9F09FF0DAEBAF93EDFF01F7B669A2}
       end>
+    MenuSupport.IcoLineSkin = 'ICOLINE'
     MenuSupport.ExtraLineFont.Charset = DEFAULT_CHARSET
     MenuSupport.ExtraLineFont.Color = clWindowText
     MenuSupport.ExtraLineFont.Height = -11
