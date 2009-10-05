@@ -4,8 +4,8 @@ object Form1: TForm1
   AutoSize = True
   BorderStyle = bsToolWindow
   Caption = #20845#21512#24425
-  ClientHeight = 305
-  ClientWidth = 392
+  ClientHeight = 303
+  ClientWidth = 414
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -5080,8 +5080,8 @@ object Form1: TForm1
   TextHeight = 13
   object mmoResult: TMemo
     Left = 0
-    Top = 212
-    Width = 392
+    Top = 210
+    Width = 414
     Height = 93
     Ctl3D = False
     ParentCtl3D = False
@@ -5089,8 +5089,8 @@ object Form1: TForm1
   end
   object grpSpecialBall: TGroupBox
     Left = 0
-    Top = 96
-    Width = 392
+    Top = 94
+    Width = 414
     Height = 113
     Caption = #20363#22806
     Ctl3D = False
@@ -5098,8 +5098,8 @@ object Form1: TForm1
     TabOrder = 1
   end
   object btnClose: TButton
-    Left = 311
-    Top = 8
+    Left = 327
+    Top = 16
     Width = 75
     Height = 25
     Caption = #20851'    '#38381
@@ -5108,8 +5108,8 @@ object Form1: TForm1
     OnClick = btnCloseClick
   end
   object btnReset: TButton
-    Left = 311
-    Top = 40
+    Left = 327
+    Top = 48
     Width = 75
     Height = 25
     Caption = #37325'    '#32622
@@ -5117,7 +5117,7 @@ object Form1: TForm1
     OnClick = btnResetClick
   end
   object lst2: TsCheckListBox
-    Left = 62
+    Left = 70
     Top = 0
     Width = 54
     Height = 84
@@ -5148,7 +5148,7 @@ object Form1: TForm1
     OnClickCheck = ClickCheck
   end
   object lst3: TsCheckListBox
-    Left = 124
+    Left = 132
     Top = 0
     Width = 54
     Height = 84
@@ -5179,7 +5179,7 @@ object Form1: TForm1
     OnClickCheck = ClickCheck
   end
   object lst1: TsCheckListBox
-    Left = 0
+    Left = 8
     Top = 0
     Width = 54
     Height = 84
@@ -5211,7 +5211,7 @@ object Form1: TForm1
     OnClickCheck = ClickCheck
   end
   object lst4: TsCheckListBox
-    Left = 186
+    Left = 194
     Top = 0
     Width = 54
     Height = 84
@@ -5245,7 +5245,7 @@ object Form1: TForm1
     OnClickCheck = ClickCheck
   end
   object lst5: TsCheckListBox
-    Left = 248
+    Left = 256
     Top = 0
     Width = 54
     Height = 84
@@ -5534,6 +5534,7 @@ object Form1: TForm1
           B938975AED73699E3835FD9DCF18AA4CC15945057D413C0062E1DC73FAFA4FC9
           9ED9F09FF0DAEBAF93EDFF01F7B669A2}
       end>
+    MenuSupport.IcoLineSkin = 'ICOLINE'
     MenuSupport.ExtraLineFont.Charset = DEFAULT_CHARSET
     MenuSupport.ExtraLineFont.Color = clWindowText
     MenuSupport.ExtraLineFont.Height = -11

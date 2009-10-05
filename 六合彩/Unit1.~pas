@@ -251,12 +251,13 @@ begin
     begin
       Name := 'chk' + IntToStr(i);
       Parent := Form1.grpSpecialBall;
-      Caption := IntToStr(i);
-      Left := 8 + 36 * (i - 1) - line * (36 * 10);
+      Caption := FormatFloat('00', i);
+      Left := 8 + 40 * (i - 1) - line * (40 * 10);
       Top := 16 + line * 17;
-      Width := 36;
+      Alignment := taLeftJustify;
+      Width := 40;
       Height := 17;
-      Checked := True;
+      Checked := True;      
       OnClick := Form1.MyClick;
     end;
 
