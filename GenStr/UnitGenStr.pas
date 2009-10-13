@@ -69,6 +69,12 @@ type
       sign: Integer;
       Count: Integer;
       Number: Integer;
+      lastReplaceStr: string;
+      lastNumStr: string;
+      lastConStr: string;
+      lastCharStr: string;
+      lastDateFormat: string;
+      lastDate: string;
    end;
 
 var
@@ -104,9 +110,21 @@ var
    m: Integer;
 begin
    case t of 
-   		1: q := '请输入数字';
-      2: q := '请输入字母';
-      3: q := '请输入常量';
+   		1: 
+      begin     
+        q := '请输入数字';
+        s := lastNumStr;
+      end;       
+      2: 
+      begin      
+        q := '请输入字母';
+        s := lastCharStr;
+      end;        
+      3: 
+      begin      
+        q := '请输入常量';
+        s := lastConStr;
+      end;        
    end;
    repeat
       if InputQuery(q, '', s) then
@@ -116,6 +134,7 @@ begin
                if TryStrToInt(s, m) then
                begin
                   inputStr(s, IntToStr(t));
+                  lastNumStr := s;
                end
                else
                begin
@@ -127,6 +146,7 @@ begin
                if ((s >= 'a') and (s <= 'z')) or ((s >= 'A') and (s <= 'Z')) then
                begin
                   inputStr(s, IntToStr(t));
+                  lastCharStr := s;
                end
                else
                begin
@@ -135,7 +155,10 @@ begin
                end;
             3:
                if s <> '' then
-                  inputStr(s, IntToStr(t))
+               begin
+                  inputStr(s, IntToStr(t));
+                  lastConStr := s;
+               end
                else
                begin
                   ShowMessage('请输入常量');
@@ -336,8 +359,10 @@ begin
       ShowMessage('请选择追加的前或者后');
       exit;
    end;
+   s := lastReplaceStr;
    if InputQuery('请输入追加内容', '', s) then
    begin
+      lastReplaceStr := s;
       str2 := mmo1.Text;
       for i := 1 to mmo1.Lines.Count do
       begin
@@ -459,11 +484,16 @@ var
   data : TDateTime;
 begin
   //Application.CreateForm(TForm2, Form2);
-
+  if lastDateFormat <> '' then
+  	Form2.cbb1.Text := lastDateFormat;
+  if lastDate <> '' then
+  	Form2.edt1.Text := lastDate;
   if Form2.ShowModal = mrOk then
   begin
     time := Form2.edt1.Text;
     fmat := Form2.cbb1.Text;
+    lastDateFormat := fmat;
+    lastDate := time;
     data := StrToDatetime(time);
 
     if (time <> '') and (fmat <>'') then
