@@ -156,7 +156,7 @@ globals
     location zs_xialu_WeiGuoyinbingLoc=Location(4250,-688)
     location zs_xialu_WeiGuoyinbingLoc2=Location(6600,-688)
     location zs_xialu_mutong=Location(2900,-3100)
-    boolean isdebug=true
+    boolean isdebug=false
     integer MaxSlot=6
     string array digit_str
     unit mHero=null
@@ -5661,9 +5661,13 @@ function zs_buyItems_Action_fashi takes nothing returns nothing
         call zs_buyshuzhi(4)
         call zs_buyshuzhi(4)
     endif
-    call zs_buyxie()
-    call zs_buyHong(4)
-    call zs_buyLan(2)
+    call zs_buyxie()    
+    if GetNumberOfItemByID(mHero,'I010')<=0 then
+        call zs_buyHong(4)
+    endif	
+	if GetNumberOfItemByID(mHero,'sneg')<=0 then
+		call zs_buyLan(2)
+	endif
     if GetNumberOfItemByID(mHero,'sneg')>0 or GetNumberOfItemByID(mHero,'ssan')>0 then
         call zs_buyLilianghuwan(2)
     endif
@@ -5680,11 +5684,7 @@ function zs_buyItems_Action_fashi takes nothing returns nothing
     if not zs_dadifu()then
         return
     endif
-    if isxun()or isZhuGeLiang()then
-        call zs_qingnang()
-    else
-        call zs_mengde()
-    endif
+    call zs_mengde()    
     set zs_NeedToBuy=false
 endfunction
 
@@ -7963,16 +7963,16 @@ function zs_buchonghp_condition takes nothing returns nothing
         return
     endif
     if GetHPVoided(mHero)>500 then
-        set zs_action_prioty_arry[2]=56
+        set zs_action_prioty_arry[2]=76
     endif
     if MyHeroHP<300 then
-        set zs_action_prioty_arry[2]=60
+        set zs_action_prioty_arry[2]=80
     endif
     if HeroD!=null and MyHeroHP<500 and EnemyHeroMP>320 and EnemyHeroLevel>5 then
-        set zs_action_prioty_arry[2]=63
+        set zs_action_prioty_arry[2]=83
     endif
     if GetHPVoided(mHero)>800 and not X2V(HeroD,760)then
-        set zs_action_prioty_arry[2]=70
+        set zs_action_prioty_arry[2]=90
     endif
 endfunction
 
@@ -8372,19 +8372,19 @@ function zs_move_condition takes nothing returns nothing
         set zs_action_prioty_arry[5]=69
     endif
     if HeroD==null and zs_myhero_hpchanged<-80 and MyHeroHP<1000 then
-        set zs_action_prioty_arry[5]=70
+        set zs_action_prioty_arry[5]=80
     endif
     if HeroD!=null and MyHeroHP+300<EnemyHeroHP and MyHeroHP<800 and EnemyHeroMP>350 and EnemyHeroLevel>4 and rangeToHeroD<1000 then
         set zs_action_prioty_arry[5]=69
     endif
     if AllyCount==0 and EnemyCount>2 and MyHeroHP<500 then
-        set zs_action_prioty_arry[5]=70
+        set zs_action_prioty_arry[5]=80
     endif
     if HeroD==null and zs_myhero_hpchanged<-100 and zs_myhero_hpchanged>-200 and MyHeroHP<1000 then
-        set zs_action_prioty_arry[5]=70
+        set zs_action_prioty_arry[5]=80
     endif
     if HeroD!=null and rangeToHeroD>700 and ZG<=0 and zs_allyHeroToHeroDMinRange>600 and(EnemyCount>AllyCount+2 or zs_myhero_hpchanged<-30)then
-        set zs_action_prioty_arry[5]=71
+        set zs_action_prioty_arry[5]=81
     endif
     if HeroD!=null and BH then
         if zs_myhero_hpchanged<-80 then
@@ -10228,10 +10228,10 @@ function sima_spell_condition takes nothing returns nothing
     endif
     if NearestEnemyBubing!=null and EnemyCount>2 and mHeroLevel>6 and can_sima_cast_ef()then
         if MyHeroMP>600 or IsManaAlmostFull(mHero) and (FarestAllyBubingFromRetreatLoc==null or RangeTo(FarestAllyBubingFromRetreatLoc,NearestEnemyBubing)>300)then
-            set zs_action_prioty_arry[59]=58	//EF Bing
+            set zs_action_prioty_arry[59]=82	//EF Bing
         endif
         if MyHeroMP>600 or IsManaAlmostFull(mHero) and (FarestAllyBubingFromRetreatLoc!=null and RangeTo(FarestAllyBubingFromRetreatLoc,NearestEnemyBubing)<300)then
-            set zs_action_prioty_arry[66]=59	//FE Bing
+            set zs_action_prioty_arry[66]=83	//FE Bing
     endif
     endif
     if TowerD!=null and GetHP(TowerD)<260 and MyHeroHP>200 and can_sima_cast_f()then
@@ -10395,10 +10395,10 @@ function zhuge_spell_condition takes nothing returns nothing
     if HeroD != null and zs_canspelltoHerod then
         set index=getSpellOffDamageIndex()
         if(IsLifeAlmostFull(HeroD)or EnemyHeroHP>1000)and can_zhuge_cast_g() and MyHeroMP>300 and rangeToTowerD>1100 and rangeToHeroD<700 then
-            set zs_action_prioty_arry[59]=81	//G Bing
+            set zs_action_prioty_arry[59]=82	//G Bing
         endif
         if IsBianXing(HeroD) then
-            set zs_action_prioty_arry[57]=82	//ChaseA
+            set zs_action_prioty_arry[57]=83	//ChaseA
         endif
         if(EnemyHeroHP<300 or(EnemyHeroHP<zs_get_zhuge_e_damage()+110+mHeroLevel*10))and can_zhuge_cast_e()and OG then
             set zs_action_prioty_arry[57]=81	//ChaseA
@@ -10449,12 +10449,12 @@ function zhuge_spell_condition takes nothing returns nothing
     endif
     if zs_nearestMinHpEnemyBing!=null and zs_nearestEnemyBingMinHp<zs_get_zhuge_g_damage()and EnemyCount>2 and mHeroLevel>15 and can_zhuge_cast_e()then
         if MyHeroMP>500 or IsManaAlmostFull(mHero)then
-            set zs_action_prioty_arry[67]=57	//E Bing
+            set zs_action_prioty_arry[67]=82	//E Bing
         endif
     endif	
     if zs_nearestMinHpEnemyBing!=null and zs_nearestEnemyBingMinHp<zs_get_zhuge_g_damage()and EnemyCount>1 and mHeroLevel>2 and can_zhuge_cast_g()then
         if MyHeroMP>600 or IsManaAlmostFull(mHero)then
-            set zs_action_prioty_arry[59]=58	//G Bing
+            set zs_action_prioty_arry[59]=83	//G Bing
         endif
     endif
     if zs_get_zhuge_lei_damage()>LowestEnemyHeroHp and RangeTo(mHero,zs_weakestEnemyHero) > 1500 and IsUnitVisible(zs_weakestEnemyHero,ai_player)and RangeTo(D6(zs_weakestEnemyHero),zs_weakestEnemyHero)>600 and can_zhuge_cast_x()and not IsImmune(zs_weakestEnemyHero)then
@@ -12024,12 +12024,12 @@ function CEV takes nothing returns nothing
         // call CVV(GetStoredInteger(zs_gamecache,"heros",ITS(index)))
     // endif
     local integer rs=0
-    set rs = GetRandomInt(1,4)
-    if rs == 1 then
+    set rs = GetRandomInt(1,40)
+    if rs <= 10 then
         call CVV(hid_zhugeliang)
-    elseif rs == 2 then
+    elseif rs <= 20 then
 		call CVV(hid_simayi)
-	elseif rs == 3 then
+	elseif rs <= 30 then
 		call CVV(hid_guojia)
 	else
 		call CVV(hid_xun)
@@ -12038,8 +12038,8 @@ endfunction
 
 function CXV takes nothing returns nothing
     local integer rs=0
-    set rs = GetRandomInt(1,2)
-    if rs == 1 then
+    set rs = GetRandomInt(1,20)
+    if rs <= 10 then
         call CVV(hid_zhugeliang)
     else
         call CVV(hid_simayi)
@@ -13894,18 +13894,18 @@ function main takes nothing returns nothing
     set digit_str[7]="7"
     set digit_str[8]="8"
     set digit_str[9]="9"
-    set zs_itemID1[0]=iid_mengdeshu
-    set zs_itemID2[0]=iid_mengdeshu
-    set zs_itemID1[1]=iid_qingnangshu
-    set zs_itemID2[1]=iid_qingnangshu
-    set zs_itemID1[2]='sneg'
-    set zs_itemID2[2]='sneg'
-    set zs_itemID1[3]=iid_tuimodao
-    set zs_itemID2[3]=iid_tuimodao
-    set zs_itemID1[4]='pclr'
-    set zs_itemID2[4]='pclr'
-    set zs_itemID1[5]='hslv'
-    set zs_itemID2[5]='hslv'
+	  set zs_itemID1[0]=iid_mengdeshu
+	  set zs_itemID2[0]='I005'
+	  set zs_itemID1[1]=iid_qingnangshu
+	  set zs_itemID2[1]='I00A'
+	  set zs_itemID1[2]='sneg'
+	  set zs_itemID2[2]='I00N'
+	  set zs_itemID1[3]=iid_tuimodao
+	  set zs_itemID2[3]='I00R'
+	  set zs_itemID1[4]='pclr'
+	  set zs_itemID2[4]='I01G'
+	  set zs_itemID1[5]='hslv'
+	  set zs_itemID2[5]='I01V'
     call U2('A04W',1,15,100,0,852127)
     call U2('A04W',2,15,100,0,852127)
     call U2('A04W',3,15,100,0,852127)
