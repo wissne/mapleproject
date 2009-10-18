@@ -5684,6 +5684,9 @@ function zs_buyItems_Action_fashi takes nothing returns nothing
     if not zs_dadifu()then
         return
     endif
+    if not zs_xuanwu()then
+        return
+    endif	
     call zs_mengde()    
     set zs_NeedToBuy=false
 endfunction
@@ -5699,7 +5702,9 @@ function EBV takes nothing returns nothing
         call zs_buylilianquantaoNum(2)
     endif
     call zs_buyxie()
-    call zs_buyHong(4)
+    if GetNumberOfItemByID(mHero,'I010')<=0 then
+        call zs_buyHong(4)
+    endif	
     if GetNumberOfItemByID(mHero,'sneg')>0 or GetNumberOfItemByID(mHero,'ssan')>0 then
         call zs_buyLilianghuwan(2)
     endif
@@ -8354,13 +8359,13 @@ function zs_move_condition takes nothing returns nothing
         set zs_action_prioty_arry[5]=62
     endif
     if zs_AllyHeroNearMeCount==0 and zs_EnemyHeroNearMeCount>=2 and KH<900 then
-        set zs_action_prioty_arry[5]=64
+        set zs_action_prioty_arry[5]=84
     endif
     if MyHeroHP<400 and HeroD!=null and(EnemyHeroMP>350 or IsManaAlmostFull(HeroD))and rangeToHeroD<800 and EnemyHeroLevel>3 then
         set zs_action_prioty_arry[5]=65
     endif
     if HeroD!=null and((AllyCount==0 and EnemyCount>2)or(AllyCount==1 and EnemyCount>5))and MyHeroHP<600 then
-        set zs_action_prioty_arry[5]=65
+        set zs_action_prioty_arry[5]=85
     endif
     if MyHeroHP<300 and HeroD!=null and(EnemyHeroMP>260 or IsManaAlmostFull(HeroD))and rangeToHeroD<800 and EnemyHeroLevel>1 then
         set zs_action_prioty_arry[5]=66
@@ -8372,13 +8377,13 @@ function zs_move_condition takes nothing returns nothing
         set zs_action_prioty_arry[5]=69
     endif
     if HeroD==null and zs_myhero_hpchanged<-80 and MyHeroHP<1000 then
-        set zs_action_prioty_arry[5]=80
+        set zs_action_prioty_arry[5]=84
     endif
     if HeroD!=null and MyHeroHP+300<EnemyHeroHP and MyHeroHP<800 and EnemyHeroMP>350 and EnemyHeroLevel>4 and rangeToHeroD<1000 then
         set zs_action_prioty_arry[5]=69
     endif
     if AllyCount==0 and EnemyCount>2 and MyHeroHP<500 then
-        set zs_action_prioty_arry[5]=80
+        set zs_action_prioty_arry[5]=85
     endif
     if HeroD==null and zs_myhero_hpchanged<-100 and zs_myhero_hpchanged>-200 and MyHeroHP<1000 then
         set zs_action_prioty_arry[5]=80
@@ -8571,7 +8576,7 @@ function zs_move_condition takes nothing returns nothing
     endif
     if TowerD!=null and HeroD!=null then
         if mHeroLevel<6 and MyHeroHP<700 and rangeToTowerD<BV and(FarestAllyBubingFromRetreatLoc==null or(FarestAllyBubingFromRetreatLoc!=null and RangeTo(FarestAllyBubingFromRetreatLoc,TowerD)>600))and zs_myhero_hpchanged<-20 then
-            set zs_action_prioty_arry[8]=78
+            set zs_action_prioty_arry[8]=88
         endif
     endif
     if(HeroD!=null and YG<-7 and ZG<=0 and rangeToHeroD>650)then
@@ -8620,7 +8625,7 @@ function zs_move_condition takes nothing returns nothing
         endif
     endif
     if HeroD!=null and zs_MyFireLoc!=null and(EnemyCount>AllyCount+3 or AllyCount<2)and(TowerD!=null and RangeToLoc(TowerD,zs_MyFireLoc)<800)then
-        set zs_action_prioty_arry[12]=54
+        set zs_action_prioty_arry[12]=84
     endif
     if budaobingD2!=null then
         set zs_action_prioty_arry[13]=41
@@ -10175,10 +10180,10 @@ function sima_spell_condition takes nothing returns nothing
     if HeroD!=null and zs_canspelltoHerod then
         set index=getSpellOffDamageIndex()
         if (not canAssist(HeroD)) and (EnemyHeroHP>500)and MyHeroMP>300 and rangeToTowerD>1100 and rangeToHeroD<700 and can_sima_cast_ef() and mHeroLevel>6 and OG then
-            set zs_action_prioty_arry[52]=82	//EFA	魔血
+            set zs_action_prioty_arry[52]=85	//EFA	魔血
         endif
         if (not canAssist(HeroD)) and zs_HeroPower>0 and can_sima_cast_ef() and mHeroLevel>4 and OG then
-            set zs_action_prioty_arry[52]=82	//EFA	魔血
+            set zs_action_prioty_arry[52]=85	//EFA	魔血
         endif
         if (not canAssist(HeroD)) and (EnemyHeroHP>600 or IsLifeAlmostFull(HeroD)or(EnemyHeroHP>300 and mHeroLevel<5))and rangeToTowerD>1100 and MyHeroMP>300 and rangeToHeroD<710 and can_sima_cast_e()and OG then
             set zs_action_prioty_arry[50]=81	//EA
@@ -10197,7 +10202,10 @@ function sima_spell_condition takes nothing returns nothing
             set zs_action_prioty_arry[55]=86
 		endif
 		if EnemyCount==0 and AllyCount > 1 and can_sima_cast_e() and (not canAssist(HeroD)) then
-			set zs_action_prioty_arry[50]=84	//有兵E
+			if can_sima_cast_ef() then
+				set zs_action_prioty_arry[52]=84
+			endif
+			set zs_action_prioty_arry[50]=83	//有兵E
 		endif
 		if zs_EnemyHeroNearMeCount>=2 and zs_AllyHeroNearMeCount>=2 and (not canAssist(HeroD)) and can_sima_cast_n_ef() then
 			set zs_action_prioty_arry[67]=86	//ENFA
@@ -10228,10 +10236,10 @@ function sima_spell_condition takes nothing returns nothing
     endif
     if NearestEnemyBubing!=null and EnemyCount>2 and mHeroLevel>6 and can_sima_cast_ef()then
         if MyHeroMP>600 or IsManaAlmostFull(mHero) and (FarestAllyBubingFromRetreatLoc==null or RangeTo(FarestAllyBubingFromRetreatLoc,NearestEnemyBubing)>300)then
-            set zs_action_prioty_arry[59]=82	//EF Bing
+            set zs_action_prioty_arry[59]=83	//EF Bing
         endif
         if MyHeroMP>600 or IsManaAlmostFull(mHero) and (FarestAllyBubingFromRetreatLoc!=null and RangeTo(FarestAllyBubingFromRetreatLoc,NearestEnemyBubing)<300)then
-            set zs_action_prioty_arry[66]=83	//FE Bing
+            set zs_action_prioty_arry[66]=84	//FE Bing
     endif
     endif
     if TowerD!=null and GetHP(TowerD)<260 and MyHeroHP>200 and can_sima_cast_f()then
