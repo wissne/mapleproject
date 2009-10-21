@@ -2926,20 +2926,20 @@ endfunction
 
 function SelectUnitsById takes player ThePlayer,integer uid returns group
     local unit u=null
-    local group NearestEnemyBubing=CreateGroup()
+    local group g=CreateGroup()
     local group rg=CreateGroup()
-    call GroupEnumUnitsOfPlayer(NearestEnemyBubing,ThePlayer,null)
+    call GroupEnumUnitsOfPlayer(g,ThePlayer,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(GetUnitTypeId(u)==uid and IsAlive(u))then
             call SetUnitAcquireRange(u,61)
             call GroupAddUnit(rg,u)
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     return rg
 endfunction
 
@@ -2949,37 +2949,37 @@ endfunction
 
 function SelectUnitsByIlussion takes player ThePlayer returns group
     local unit u=null
-    local group NearestEnemyBubing=CreateGroup()
+    local group g=CreateGroup()
     local group rg=CreateGroup()
-    call GroupEnumUnitsOfPlayer(NearestEnemyBubing,ThePlayer,null)
+    call GroupEnumUnitsOfPlayer(g,ThePlayer,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(IsUnitIllusion(u)and IsAlive(u))then
             call GroupAddUnit(rg,u)
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     return rg
 endfunction
 
 function SelectWard takes player ThePlayer returns group
     local unit u=null
-    local group NearestEnemyBubing=CreateGroup()
+    local group g=CreateGroup()
     local group rg=CreateGroup()
-    call GroupEnumUnitsOfPlayer(NearestEnemyBubing,ThePlayer,null)
+    call GroupEnumUnitsOfPlayer(g,ThePlayer,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(GetUnitTypeId(u)=='o00H' or GetUnitTypeId(u)=='o00I' or GetUnitTypeId(u)=='o00J')and IsAlive(u)then
             call GroupAddUnit(rg,u)
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     return rg
 endfunction
 
@@ -3215,10 +3215,10 @@ function getUnitByid takes integer iunitid,location loc,real radius returns unit
     local real nearestRange=999999
     local unit u=null
     local unit ru=null
-    local group NearestEnemyBubing=CreateGroup()
-    call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,loc,radius,null)
+    local group g=CreateGroup()
+    call GroupEnumUnitsInRangeOfLoc(g,loc,radius,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(GetUnitTypeId(u)==iunitid)then
             set TheRange=RangeToLoc(u,loc)
@@ -3227,10 +3227,10 @@ function getUnitByid takes integer iunitid,location loc,real radius returns unit
                 set ru=u
             endif
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     if(ru==null)then
     endif
     return ru
@@ -3238,18 +3238,18 @@ endfunction
 
 function F3 takes nothing returns nothing
     local unit u=null
-    local group NearestEnemyBubing=CreateGroup()
-    call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,TH,600,null)
+    local group g=CreateGroup()
+    call GroupEnumUnitsInRangeOfLoc(g,TH,600,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if GetUnitTypeId(u)==uid_dragon and IsAlive(u)then
             set SH=u
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
 endfunction
 
 function G3 takes unit TheUnit,real Radius,boolean includeInvisible returns unit
@@ -3258,16 +3258,16 @@ function G3 takes unit TheUnit,real Radius,boolean includeInvisible returns unit
     local real nearestRange=999999
     local unit u=null
     local unit ru=null
-    local group NearestEnemyBubing=CreateGroup()
+    local group g=CreateGroup()
     if(TheUnit==null)and(not IsAlive(TheUnit))then
         return null
     endif
     set Loc=GetUnitLoc(TheUnit)
-    call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
+    call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
     call RemoveLocation(Loc)
     set Loc=null
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if IsUnitEnemy(u,ai_player)and IsAlive(u)then
             if GetUnitTypeId(u)==uid_zhimingjiejieLv1 or GetUnitTypeId(u)==uid_zhimingjiejieLv2 or GetUnitTypeId(u)==uid_zhimingjiejieLv3 or GetUnitTypeId(u)==uid_zhimingjiejieLv4 then
@@ -3289,10 +3289,10 @@ function G3 takes unit TheUnit,real Radius,boolean includeInvisible returns unit
                 endif
             endif
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     if(ru!=null)then
     endif
     set u=null
@@ -3303,16 +3303,16 @@ function GetNearestEnemyImportantStructs takes unit TheUnit,real Radius,boolean 
     local location Loc=null
     local unit u=null
     local unit ru=null
-    local group NearestEnemyBubing=CreateGroup()
+    local group g=CreateGroup()
     if(TheUnit==null)and(not IsAlive(TheUnit))then
         return null
     endif
     set Loc=GetUnitLoc(TheUnit)
-    call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
+    call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
     call RemoveLocation(Loc)
     set Loc=null
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null or ru!=null
         if IsUnitEnemy(u,ai_player)and IsAlive(u)then
             if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
@@ -3321,10 +3321,10 @@ function GetNearestEnemyImportantStructs takes unit TheUnit,real Radius,boolean 
                 endif
             endif
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     set u=null
     if ru==null then
         if NF!=null and RangeTo(TheUnit,NF)<2800 then
@@ -3340,16 +3340,16 @@ function GetNearestEnemyTower takes unit TheUnit,real Radius returns unit
     local real nearestRange=999999
     local unit u=null
     local unit ru=null
-    local group NearestEnemyBubing=CreateGroup()
+    local group g=CreateGroup()
     if(TheUnit==null)and(not IsAlive(TheUnit))then
         return null
     endif
     set Loc=GetUnitLoc(TheUnit)
-    call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
+    call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
     call RemoveLocation(Loc)
     set Loc=null
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(IsEnemyTower(u))then
             set TheRange=RangeTo(TheUnit,u)
@@ -3358,10 +3358,10 @@ function GetNearestEnemyTower takes unit TheUnit,real Radius returns unit
                 set ru=u
             endif
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     if(ru!=null)then
     endif
     set u=null
@@ -3371,20 +3371,20 @@ endfunction
 function GetEnemyBingInRangeCount takes location Loc,real Radius,boolean includeInvisible returns integer
     local integer result=0
     local unit u=null
-    local group NearestEnemyBubing=CreateGroup()
-    call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
+    local group g=CreateGroup()
+    call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(IsEnemyBing(u)and IsAlive(u))then
             if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
                 set result=result+1
             endif
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     set u=null
     return result
 endfunction
@@ -3392,20 +3392,20 @@ endfunction
 function GetAllyBingInRangeCount takes location Loc,real Radius,boolean includeInvisible returns integer
     local integer result=0
     local unit u=null
-    local group NearestEnemyBubing=CreateGroup()
-    call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
+    local group g=CreateGroup()
+    call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(IsAllyBing(u)and IsAlive(u))then
             if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
                 set result=result+1
             endif
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     set u=null
     return result
 endfunction
@@ -3413,20 +3413,20 @@ endfunction
 function GetZhongliEnemyInRangeCount takes location Loc,real Radius,boolean includeInvisible returns integer
     local integer result=0
     local unit u=null
-    local group NearestEnemyBubing=CreateGroup()
-    call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
+    local group g=CreateGroup()
+    call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(isZhongLiEnemy(u)and IsAlive(u))then
             if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
                 set result=result+1
             endif
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     set u=null
     return result
 endfunction
@@ -3437,16 +3437,16 @@ function GetFarestAllyBubingNearHeroFromBase takes unit TheUnit,real Radius,bool
     local real fareastRange=0
     local unit u=null
     local unit ru=null
-    local group NearestEnemyBubing=CreateGroup()
+    local group g=CreateGroup()
     if(TheUnit==null)or(not IsAlive(TheUnit))then
         return null
     endif
     set Loc=GetUnitLoc(TheUnit)
-    call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
+    call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
     call RemoveLocation(Loc)
     set Loc=null
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(IsAllyBing(u)and IsMoving(u))then
             if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
@@ -3457,10 +3457,10 @@ function GetFarestAllyBubingNearHeroFromBase takes unit TheUnit,real Radius,bool
                 endif
             endif
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     if(ru!=null)then
     endif
     set u=null
@@ -3472,10 +3472,10 @@ function GetFarestAllyFromBaseInMiddleLine takes nothing returns unit
     local real FarestRange=0
     local unit u=null
     local unit ru=null
-    local group NearestEnemyBubing=CreateGroup()
-    call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,mBaseLoc,999999,null)
+    local group g=CreateGroup()
+    call GroupEnumUnitsInRangeOfLoc(g,mBaseLoc,999999,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(IsAllyBingAttaker(u)and isUnitInMiddleLine(u))then
             set TheRange=RangeToLoc(u,mBaseLoc)
@@ -3484,10 +3484,10 @@ function GetFarestAllyFromBaseInMiddleLine takes nothing returns unit
                 set ru=u
             endif
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     if(ru==null)then
     endif
     set u=null
@@ -3499,10 +3499,10 @@ function GetNearestEnemyFromBaseInMiddleLine takes nothing returns unit
     local real NearestRange=999999
     local unit u=null
     local unit ru=null
-    local group NearestEnemyBubing=CreateGroup()
-    call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,mBaseLoc,999999,null)
+    local group g=CreateGroup()
+    call GroupEnumUnitsInRangeOfLoc(g,mBaseLoc,999999,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(IsEnemyBingAttaker(u)and isUnitInMiddleLine(u))then
             set TheRange=RangeToLoc(u,mBaseLoc)
@@ -3511,10 +3511,10 @@ function GetNearestEnemyFromBaseInMiddleLine takes nothing returns unit
                 set ru=u
             endif
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     if(ru==null)then
     endif
     set u=null
@@ -3654,16 +3654,16 @@ function GetEnemyNearestBubingNearHero takes unit TheUnit,real Radius,boolean in
     local real fareastRange=999999
     local unit u=null
     local unit ru=null
-    local group NearestEnemyBubing=CreateGroup()
+    local group g=CreateGroup()
     if(TheUnit==null)or(not IsAlive(TheUnit))then
         return null
     endif
     set Loc=GetUnitLoc(TheUnit)
-    call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
+    call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
     call RemoveLocation(Loc)
     set Loc=null
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(IsEnemyBing(u)and IsAlive(u))then
             if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
@@ -3674,10 +3674,10 @@ function GetEnemyNearestBubingNearHero takes unit TheUnit,real Radius,boolean in
                 endif
             endif
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     if(ru!=null)then
     endif
     set u=null
@@ -3690,17 +3690,17 @@ function GetEnemyWeakestBubingNearHero takes unit TheUnit,real Radius,boolean in
     local real fareastRange=999999
     local unit u=null
     local unit ru=null
-    local group NearestEnemyBubing=CreateGroup()
+    local group g=CreateGroup()
     if(TheUnit==null)or(not IsAlive(TheUnit))then
         call debugstr(" unit null")
         return null
     endif
     set Loc=GetUnitLoc(TheUnit)
-    call GroupEnumUnitsInRangeOfLoc(NearestEnemyBubing,Loc,Radius,null)
+    call GroupEnumUnitsInRangeOfLoc(g,Loc,Radius,null)
     call RemoveLocation(Loc)
     set Loc=null
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(IsEnemyBing(u)and IsAlive(u))then
             if(includeInvisible)or(IsUnitInvisible(u,ai_player)==false)then
@@ -3711,10 +3711,10 @@ function GetEnemyWeakestBubingNearHero takes unit TheUnit,real Radius,boolean in
                 endif
             endif
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     if(ru!=null)then
     endif
     set u=null
@@ -4199,11 +4199,11 @@ endfunction
 
 function enumUnitsNearMyHero takes nothing returns nothing
     local unit u=null
-    local group NearestEnemyBubing=CreateGroup()
+    local group g=CreateGroup()
     local integer i=0
-    call GroupEnumUnitsInRange(NearestEnemyBubing,GetUnitX(mHero),GetUnitY(mHero),zs_gardRange,null)
+    call GroupEnumUnitsInRange(g,GetUnitX(mHero),GetUnitY(mHero),zs_gardRange,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if(IsAlive(u)and CanAttack(u))then
             if not IsUnitInvisible(u,ai_player)then
@@ -4220,10 +4220,10 @@ function enumUnitsNearMyHero takes nothing returns nothing
             call setEnemyNonAttackStructureNearMyHero(u)
         endif
         call F5(u)
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     set u=null
 endfunction
 
@@ -4289,18 +4289,18 @@ endfunction
 function getfirstHeroOfPlayer takes player p returns unit
     local unit u=null
     local unit ru=null
-    local group NearestEnemyBubing=CreateGroup()
-    call GroupEnumUnitsOfPlayer(NearestEnemyBubing,p,null)
+    local group g=CreateGroup()
+    call GroupEnumUnitsOfPlayer(g,p,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null or ru!=null
         if(IsUnitType(u,UNIT_TYPE_HERO) and GetUnitUserData(u)<100)then
             set ru=u
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     set u=null
     return ru
 endfunction
@@ -4391,18 +4391,18 @@ endfunction
 function getGSOfPlayer takes player p returns unit
     local unit u=null
     local unit ru=null
-    local group NearestEnemyBubing=CreateGroup()
-    call GroupEnumUnitsOfPlayer(NearestEnemyBubing,p,null)
+    local group g=CreateGroup()
+    call GroupEnumUnitsOfPlayer(g,p,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null or ru!=null
         if(IsImmune(u)and IsNotHero(u)and UnitHasBuffsEx(u,false,false,false,false,true,false,false))then
             set ru=u
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     set u=null
     return ru
 endfunction
@@ -13671,7 +13671,7 @@ function main takes nothing returns nothing
     local integer AFV
     local unit C0V
     local unit u
-    local group NearestEnemyBubing
+    local group g
     local integer AAV
     set i=0
     set command=-1
@@ -14060,10 +14060,10 @@ function main takes nothing returns nothing
     call StartThread(function mainLoop)
     call Sleep(2)
     set u=null
-    set NearestEnemyBubing=CreateGroup()
-    call GroupEnumUnitsInRange(NearestEnemyBubing,0,0,999999,null)
+    set g=CreateGroup()
+    call GroupEnumUnitsInRange(g,0,0,999999,null)
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen u==null
         if IsAlive(u)then
             if IsUnitAlly(u,ai_player)then
@@ -14127,10 +14127,10 @@ function main takes nothing returns nothing
                 endif
             endif
         endif
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     set zs_firelines[101]=TG
     set zs_firelines[102]=TH
     call DYV()
