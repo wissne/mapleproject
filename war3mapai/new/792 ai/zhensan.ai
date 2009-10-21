@@ -2893,17 +2893,17 @@ function zs_IsTimeOut takes integer id,real period returns boolean
     return false
 endfunction
 
-function W1 takes group NearestEnemyBubing returns integer
+function W1 takes group g returns integer
     local integer count=0
     local integer index=0
     local unit u=null
     local group rg=null
-    if NearestEnemyBubing==null then
+    if g==null then
         return-1
     endif
     set rg=CreateGroup()
     loop
-        set u=FirstOfGroup(NearestEnemyBubing)
+        set u=FirstOfGroup(g)
         exitwhen index>=13
         if u!=null and IsAlive(u)then
             call SetUnitAcquireRange(u,61)
@@ -2911,16 +2911,16 @@ function W1 takes group NearestEnemyBubing returns integer
             call GroupAddUnit(rg,u)
         endif
         set index=index+1
-        call GroupRemoveUnit(NearestEnemyBubing,u)
+        call GroupRemoveUnit(g,u)
     endloop
-    if NearestEnemyBubing==VF then
+    if g==VF then
         set VF=rg
     endif
-    if NearestEnemyBubing==zs_toushiche_group then
+    if g==zs_toushiche_group then
         set zs_toushiche_group=rg
     endif
-    call DestroyGroup(NearestEnemyBubing)
-    set NearestEnemyBubing=null
+    call DestroyGroup(g)
+    set g=null
     return count
 endfunction
 
