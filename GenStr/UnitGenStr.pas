@@ -60,6 +60,7 @@ type
       function dlgFind1Find(Sender: TObject): Boolean;
       procedure mmo1DblClick(Sender: TObject);
     procedure btn9Click(Sender: TObject);
+    procedure mmo1KeyPress(Sender: TObject; var Key: Char);
    private
     { Private declarations }
       hThread: THandle;
@@ -510,6 +511,20 @@ begin
 
   end;
 
+end;
+
+procedure TForm1.mmo1KeyPress(Sender: TObject; var Key: Char);
+begin
+	if Key = #27 then
+  begin
+		lst1.Clear;
+		Self.Count := 0;
+    mmo1.Text := '';
+    lastCharStr := '';
+    lastReplaceStr := '';
+    lastNumStr := '';
+    lastConStr := '';
+  end;
 end;
 
 end.
