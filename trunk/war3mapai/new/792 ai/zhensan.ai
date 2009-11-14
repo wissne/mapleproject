@@ -5661,7 +5661,7 @@ function zs_fengzhang takes nothing returns boolean
     call zs_buyfoujue()
     call zs_buyhuodan()
     call zs_buyFengzhangshu()
-    if GetNumberOfItemByID(mHero,'sneg')>0 then
+    if GetNumberOfItemByID(mHero,'sneg')>0 or GetNumberOfItemByID(mHero,'ssan')>0 then
         return true
     endif
     return false
