@@ -252,8 +252,7 @@ begin
          s := getMmoValue(i);
          if Form1.isWrap then
          begin
-           s := s + #13;
-           Form1.mmo1.Lines.Add(s);
+            Form1.mmo1.Lines.Add(s);
          end
          else
             Form1.mmo1.Lines.Text := Form1.mmo1.Lines.Text + s;         
