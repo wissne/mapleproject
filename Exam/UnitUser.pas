@@ -236,7 +236,7 @@ end;
 
 procedure TfrmUser.qryUserAfterScroll(DataSet: TDataSet);
 begin
-  if qryUser.State in [dsBrowse] then
+  if (qryUser.State in [dsBrowse]) and not qryUser.IsEmpty then
   begin  
     edtPwd.OnChange := nil;
     edtPwd.Text := CF.UncrypKey(qryUser.FieldByName('pwd').AsString);

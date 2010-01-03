@@ -1016,7 +1016,7 @@ object frmLoading: TfrmLoading
     Top = 192
     Width = 75
     Height = 22
-    Caption = 'v1.1 by maple'
+    Caption = 'v1.2 by maple'
     ParentFont = False
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack

@@ -3,7 +3,7 @@ object frmMain: TfrmMain
   Top = 83
   Width = 811
   Height = 600
-  Caption = #35797#39064#29983#25104#31995#32479' v1.1'
+  Caption = #35797#39064#29983#25104#31995#32479' v1.2'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -26,7 +26,7 @@ object frmMain: TfrmMain
     Panels = <
       item
         Text = #26410#30331#20837
-        Width = 50
+        Width = 100
       end
       item
         Width = 50
