@@ -188,14 +188,16 @@ begin
       //登入成功
       EnableBtn;
       isLogin := True;
-      stbMain.Panels[0].Text := MSG_LOGIN;
+      stbMain.Panels[0].Text := '[' + frmLoading.userName + ']' + MSG_LOGIN;
+      stbMain.Panels[1].Text := FormatDateTime('yyyy年mm月dd日 hh:nn', Now);
     end;
   end
   else
   begin
     EnableBtn(False);
     isLogin := False;
-    stbMain.Panels[0].Text := MSG_LOGOUT; 	
+    stbMain.Panels[0].Text := MSG_LOGOUT; 
+    stbMain.Panels[1].Text := '';
   end;      
 end;  
 
@@ -343,7 +345,8 @@ end;
 
 procedure TfrmMain.btnGenClick(Sender: TObject);
 var
-  id, i: integer;
+//  id: Integer;
+  i: integer;
   typeId, subjId, gradeId, number, totalNum, diff1, diff2: Integer;
   lastDate: TDateTime;
   sql1, sql2, sql3, sqlB, sqlA, sqlC, sqlAll: string;
@@ -355,7 +358,7 @@ begin
 
   count := 1;
 	genExam:
-  id := qryCase.FieldByName('id').AsInteger;
+//  id := qryCase.FieldByName('id').AsInteger;
   qryCase.First;
   sql1 := ' select * from ( ';
   sql3 := ' ) t';
@@ -376,6 +379,7 @@ begin
     totalNum := totalNum + number;
     diff1 := qryCase.FieldByName('begDiff').AsInteger;
     diff2 := qryCase.FieldByName('endDiff').AsInteger;
+    lastDate := 0;
     if (qryCase.FieldByName('lastDate') <> nil) then
     	lastDate := qryCase.FieldByName('lastDate').AsDateTime;
 		sql2 := ' select top ' 

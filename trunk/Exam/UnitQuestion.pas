@@ -134,6 +134,8 @@ procedure TfrmQuestion.btnQueryClick(Sender: TObject);
 var
   param: string;
 begin
+  if Trim(cbbGradeQry.Text) <> '' then
+  	param := param + ' and grade = ''' + cbbGradeQry.Text + '''';
   if Trim(cbbQrySubj.Text) <> '' then
   	param := param + ' and subj = ''' + cbbQrySubj.Text + '''';
   if Trim(cbbQryType.Text) <> '' then
