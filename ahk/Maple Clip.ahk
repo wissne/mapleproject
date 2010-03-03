@@ -30,6 +30,15 @@ gType := 0
 ;~         MsgBox % gType
         Return
     }
+    StringSplit,word_array,Clipboard,"`r`n"
+    if FileExist(word_array1)
+    {
+		gCount := 0
+		gIndex := 0
+;~ 		gStr := ""
+;~         MsgBox % gType
+        Return
+    }
 	if (Clipboard is Number Or Clipboard is Text)
 	{
 		Array%gCount% := Clipboard

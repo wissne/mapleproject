@@ -33,6 +33,14 @@ Func CaptureCtrlC()
 		$bak = ""
 		Return
 	EndIf
+	$strArray = StringSplit($bak,@CRLF)
+	If FileExists($strArray[1]) Then
+		$gCount = 0
+		$gIndex = 0
+		$gString = ""
+		$bak = ""
+		Return		
+	EndIf
 	If $gIndex > 0 Then
 		$gCount = 0
 		$gIndex = 0
