@@ -20,6 +20,7 @@ Func CaptureCtrlC()
 	Send("^c")
 ;~ 	Send("^c")
 	Send("{LCTRL DOWN}{LCTRL UP}")
+	Sleep(100)
 	$bak = ClipGet()
 	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $bak = ' & $bak & @crlf & '>Error code: ' & @error & @crlf) ;### Debug Console	
 	HotKeySet("^c", "CaptureCtrlC")
@@ -47,7 +48,7 @@ Func CaptureCtrlC()
 	EndIf
 	$gString &= $bak & @CRLF
 	$gCount += 1
-	ClipPut($Array[0])
+	ClipPut("")
 	If $gIndex < $gCount Then
 		ToolTip(GetTipForShow())
 		Sleep(2000)
@@ -58,7 +59,7 @@ EndFunc   ;==>CaptureCtrlC
 Func CaptureCtrlV()
 	; 这里可定义要做的各种任务
 	If $gIndex < $gCount Then
-		$bak = ClipGet()
+;~ 		$bak = ClipGet()
 		If @error <> 0 Then
 			Return
 		EndIf
@@ -79,6 +80,7 @@ Func CaptureCtrlV()
 		Sleep(2000)
 		ToolTip("")
 	EndIf
+;~ 	ClipPut("")
 EndFunc   ;==>CaptureCtrlV
 
 Func GetTipForShow()
