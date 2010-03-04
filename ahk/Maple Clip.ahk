@@ -97,15 +97,27 @@ return
         Return
     gStr := "=========== Maple Tip ==========="
     i := gIndex
+    j := 1
 ;~     MsgBox % gIndex . gCount
+
+    spot := "..."
+    spop := "¡¢"
     Loop
     {
         if (i < gCount)
         {
             if gStr <>
                 gStr .= "`r`n"
-            gStr .= Array%i%
+            If StrLen(Array%i%)>30
+            {
+                gStr .= j .  spop . SubStr(Array%i%,1,28) . spot
+            }
+            Else
+            {
+                gStr .= j .  spop . Array%i%
+            }
             i += 1
+            j += 1
 ;~             MsgBox % gStr
         }
         Else
