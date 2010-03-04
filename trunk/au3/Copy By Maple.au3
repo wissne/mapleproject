@@ -95,12 +95,21 @@ Func CaptureCtrlV()
 EndFunc   ;==>CaptureCtrlV
 
 Func GetTipForShow()
-	$gString = "=============== Maple Tip ==============="
+	$gString = "=========== Maple Tip ==========="
+	$s1 = "..."
+	$s2 = "¡¢"
+	$j = 1
 	For $i = $gIndex To $gCount - 1 Step 1
 		If $gString <> "" Then
 			$gString &= @CRLF
 		EndIf
-		$gString &= $Array[$i]
+		If StringLen($Array[$i])> 30 Then
+			$gString &= $j & $s2 & StringLeft($Array[$i], 28) & $s1
+		Else
+			$gString &= $j & $s2 & $Array[$i]
+		EndIf
+;~ 		$gString &= $Array[$i]
+		$j += 1
 	Next
 	Return $gString
 EndFunc   ;==>GetTipForShow
