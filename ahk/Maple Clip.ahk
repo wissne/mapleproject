@@ -22,7 +22,8 @@ gType := 0
     }
     KeyWait c
 ;~     ClipWait
-    if FileExist(Clipboard) or (gType != 1)
+;~     if FileExist(Clipboard) or (gType != 1)
+    if IsClipFile() <> 0
     {
 		gCount := 0
 		gIndex := 0
@@ -30,15 +31,15 @@ gType := 0
 ;~         MsgBox % gType
         Return
     }
-    StringSplit,word_array,Clipboard,"`r`n"
-    if FileExist(word_array1)
-    {
-		gCount := 0
-		gIndex := 0
+;~     StringSplit,word_array,Clipboard,"`r`n"
+;~     if FileExist(word_array1)
+;~     {
+;~ 		gCount := 0
+;~ 		gIndex := 0
 ;~ 		gStr := ""
 ;~         MsgBox % gType
-        Return
-    }
+;~         Return
+;~     }
 	if (Clipboard is Number Or Clipboard is Text)
 	{
 		Array%gCount% := Clipboard
@@ -86,6 +87,26 @@ $^v::
     KeyWait v
 }
 Return
+
+IsClipFile()
+{
+if ( DllCall("OpenClipboard", uint, 0, int) )
+{
+  ClipFormat:=0
+  Loop
+  {
+   ClipFormat := DllCall("EnumClipboardFormats", uint, ClipFormat, uint)
+   if (ClipFormat=0 || ClipFormat=0xF) ;CF_HDROP=0xF
+   break
+  }
+  DllCall("CloseClipboard")
+  if (ClipFormat=0xF)
+   return 1
+  Else
+   return 0
+}
+return 2
+}
 
 OnClipboardChange:
     gType :=  A_EventInfo
