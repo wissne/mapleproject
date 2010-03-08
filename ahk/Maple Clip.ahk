@@ -6,7 +6,7 @@
 ;     Ctrl: Show clipboard content tooltip (disappear when release ctrl)
 
 ; While the control key is pressed, show a tooltip beside mouse pointer to show the clipboard content.
-#SingleInstance
+#SingleInstance force
 trans := 255
 gCount := 0
 gIndex := 0
