@@ -88,6 +88,57 @@ $^v::
 }
 Return
 
+~$^x::
+{
+	if gIndex > 0
+	{
+		gCount := 0
+		gIndex := 0
+;~ 		gStr := ""
+    }
+    KeyWait x
+;~     ClipWait
+;~     if FileExist(Clipboard) or (gType != 1)
+    if IsClipFile() <> 0
+    {
+		gCount := 0
+		gIndex := 0
+;~ 		gStr := ""
+;~         MsgBox % gType
+        Return
+    }
+;~     StringSplit,word_array,Clipboard,"`r`n"
+;~     if FileExist(word_array1)
+;~     {
+;~ 		gCount := 0
+;~ 		gIndex := 0
+;~ 		gStr := ""
+;~         MsgBox % gType
+;~         Return
+;~     }
+	if (Clipboard is Number Or Clipboard is Text)
+	{
+		Array%gCount% := Clipboard
+        if gCount > 0
+        {
+            i := % gCount - 1
+            if (Array%i% == Clipboard)
+            {
+;~                 MsgBox 123
+                gCount := 0
+                gIndex := 0
+                Array%gCount% := Clipboard
+            }
+        }
+;~ 		gStr .= Array%gCount% . "`r`n"
+		gCount := gCount + 1
+;~ 		ClipBoard := Array%gIndex%
+;~ 		MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
+    }
+;~     MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
+}
+Return
+
 IsClipFile()
 {
 if ( DllCall("OpenClipboard", uint, 0, int) )
@@ -109,7 +160,7 @@ return 2
 }
 
 OnClipboardChange:
-    gType :=  A_EventInfo
+;~     gType :=  A_EventInfo
 return
 
 
