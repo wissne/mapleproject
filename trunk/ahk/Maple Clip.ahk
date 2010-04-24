@@ -21,14 +21,15 @@ gType := 0
 ;~ 		gStr := ""
     }
     KeyWait c
-;~     ClipWait
+    Sleep 200
+    ClipWait    
 ;~     if FileExist(Clipboard) or (gType != 1)
     if IsClipFile() <> 0
     {
 		gCount := 0
 		gIndex := 0
 ;~ 		gStr := ""
-;~         MsgBox % gType
+;~         MsgBox % gType 1
         Return
     }
 ;~     StringSplit,word_array,Clipboard,"`r`n"
@@ -97,7 +98,8 @@ Return
 ;~ 		gStr := ""
     }
     KeyWait x
-;~     ClipWait
+    Sleep 200
+    ClipWait
 ;~     if FileExist(Clipboard) or (gType != 1)
     if IsClipFile() <> 0
     {
