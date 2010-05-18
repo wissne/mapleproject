@@ -12,6 +12,15 @@ gCount := 0
 gIndex := 0
 gStr := ""
 gType := 0
+gShowMsg := True
+
+#c::Suspend
+#v::
+{
+    gShowMsg := not gShowMsg
+}
+
+
 ~$^c::
 {
 	if gIndex > 0
@@ -22,7 +31,7 @@ gType := 0
     }
     KeyWait c
     Sleep 200
-    ClipWait    
+    ClipWait
 ;~     if FileExist(Clipboard) or (gType != 1)
     if IsClipFile() <> 0
     {
@@ -30,6 +39,7 @@ gType := 0
 		gIndex := 0
 ;~ 		gStr := ""
 ;~         MsgBox % gType 1
+        HideContent()
         Return
     }
 ;~     StringSplit,word_array,Clipboard,"`r`n"
@@ -61,8 +71,29 @@ gType := 0
 ;~ 		MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
     }
 ;~     MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
+    FunShowClipBoard()
 }
 Return
+
+~$^b::
+{
+;~     MsgBox % gCount / 2
+    i := gCount // 2
+;~     MsgBox % i
+
+    Loop %i%
+    {
+        tmpIndex1 := A_Index - 1
+        tmpIndex2 := gCount - tmpIndex1 - 1
+        tmpStr := Array%tmpIndex1%
+        Array%tmpIndex1% := Array%tmpIndex2%
+        Array%tmpIndex2% := tmpStr
+;~         MsgBox % tmpStr "," tmpIndex1 ":" tmpIndex2
+    }
+    FunShowClipBoard()
+}
+Return
+
 
 $^v::
 {
@@ -76,7 +107,7 @@ $^v::
 ;~ 			MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
         }
 ;~         MsgBox 123
-	}
+    }
 	Else
 	{
 		gCount := 0
@@ -86,6 +117,7 @@ $^v::
     }
     Send ^v
     KeyWait v
+    FunShowClipBoard()
 }
 Return
 
@@ -107,6 +139,7 @@ Return
 		gIndex := 0
 ;~ 		gStr := ""
 ;~         MsgBox % gType
+        HideContent()
         Return
     }
 ;~     StringSplit,word_array,Clipboard,"`r`n"
@@ -138,6 +171,7 @@ Return
 ;~ 		MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
     }
 ;~     MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
+    FunShowClipBoard()
 }
 Return
 
@@ -165,10 +199,18 @@ OnClipboardChange:
 ;~     gType :=  A_EventInfo
 return
 
-
-~Ctrl::
-    if (gIndex >= gCount)
+FunShowClipBoard()
+{
+    global gIndex
+    global gCount
+    global gStr
+    global Array
+    global gShowMsg
+    if (gIndex >= gCount || not gShowMsg)
+    {
+        HideContent()
         Return
+    }
     gStr := "=========== Maple Tip ==========="
     i := gIndex
     j := 1
@@ -201,14 +243,20 @@ return
     }
 
     ShowContent(gStr)
+    Return
+}
+~Ctrl::
+    FunShowClipBoard()
     KeyWait Ctrl
     HideContent()
-    return
+return
 
 ; Show Clipboard ToolTips
 ShowContent(content)
 {
-    ToolTip, %content% , A_CaretX , A_CaretY + 30
+;~     ToolTip, %content% , A_CaretX , A_CaretY + 30
+    MouseGetPos, xpos, ypos
+    ToolTip, %content% , xpos , ypos + 30
     return
 }
 
