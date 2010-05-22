@@ -21,6 +21,64 @@ gShowMsg := True
 }
 
 
+
+~$^+c::
+{
+	if gIndex > 0
+	{
+		gCount := 0
+		gIndex := 0
+;~ 		gStr := ""
+    }
+    KeyWait c
+    Send ^c
+    Sleep 200
+    ClipWait
+;~     Msgbox % Clipboard
+;~     if FileExist(Clipboard) or (gType != 1)
+    if IsClipFile() <> 0
+    {
+		gCount := 0
+		gIndex := 0
+;~ 		gStr := ""
+;~         MsgBox % gType 1
+        HideContent()
+        Return
+    }
+;~     StringSplit,word_array,Clipboard,"`r`n"
+;~     if FileExist(word_array1)
+;~     {
+;~ 		gCount := 0
+;~ 		gIndex := 0
+;~ 		gStr := ""
+;~         MsgBox % gType
+;~         Return
+;~     }
+	if (Clipboard is Number Or Clipboard is Text)
+	{
+;~         MsgBox % gCount
+        if gCount = 0
+        {
+            Array%gCount% := Clipboard
+;~             MsgBox % Clipboard
+            gCount := gCount + 1
+        }
+        else if gCount > 0
+        {
+            i := % gCount - 1
+;~                 MsgBox 123
+            Array%i% := Array%i% . Clipboard
+;~             Msgbox % Array%i%
+        }
+;~ 		gStr .= Array%gCount% . "`r`n"
+;~ 		ClipBoard := Array%gIndex%
+;~ 		MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
+    }
+;~     MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
+    FunShowClipBoard()
+}
+Return
+
 ~$^c::
 {
 	if gIndex > 0
@@ -75,7 +133,8 @@ gShowMsg := True
 }
 Return
 
-~$^b::
+
+~^!v::
 {
 ;~     MsgBox % gCount / 2
     i := gCount // 2
