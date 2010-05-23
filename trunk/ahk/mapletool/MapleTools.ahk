@@ -102,10 +102,10 @@ LATEST VERSION CHANGES:
 ; USER EDITABLE SETTINGS:
 
   ; Icons
-    Use_Large_Icons =1 ; 0 = small icons, 1 = large icons in listview
+    Use_Large_Icons =0 ; 0 = small icons, 1 = large icons in listview
 
   ; Fonts
-    Font_Size =13 ; (default = 13)
+    Font_Size =8 ; (default = 13)
     Font_Type =MS sans serif ; (default = MS sans serif)
 
   ; Position
@@ -1438,7 +1438,7 @@ send, ^v
 send, {home}
 Clipboard := fileNamePrefix
 send, ^v
-send, +{Home}
+send, ^+{Home}
 ;~ MsgBox % SubStr(clipboard, 0, StrLen(clipboard)-StepCount)
 ; 获得最后一个数组元素的长度。继续例子，把 3 赋值给 StepCount，也就是说 txt 是由 3 个字符组成的。
 ;~ send +^{end}
@@ -1788,7 +1788,7 @@ Display_List:
     Gui, 1: Font, s%Font_Size%, %Font_Type%
     Gui, 1: Color, 404040 ; i.e. border/background (default = 404040) ; barely visible - right and bottom sides only
     Gui, 1: Margin, 1, 1
-    Gui, 1: Add, ListView, x-1 y-1 r%Window_Found_Count% w%Listview_Width% AltSubmit -Multi NoSort Background%Listview_Colour% Count10 gListView_Event vListView1,#| |Window|Exe
+    Gui, 1: Add, ListView, x-1 y-1 r%Window_Found_Count% w%Listview_Width% AltSubmit -Multi NoSort Background%Listview_Colour% Count10 gListView_Event vListView1,#| |Window|Exe    
     }
 
   ; Attach the ImageLists to the ListView so that it can later display the icons:
