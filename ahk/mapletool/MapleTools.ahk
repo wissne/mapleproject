@@ -7,7 +7,7 @@
 ;#NoTrayIcon
 
 SetBatchLines, -1
-CoordMode, ToolTip, Screen
+;CoordMode, ToolTip, Screen
 Process Priority,,High
 U_GVIM := "C:\Program Files\Vim\vim72\gvim.exe"
 trans := 255
@@ -102,10 +102,10 @@ LATEST VERSION CHANGES:
 ; USER EDITABLE SETTINGS:
 
   ; Icons
-    Use_Large_Icons =0 ; 0 = small icons, 1 = large icons in listview
+    Use_Large_Icons =1 ; 0 = small icons, 1 = large icons in listview
 
   ; Fonts
-    Font_Size =8 ; (default = 13)
+    Font_Size =10 ; (default = 13)
     Font_Type =MS sans serif ; (default = MS sans serif)
 
   ; Position
@@ -186,7 +186,11 @@ Hotkey, !^+left, toggleWindowLeft
 Hotkey, !^+up, toggleWindowUp
 Hotkey, !^+down, toggleWindowDown
 
-
+HotKey, #c, toggleSuspend
+Hotkey, #v, hiddenToolTip
+HotKey, ~ctrl, ctrlIsDown
+HotKey, ctrl up, ctrlIsUp
+Hotkey, ~LButton, showDesktop
 
 /*
  * Timer initialization.
@@ -288,7 +292,7 @@ start:
    }
    if ( if_turnoff_monitor = 1 )
    {
-      SetTimer, TurnoffMonitor, 3000 
+      SetTimer, TurnoffMonitor, 3000
       StringRight, H_key, hotkey, 1
       KeyWait %H_key%
       KeyWait LWin
@@ -362,7 +366,7 @@ start:
          }
          if ( if_turnoff_monitor = 1 )
          {
-            SetTimer, TurnoffMonitor, off 
+            SetTimer, TurnoffMonitor, off
          }
          SystemCursor(1)
 
@@ -375,6 +379,8 @@ start:
          Hotkey, LAlt, stop, off
          Hotkey, RAlt, stop, off
          Hotkey, Ctrl, stop, off
+         HotKey, ~ctrl, ctrlIsDown, On
+         Hotkey, ~LButton, showDesktop, On
          Hotkey, esc, stop, off
          Hotkey, del, stop, off
          Hotkey, f1, stop, off
@@ -420,11 +426,11 @@ makeMenu:
       Menu, language, UnCheck, %L_english%
       Menu, language, UnCheck, %L_simple%
       Menu, language, UnCheck, %L_traditional%
-      if ( language = 0 ) 
+      if ( language = 0 )
          Menu, language, Check, %L_english%
-      else if ( language = 1 ) 
+      else if ( language = 1 )
          Menu, language, Check, %L_simple%
-      else if ( language = 2 ) 
+      else if ( language = 2 )
          Menu, language, Check, %L_traditional%
 
       Menu, tray, Add, %L_language%, :language
@@ -462,7 +468,7 @@ makeMenu:
       menu, interface, Check, %L_interface3%
 
    Menu, tray, Add, %L_interface%, :interface
-   Menu, tray, Add   
+   Menu, tray, Add
 ;~    Menu, tray, Add, About..., menuAbout
    Menu, tray, Add, %L_show_all_win%[&S], menuUnautohideAll
 ;~    Menu, tray, Add, Exit, menuExit
@@ -489,7 +495,7 @@ autoStart:
       IniWrite, 0, ahk_setting.ini, lock, autoStart
       autoStart := 0
    }
-   
+
 Return
 
 
@@ -547,13 +553,13 @@ setLang:
       }
       file_row_count /= 3
 ;~       MsgBox % file_row_count
-   
+
       FileRead, lang, lock.lng
       loop, parse, lang, `n
       {
          if ( A_Index >= 1 * (language + 1) && A_Index <= (file_row_count) * (language + 1) )
-         {      
-         A_lang_i := Mod(A_Index, file_row_count)         
+         {
+         A_lang_i := Mod(A_Index, file_row_count)
          lang_%A_lang_i% := UtfDecode(A_LoopField)
          }
          if ( A_Index = 0 * file_row_count + 2)
@@ -590,7 +596,7 @@ setLang:
       L_fullscreen := lang_27
       L_auto_run := lang_28
       L_show_all_win := lang_29
-      L_screenoff := lang_0      
+      L_screenoff := lang_0
    }
    else
    {
@@ -614,7 +620,7 @@ setLang:
       L_invalid_hotkey := "Invalid Hotkey!"
       L_donate    := "Donate"
       L_applicationfunction := "Lock the screen, and input password to unlock."
-      L_applicationtip := "Double click the TrayIcon to lock the screen at once." 
+      L_applicationtip := "Double click the TrayIcon to lock the screen at once."
       L_authors := "Appinn Software - Liang Zhuge, Willin Tang and sfufoet"
       L_purpose := "Share the free, small, practical, interesting and green softwares."
       L_from := "This tool is made by AutoHotKey"
@@ -718,7 +724,7 @@ Gui,99:Add,Text,x25 y+10,%L_applicationfunction%
 ;~ Gui,99:Add,Text,x25 y+5 gAppinnAhk,www.appinn.com/category/autohotkey/
 ;~ Gui,99:Font
 
-Gui,99:Show,,%L_about% %applicationname% 
+Gui,99:Show,,%L_about% %applicationname%
 hCurs:=DllCall("LoadCursor","UInt",NULL,"Int",32649,"UInt")
 OnMessage(0x200,"WM_MOUSEMOVE")
 Return
@@ -808,8 +814,8 @@ SystemCursor(OnOff=1)   ; INIT = "I","Init"; OFF = 0,"Off"; TOGGLE = -1,"T","Tog
 }
 
 changeHotkey:
-   StringLeft, old_Win, hotkey, 1 
-   StringTrimLeft, old_Hotkey, hotkey, 1 
+   StringLeft, old_Win, hotkey, 1
+   StringTrimLeft, old_Hotkey, hotkey, 1
    Gui, -SysMenu
    if (old_Win = "#")
    {
@@ -821,8 +827,8 @@ changeHotkey:
       Gui, Add, Hotkey,   vHK, %hotkey%     ;add a hotkey control
       Gui, Add, CheckBox, vCB x+5 hp , Win  ;add a checkbox to allow the Windows key (#) as a modifier.
    }
-   Gui, Add, Button, default ys, OK  
-   Gui, Add, Button, ys, Cancel  
+   Gui, Add, Button, default ys, OK
+   Gui, Add, Button, ys, Cancel
    Gui, Show,,%L_hotkey%
 return
 
@@ -854,7 +860,7 @@ return
 
 UtfDecode( str ) {
   RawLen := StrLen(str)
-  
+
   Charset := 0    ; Put 1252 or 0
 
   BufSize := (RawLen + 1) * 2
@@ -909,14 +915,24 @@ return
  */
 watchCursor:
 	MouseGetPos, , , winId ; get window under mouse pointer
+    CoordMode, Mouse, Screen
+    x_pos:=A_ScreenWidth-1
+    y_pos:=A_ScreenHeight-1
+    MouseGetPos, x, y
+;~     ToolTip %x% : %y% :: %x_pos% : %y_pos%
+    if (x>x_pos-20 and y>y_pos-20) or (x>x_pos-20 and y<20) or (x<20 and y>y_pos-20) or (x<20 and y<20) {
+      Return  ; at the corner
+    }    
+
 ; ----------------------Add by sfufoet------------------------
 ;~ 	WinGetClass, CurClass, ahk_id %winId%
 ; -----------------------------end----------------------------
-	
+
 	if (autohide_%winId%) { ; window is on the list of 'autohide' windows
 ; ----------------------Add by sfufoet------------------------
 ;~ 		if(GetKeyState("Ctrl", "P"))
 ; -----------------------------end----------------------------
+;~       ToolTip, %winParentId% : %winId% : autohide_%winId% : qqqq
 		if (hidden_%winId%) { ; window is in 'hidden' position
 			previousActiveWindow := WinExist("A")
 			WinActivate, ahk_id %winId% ; activate the window
@@ -925,12 +941,28 @@ watchCursor:
 			needHide := winId ; store it for next iteration
 		}
 		oldclass=%class%
-	} else {
+    } else {
+;~       ToolTip
 ; ----------------------Add by sfufoet------------------------
 ;~ 		If (CurClass contains Progman,WorkerW,Shell_TrayWnd)
 ; -----------------------------end----------------------------
 		if (needHide) {
-			WinMove, ahk_id %needHide%, , hidden_%needHide%_x, hidden_%needHide%_y ; move it to 'hidden' position
+            WinGetPos, tmp_x, tmp_y, tmp_width, tmp_height, ahk_id %needHide%      
+            if (x>tmp_x and x<tmp_x+tmp_width and y>tmp_y and y<tmp_y+tmp_height)
+            {
+              WinGet, winParentId, PID, A
+              WinGet, hidParentId, PID, ahk_id %needHide%
+              if (hidParentId == winParentId) {
+                Return
+              }
+              WinGetTitle, winTitle1, A
+              WinGetTitle, winTitle2, ahk_id %needHide%
+              if (winTitle1 == winTitle2) {
+                Return
+              }          
+            }
+;~             ToolTip, %winParentId% : autohide_%winId% : 1 : %needHide%
+            WinMove, ahk_id %needHide%, , hidden_%needHide%_x, hidden_%needHide%_y ; move it to 'hidden' position
 			WinActivate, ahk_id %previousActiveWindow% ; activate previously active window
 			hidden_%needHide% := true
 			needHide := false ; do that only once
@@ -966,8 +998,8 @@ return
 toggleWindow:
 	WinGet, curWinId, id, A
     WinGetClass, CurClass, ahk_id %curWinId%
-    
-   If CurClass contains Progman,WorkerW,Shell_TrayWnd 
+
+   If CurClass contains Progman,WorkerW,Shell_TrayWnd
       Return
 
     autohideWindows = %autohideWindows%,%curWinId%
@@ -993,20 +1025,20 @@ toggleWindow:
 		} else if (mode = "up") {
 			showing_%curWinId%_x := orig_%curWinId%_x
 			showing_%curWinId%_y := 0
-            
+
 			hidden_%curWinId%_x := orig_%curWinId%_x
 			hidden_%curWinId%_y := -height + 1
-            
+
 ;~             cur_x_pos := orig_%curWinId%_x
 ;~             cur_y_pos := orig_%curWinId%_y
 ;~             Loop
-;~             {               
+;~             {
 ;~                WinMove, ahk_id %curWinId%, , cur_x_pos, cur_y_pos
 ;~                cur_y_pos -= 2
-;~                if (cur_y_pos <= hidden_%curWinId%_y) 
+;~                if (cur_y_pos <= hidden_%curWinId%_y)
 ;~                   Break
 ;~                Sleep 10
-;~             }            
+;~             }
 		} else { ; down
 			showing_%curWinId%_x := orig_%curWinId%_x
 			showing_%curWinId%_y := A_ScreenHeight - height
@@ -1049,11 +1081,12 @@ return
 
 
 ;----------------- Maple Clip -------------------
-#c::Suspend
-#v::
-{
-    gShowMsg := not gShowMsg
-}
+toggleSuspend:
+  Suspend
+return
+
+hiddenToolTip:
+  gShowMsg := not gShowMsg
 Return
 
 
@@ -1065,6 +1098,7 @@ Return
 		gIndex := 0
 ;~ 		gStr := ""
     }
+    Clipboard :=
     KeyWait c
     Send ^c
     Sleep 100
@@ -1122,9 +1156,13 @@ Return
 		gIndex := 0
 ;~ 		gStr := ""
     }
+    Clipboard :=
     KeyWait c
-    Sleep 200
+;~     Send ^c
+    Sleep 100
     ClipWait
+
+;~     MsgBox %Clipboard%
 ;~     if FileExist(Clipboard) or (gType != 1)
     if IsClipFile() <> 0
     {
@@ -1135,6 +1173,63 @@ Return
         HideContent()
         Return
     }
+;~     StringSplit,word_array,Clipboard,"`r`n"
+;~     if FileExist(word_array1)
+;~     {
+;~ 		gCount := 0
+;~ 		gIndex := 0
+;~ 		gStr := ""
+;~         MsgBox % gType
+;~         Return
+;~     }
+	if (Clipboard is Number Or Clipboard is Text)
+	{
+		Array%gCount% := Clipboard
+        if gCount > 0
+        {
+            i := % gCount - 1
+            if (Array%i% == Clipboard)
+            {
+;~                 MsgBox 123
+                gCount := 0
+                gIndex := 0
+                Array%gCount% := Clipboard
+            }
+        }
+;~ 		gStr .= Array%gCount% . "`r`n"
+		gCount := gCount + 1
+;~ 		ClipBoard := Array%gIndex%
+;~ 		MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
+    }
+;~     MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
+    FunShowClipBoard()
+}
+Return
+
+~$^!c::
+{
+	if gIndex > 0
+	{
+		gCount := 0
+		gIndex := 0
+;~ 		gStr := ""
+    }
+    Clipboard :=
+    KeyWait c
+    Sleep 100
+    Send ^c
+    ClipWait
+;~     if FileExist(Clipboard) or (gType != 1)
+    if IsClipFile() == 0
+    {
+		gCount := 0
+		gIndex := 0
+;~ 		gStr := ""
+;~         MsgBox % gType 1
+        HideContent()
+        Return
+    }
+;~     MsgBox 123
 ;~     StringSplit,word_array,Clipboard,"`r`n"
 ;~     if FileExist(word_array1)
 ;~     {
@@ -1269,6 +1364,10 @@ Return
 }
 Return
 
+~RButton & LButton::
+  WinMinimize, A
+Return
+
 IsClipFile()
 {
 if ( DllCall("OpenClipboard", uint, 0, int) )
@@ -1339,11 +1438,16 @@ FunShowClipBoard()
     ShowContent(gStr)
     Return
 }
-~Ctrl::
-    FunShowClipBoard()
-    KeyWait Ctrl
-    HideContent()
+
+
+
+ctrlIsDown:
+    FunShowClipBoard()      
 return
+
+ctrlIsUp:
+  HideContent()
+Return
 
 ; Show Clipboard ToolTips
 ShowContent(content)
@@ -1405,18 +1509,22 @@ SetTrans:
 return
 
 ;----------------------桌面显示---------------------------
-~LButton::
+showDesktop:
    x_pos:=A_ScreenWidth-1
    y_pos:=A_ScreenHeight-1
    MouseGetPos,x,y
-;~    MsgBox % x ":" y ":" x_pos ":" y_pos   
+;~    MsgBox % x ":" y ":" x_pos ":" y_pos
    if (x>x_pos-20 and y>y_pos-20) {
-      send #d      
+      send #d
    }
 Return
 
 ;-------------------------智能F2----------------------------
-~F2::
+~F2 Up::
+If Not (WiActive ("ahk_class CabinetWClass") or WinActive ("ahk_class Progman"))
+{
+  Return
+}
 ; 还记得 ~ 的用法么？
 date = %clipboard%
 ; 先把剪贴板的内容保存下来。往往剪贴板里存放的就是文件的新名字。
@@ -1457,7 +1565,7 @@ send, ^+{Home}
 ; 选中最后一个“.”的左边所有的文字，这时就选中了文件名
 clipboard = %date%
 ; 还原剪贴板
-return 
+return
 
 
 
@@ -1480,7 +1588,7 @@ Initiate_Hotkeys:
     Use_AND_Symbol :=" & "
   Hotkey, %Alt_Hotkey%%Use_AND_Symbol%%Tab_Hotkey%, Alt_Tab, On ; turn on alt-tab hotkey here to be able to turn it off for simple switching of apps in script
   Hotkey, %Alt_Hotkey%%Use_AND_Symbol%%Shift_Tab_Hotkey%, Alt_Shift_Tab, On ; turn on alt-tab hotkey here to be able to turn it off for simple switching of apps in script
-  
+
   If Single_Key_Show_Alt_Tab !=
     {
     If Single_Key_Show_Alt_Tab contains #,!,^,+
@@ -1489,9 +1597,9 @@ Initiate_Hotkeys:
     If Single_Key_Hide_Alt_Tab contains #,!,^,+
       Replace_Modifier_Symbol( "Single_Key_Hide_Alt_Tab" , "Single_Key_Hide_Alt_Tab" )
     }
-  
+
   Replace_Modifier_Symbol( "Alt_Hotkey" , "Alt_Hotkey2" )
-  
+
   If Tab_Hotkey not contains Wheel ; wheel isn't used as an alt-tab hotkey so cna be used for scrolling list instead
     Use_Wheel_Scroll_List =1
   If Shift_Tab_Hotkey not contains Wheel ; wheel isn't used as an alt-tab hotkey so cna be used for scrolling list instead
@@ -1524,10 +1632,10 @@ Return
 
 
 
-ListView_Get_Selected_and_Ensure_Visible: 
+ListView_Get_Selected_and_Ensure_Visible:
   LV_Modify(Selected_Row, "Focus Select")
   SendMessage, 0x1000+19, LV_GetNext("", "F")-1, 0, SysListView321, ahk_id %Gui_ID% ; LVM_ENSUREVISIBLE =(LVM_FIRST + 19), LVM_FIRST = 0x1000
-Return 
+Return
 
 
 
@@ -1687,7 +1795,7 @@ Display_List:
           Continue
         StringLeft, Exclude_Item, A_LoopField, 1
         If Exclude_Item =! ; remove ! for matching strings
-          StringTrimLeft, Loop_Item, A_LoopField, 1 
+          StringTrimLeft, Loop_Item, A_LoopField, 1
         Else
           Loop_Item=%A_LoopField%
 
@@ -1788,7 +1896,7 @@ Display_List:
     Gui, 1: Font, s%Font_Size%, %Font_Type%
     Gui, 1: Color, 404040 ; i.e. border/background (default = 404040) ; barely visible - right and bottom sides only
     Gui, 1: Margin, 1, 1
-    Gui, 1: Add, ListView, x-1 y-1 r%Window_Found_Count% w%Listview_Width% AltSubmit -Multi NoSort Background%Listview_Colour% Count10 gListView_Event vListView1,#| |Window|Exe    
+    Gui, 1: Add, ListView, x-1 y-1 r%Window_Found_Count% w%Listview_Width% AltSubmit -Multi NoSort Background%Listview_Colour% Count10 gListView_Event vListView1,#| |Window|Exe
     }
 
   ; Attach the ImageLists to the ListView so that it can later display the icons:
@@ -1846,7 +1954,7 @@ Return
 Gui_Resize_and_Position:
   DetectHiddenWindows, On ; retrieving column widths to enable calculation of col 3 width
 
-  Gui, +LastFound   
+  Gui, +LastFound
   Gui_ID := WinExist() ; for auto-sizing columns later
 
   If Display_List_Shown !=1 ; no need to resize columns for updating listview
@@ -1871,8 +1979,8 @@ Gui_Resize_and_Position:
     LV_ModifyCol(Sort_Order_Column, Sort_Order_Direction) ; sort by columm
     }
 
-  ListView_Resize_Vertically(Gui_ID) ; Automatically resize listview vertically - pass the gui id value 
-  
+  ListView_Resize_Vertically(Gui_ID) ; Automatically resize listview vertically - pass the gui id value
+
   GuiControlGet, Listview_Now, Pos, ListView1 ; retrieve listview dimensions/position ; for auto-sizing (elsewhere)
 
   ; auto-position gui upwards according to size
@@ -1992,7 +2100,7 @@ GuiContextMenu:  ; Launched in response to a right-click or press of the Apps ke
       }
 
     Menu, ContextMenu1, Add, Group - &Save/Edit, Gui_Window_Group_Save_Edit
-    
+
     Menu, Gui_Window_Group_Delete, Color, E10000, Single ; warning colour
     Loop, Parse, Custom_Group_List,|
       Menu, Gui_Window_Group_Delete, Add,%A_LoopField%, Gui_Window_Group_Delete
@@ -2161,7 +2269,7 @@ Check_Mouse_Position_Deactivate: ; check if not over an edge-docked window any m
     If ((Check_Mouse_Position_X >= Active_Window_Now_Mouse_X -10 and Check_Mouse_Position_X <= Active_Window_Now_Mouse_X +10) ; ; mouse not moved - e.g. clicked taskbar
       and (Check_Mouse_Position_Y >= Active_Window_Now_Mouse_Y -10 and Check_Mouse_Position_Y <= Active_Window_Now_Mouse_Y +10)
       and (Active_Window_Now_Title = Edge_Dock_Active_Window_Title))
-        Return    
+        Return
 
     If (Active_Window_Now_Title = Edge_Dock_Active_Window_Title and Active_Window_Now_Mouse_Title = ""
           and (Active_Window_Now_ID != TaskBar_ID and Active_Window_Now_Mouse != TaskBar_ID))
@@ -2255,9 +2363,9 @@ Gui_Hotkeys:
     GuiControl, 2: Disable, Alt_Hotkey_Tab
     GuiControl, 2: Disable, Alt_Hotkey_Esc
     GuiControl, 2: Disable, Alt_Hotkey_Enter
-    GuiControl, 2: Disable, Alt_Hotkey_WheelUp 
+    GuiControl, 2: Disable, Alt_Hotkey_WheelUp
     GuiControl, 2: Disable, Alt_Hotkey_WheelDown
-    GuiControl, 2: Disable, Alt_Hotkey_Hotkey 
+    GuiControl, 2: Disable, Alt_Hotkey_Hotkey
   Gui_Add_Hotkey(2, "Tab","(key in Alt+Tab)", "Tab_Hotkey")
   Gui_Add_Hotkey(2, "Shift+Tab","(Key(s) in Alt+Shift+Tab)", "Shift_Tab_Hotkey")
   Gui_Add_Hotkey(2, "Esc","(key in Alt+Esc)", "Esc_Hotkey")
@@ -2286,7 +2394,7 @@ Gui_Hotkeys:
 Return
 
 
-  
+
 Gui_2_Group_Hotkey_Assign:
   Selected_Row := LV_GetNext(0, "F")
   If not Selected_Row
@@ -2331,7 +2439,7 @@ Gui_2_OK:
   Gui_Read_Hotkey(2, "Esc_Hotkey")
   Gui_Read_Hotkey(2, "Single_Key_Show_Alt_Tab")
   Gui_Read_Hotkey(2, "Single_Key_Hide_Alt_Tab")
-  Reload 
+  Reload
 Return
 
 
@@ -2451,7 +2559,7 @@ Gui_Add_Hotkey(Gui, Text, Comment, var_name)
   Else
     WheelDown=0
   Hotkey=%temp_hotkey% ; remainder
-  
+
   Gui, %Gui%: Font, bold
   Gui, %Gui%: Add, Text, xm, %Text%
   Gui, %Gui%: Font
@@ -2510,7 +2618,7 @@ Choose window titles/exes to include/exclude when LOADING a list:
   - "Exclude all windows not in list?" ignores new windows that do not match the list.
   - Only ticked items are added to the list. Unticked are removed.
   - Priority of rules is top (highest) to bottom (lowest).
-  - Not case sensitive. 
+  - Not case sensitive.
                     )
   IL_Destroy(Gui_3_ImageList)
   Gui, 3: Add, ListView, xm y+15 r15 w500 Checked -ReadOnly -Multi NoSortHdr AltSubmit gListView3_Event, (Partial) Window Title|EXE
@@ -2566,7 +2674,7 @@ Choose window titles/exes to include/exclude when LOADING a list:
   Gosub, Gui_3_Update_Icons
 
   DetectHiddenWindows, On
-  Gui, 3: +LastFound 
+  Gui, 3: +LastFound
   Gui_3_ID := WinExist() ; for auto-sizing columns later
   LV_ModifyCol(1, 350)
   ControlGet, Gui_3_Listview_Style, Style,, SysListView321, ahk_id %Gui_3_ID%
@@ -2611,13 +2719,13 @@ ListView_Swap_Rows(Direction) ; Direction=Up/Down -swaps all text in each column
     {
     Row_Swap_With := Row_Selected -1
     If Row_Swap_With =0 ; reached top of listview
-      Return 
+      Return
     }
   Else
     {
     Row_Swap_With := Row_Selected +1
     If ( Row_Swap_With > LV_GetCount() ) ; reached end of listview
-      Return 
+      Return
     }
   Loop, % LV_GetCount("Col")
     {
@@ -2651,7 +2759,7 @@ ListView_Swap_Rows(Direction) ; Direction=Up/Down -swaps all text in each column
 
 Gui3_OK:
   Gui, 3: Submit
-  
+
   If Custom_Name =
     {
     MsgBox, 48, ERROR, Enter a valid name for the group!
@@ -2700,10 +2808,10 @@ ListView3_Event:
     Gosub, Gui_3_Update_Icons
 
   If A_GuiEvent = DoubleClick
-     SendMessage, 0x1017, LV_GetNext(0, "Focused") - 1, 0, SysListView321  ; 0x1017 is LVM_EDITLABEL 
+     SendMessage, 0x1017, LV_GetNext(0, "Focused") - 1, 0, SysListView321  ; 0x1017 is LVM_EDITLABEL
 
-  If (A_GuiEvent = "K" AND A_EventInfo = 0x71)  ; Key-down of the F2 key (0x71 is its virtual key). 
-     SendMessage, 0x1017, LV_GetNext(0, "Focused") - 1, 0, SysListView321  ; 0x1017 is LVM_EDITLABEL 
+  If (A_GuiEvent = "K" AND A_EventInfo = 0x71)  ; Key-down of the F2 key (0x71 is its virtual key).
+     SendMessage, 0x1017, LV_GetNext(0, "Focused") - 1, 0, SysListView321  ; 0x1017 is LVM_EDITLABEL
 Return
 
 
@@ -2767,7 +2875,7 @@ Return
 
 Gui_3_Manual_Title_Blank:
   If Gui_3_Manual_Allow_Blank =1
-    GuiControl,, Gui_3_Manual_Title, ; blank 
+    GuiControl,, Gui_3_Manual_Title, ; blank
   Gui_3_Manual_Allow_Blank =0
   GuiControl, +Default, A&dd
 Return
@@ -2776,7 +2884,7 @@ Return
 
 Gui_3_Manual_Exe_Blank:
   If Gui_3_Manual_Allow_Blank =1
-    GuiControl,, Gui_3_Manual_Exe, ; blank 
+    GuiControl,, Gui_3_Manual_Exe, ; blank
   Gui_3_Manual_Allow_Blank =0
   GuiControl, +Default, A&dd
 Return
@@ -3096,7 +3204,7 @@ ListView_Destroy:
   Display_List_Shown =0
   Gui, 1: Destroy
   If Alt_Esc != 1 ; i.e. not called from Alt_Esc
-    {  
+    {
     wid := Window%RowText%
     WinGet, wid_MinMax, MinMax, ahk_id %wid%
     If wid_MinMax =-1 ;minimised
@@ -3168,9 +3276,9 @@ Return
   Gui, 3: Destroy
   Gui, 1: Default
 Return
-    
-    
-    
+
+
+
 Load_Settings_From_Ini:
   ; Hotkeys
     IniRead, Alt_Hotkey, Alt_Tab_Settings.ini, Hotkeys, Alt_Hotkey, !
@@ -3221,10 +3329,10 @@ Save_Settings_To_Ini:
     IniWrite, %Esc_Hotkey%, Alt_Tab_Settings.ini, Hotkeys, Esc_Hotkey
     IniWrite, %Single_Key_Show_Alt_Tab%, Alt_Tab_Settings.ini, Hotkeys, Single_Key_Show_Alt_Tab
     IniWrite, %Single_Key_Hide_Alt_Tab%, Alt_Tab_Settings.ini, Hotkeys, Single_Key_Hide_Alt_Tab
-    
+
   ; Sort_Order
-    IniWrite, %Sort_Order_Column%, Alt_Tab_Settings.ini, Sort_Order, Sort_Order_Column 
-    IniWrite, %Sort_Order_Direction%, Alt_Tab_Settings.ini, Sort_Order, Sort_Order_Direction 
+    IniWrite, %Sort_Order_Column%, Alt_Tab_Settings.ini, Sort_Order, Sort_Order_Column
+    IniWrite, %Sort_Order_Direction%, Alt_Tab_Settings.ini, Sort_Order, Sort_Order_Direction
 
   ; Custom_Groups + Group_Hotkey - remember lists of windows
     IniWrite, %Custom_Group_List%, Alt_Tab_Settings.ini, Custom_Groups, Custom_Group_List
@@ -3327,16 +3435,16 @@ GetCPA_file_name( p_hw_target ) ; retrives Control Panel applet icon
 
 ;========================================================================================================
 
-WM_ACTIVATE(wParam) 
+WM_ACTIVATE(wParam)
 {
   Global
   If ( wParam =0 and A_Gui =1 and Display_List_Shown =1) ; i.e. don't trigger when submitting gui
     {
     Alt_Esc_No_Re_Activate =1
-    Gosub, Alt_Esc ; hides alt-tab gui    
+    Gosub, Alt_Esc ; hides alt-tab gui
     Alt_Esc_No_Re_Activate =
     }
-} 
+}
 
 
 
