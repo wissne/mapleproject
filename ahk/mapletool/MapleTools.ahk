@@ -922,7 +922,7 @@ watchCursor:
 ;~     ToolTip %x% : %y% :: %x_pos% : %y_pos%
     if (x>x_pos-20 and y>y_pos-20) or (x>x_pos-20 and y<20) or (x<20 and y>y_pos-20) or (x<20 and y<20) {
       Return  ; at the corner
-    }    
+    }
 
 ; ----------------------Add by sfufoet------------------------
 ;~ 	WinGetClass, CurClass, ahk_id %winId%
@@ -947,7 +947,7 @@ watchCursor:
 ;~ 		If (CurClass contains Progman,WorkerW,Shell_TrayWnd)
 ; -----------------------------end----------------------------
 		if (needHide) {
-            WinGetPos, tmp_x, tmp_y, tmp_width, tmp_height, ahk_id %needHide%      
+            WinGetPos, tmp_x, tmp_y, tmp_width, tmp_height, ahk_id %needHide%
             if (x>tmp_x and x<tmp_x+tmp_width and y>tmp_y and y<tmp_y+tmp_height)
             {
               WinGet, winParentId, PID, A
@@ -959,7 +959,7 @@ watchCursor:
               WinGetTitle, winTitle2, ahk_id %needHide%
               if (winTitle1 == winTitle2) {
                 Return
-              }          
+              }
             }
 ;~             ToolTip, %winParentId% : autohide_%winId% : 1 : %needHide%
             WinMove, ahk_id %needHide%, , hidden_%needHide%_x, hidden_%needHide%_y ; move it to 'hidden' position
@@ -1364,7 +1364,7 @@ Return
 }
 Return
 
-~RButton & LButton::
+~LButton & RButton::
   WinMinimize, A
 Return
 
@@ -1442,7 +1442,7 @@ FunShowClipBoard()
 
 
 ctrlIsDown:
-    FunShowClipBoard()      
+    FunShowClipBoard()
 return
 
 ctrlIsUp:
