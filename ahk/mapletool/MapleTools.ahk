@@ -1,3 +1,4 @@
+#NoEnv
 #Persistent
 #SingleInstance Force
 #Include Anchor.ahk
@@ -113,7 +114,7 @@ LATEST VERSION CHANGES:
     Gui_y :=A_ScreenHeight * 0.25 ; ~150 pixels on 1024*768 (Default = A_ScreenHeight * 0.25 ; OR: "Center" WITH quotes)
 
   ; Max height
-    Height_Max_Modifier =0.95 ; multiplier for screen height (e.g. 0.95 = 95% of screen height max ) (Default = 0.9)
+    Height_Max_Modifier =0.9 ; multiplier for screen height (e.g. 0.95 = 95% of screen height max ) (Default = 0.9)
 
   ; Width
     Listview_Width := A_ScreenWidth * 0.55 ; width of listview (default = A_ScreenHeight * 0.55)
@@ -1150,7 +1151,7 @@ Return
 
 ~$^c::
 {
-	if gIndex > 0
+  if gIndex > 0
 	{
 		gCount := 0
 		gIndex := 0
@@ -1158,7 +1159,7 @@ Return
     }
     Clipboard :=
     KeyWait c
-;~     Send ^c
+    Send ^c
     Sleep 100
     ClipWait
 
@@ -1366,6 +1367,18 @@ Return
 
 ~LButton & RButton::
   WinMinimize, A
+Return
+
+;~ ~$^MButton::
+;~   Send, !{Left}
+;~ Return
+
+;~ ~$!MButton::
+;~   Send, !{Right}
+;~ Return
+
+~$!MButton::
+  Send, {BackSpace}
 Return
 
 IsClipFile()
@@ -1681,7 +1694,7 @@ Alt_Tab_Common_Stuff:
     Gosub, Display_List
 
     ; limit gui height / auto-switch icon sizes
-    If (Listview_NowH > Height_Max AND Use_Large_Icons_Current =1) ; switch to small icons
+    If (Window_Found_Count > 15 AND Use_Large_Icons_Current =1) ; switch to small icons
       {
       Use_Large_Icons_Current =0
       IL_Destroy(ImageListID1) ; destroy gui, listview and associated icon imagelist.
@@ -1690,7 +1703,7 @@ Alt_Tab_Common_Stuff:
       Display_List_Shown =0
       Gosub, Display_List
       }
-    If ((Listview_NowH * Small_to_Large_Ratio) < Height_Max AND Use_Large_Icons_Current =0 AND Use_Large_Icons=1) ; switch to large icons
+    If (Window_Found_Count <= 15 AND Use_Large_Icons_Current =0 AND Use_Large_Icons=1) ; switch to large icons
       {
       Use_Large_Icons_Current =1
       IL_Destroy(ImageListID1) ; destroy gui, listview and associated icon imagelist.
