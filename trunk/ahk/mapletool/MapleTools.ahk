@@ -187,7 +187,7 @@ Hotkey, !^+left, toggleWindowLeft
 Hotkey, !^+up, toggleWindowUp
 Hotkey, !^+down, toggleWindowDown
 
-HotKey, #c, toggleSuspend
+HotKey, #z, toggleSuspend
 Hotkey, #v, hiddenToolTip
 HotKey, ~ctrl, ctrlIsDown
 HotKey, ctrl up, ctrlIsUp
@@ -1102,8 +1102,9 @@ Return
     Clipboard :=
     KeyWait c
     Send ^c
-    Sleep 100
-    ClipWait
+;~     Sleep 200
+    ClipWait 1
+
 ;~     Msgbox % Clipboard
 ;~     if FileExist(Clipboard) or (gType != 1)
     if IsClipFile() <> 0
@@ -1159,9 +1160,9 @@ Return
     }
     Clipboard :=
     KeyWait c
-    Send ^c
-    Sleep 100
-    ClipWait
+;~     Send ^c
+;~     Sleep 200
+    ClipWait 1
 
 ;~     MsgBox %Clipboard%
 ;~     if FileExist(Clipboard) or (gType != 1)
@@ -1219,7 +1220,7 @@ Return
     KeyWait c
     Sleep 100
     Send ^c
-    ClipWait
+    ClipWait 1
 ;~     if FileExist(Clipboard) or (gType != 1)
     if IsClipFile() == 0
     {
@@ -1320,8 +1321,7 @@ Return
 ;~ 		gStr := ""
     }
     KeyWait x
-    Sleep 200
-    ClipWait
+    ClipWait 1
 ;~     if FileExist(Clipboard) or (gType != 1)
     if IsClipFile() <> 0
     {
@@ -1365,9 +1365,11 @@ Return
 }
 Return
 
-~LButton & RButton::
-  WinMinimize, A
-Return
+;~ ~LButton & RButton::
+;~   KeyWait Lbutton
+;~   Send BackSpace
+;~   ToolTip 111
+;~ Return
 
 ;~ ~$^MButton::
 ;~   Send, !{Left}
@@ -1377,9 +1379,9 @@ Return
 ;~   Send, !{Right}
 ;~ Return
 
-~$!MButton::
-  Send, {BackSpace}
-Return
+;~ $~!RButton::
+;~   Send, {BackSpace}
+;~ Return
 
 IsClipFile()
 {
@@ -1526,10 +1528,13 @@ showDesktop:
    x_pos:=A_ScreenWidth-1
    y_pos:=A_ScreenHeight-1
    MouseGetPos,x,y
-;~    MsgBox % x ":" y ":" x_pos ":" y_pos
-   if (x>x_pos-20 and y>y_pos-20) {
+   if (x>x_pos-5 and y>y_pos-5) {
       send #d
    }
+   if (x<0+5 and y<0+5) {
+      WinMinimize, A
+   }
+;~    ToolTip %x% : %y% : %x_pos% : %y_pos%
 Return
 
 ;-------------------------智能F2----------------------------
@@ -1543,7 +1548,7 @@ date = %clipboard%
 ; 先把剪贴板的内容保存下来。往往剪贴板里存放的就是文件的新名字。
 send ^c
 ; 复制。为什么要复制呢？重命名的时候，系统会选中整个文件名。这时候就是复制了文件名（包括扩展名）
-clipwait
+ClipWait 1
 StringSplit, pos, clipboard,`.
 ; 分解字符串函数 StringSplit，我们要把剪贴板的文字以“.”为分隔符进行分割。假如我们有一个文件叫 appinn.com.txt（以下都会以这个文件名来讲解），那么到这里它就会被分割成 appinn、com、txt 三个字符串。这三个字符串组成了一个数组 pos，我们要输出它们各自的值时候这样写：%pos1%（也就是输出了 appinn），%pos2%，%pos3% 。因为“.”是个特殊的符号，所以这里我们要用“`”这个转义符，还记得回车的转义符么？就是“`n”啦。
 LastDot = % pos%pos0%
