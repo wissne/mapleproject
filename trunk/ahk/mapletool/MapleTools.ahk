@@ -910,6 +910,11 @@ menuExit:
 	ExitApp
 return
 
+^!a::
+  if FileExist("QQScreenCapture.exe")
+  run, QQScreenCapture.exe
+Return
+
 
 /*
  * Timer implementation.
