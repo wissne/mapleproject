@@ -961,7 +961,34 @@ watchCursor:
               if (winTitle1 == winTitle2) {
                 Return
               }
-            }
+          }
+		WinGetPos, orig_%curWinId%_x, orig_%curWinId%_y, width, height, ahk_id %curWinId% ; get the window size and store original position
+
+		if (mode = "right") {
+			showing_%curWinId%_x := A_ScreenWidth - width
+			showing_%curWinId%_y := orig_%curWinId%_y
+
+			hidden_%curWinId%_x := A_ScreenWidth - 1
+			hidden_%curWinId%_y := orig_%curWinId%_y
+		} else if (mode = "left") {
+			showing_%curWinId%_x := 0
+			showing_%curWinId%_y := orig_%curWinId%_y
+
+			hidden_%curWinId%_x := -width + 1
+			hidden_%curWinId%_y := orig_%curWinId%_y
+		} else if (mode = "up") {
+			showing_%curWinId%_x := orig_%curWinId%_x
+			showing_%curWinId%_y := 0
+
+			hidden_%curWinId%_x := orig_%curWinId%_x
+			hidden_%curWinId%_y := -height + 1
+		} else { ; down
+			showing_%curWinId%_x := orig_%curWinId%_x
+			showing_%curWinId%_y := A_ScreenHeight - height
+
+			hidden_%curWinId%_x := orig_%curWinId%_x
+			hidden_%curWinId%_y := A_ScreenHeight - 1
+		}
 ;~             ToolTip, %winParentId% : autohide_%winId% : 1 : %needHide%
             WinMove, ahk_id %needHide%, , hidden_%needHide%_x, hidden_%needHide%_y ; move it to 'hidden' position
 			WinActivate, ahk_id %previousActiveWindow% ; activate previously active window
@@ -1029,17 +1056,6 @@ toggleWindow:
 
 			hidden_%curWinId%_x := orig_%curWinId%_x
 			hidden_%curWinId%_y := -height + 1
-
-;~             cur_x_pos := orig_%curWinId%_x
-;~             cur_y_pos := orig_%curWinId%_y
-;~             Loop
-;~             {
-;~                WinMove, ahk_id %curWinId%, , cur_x_pos, cur_y_pos
-;~                cur_y_pos -= 2
-;~                if (cur_y_pos <= hidden_%curWinId%_y)
-;~                   Break
-;~                Sleep 10
-;~             }
 		} else { ; down
 			showing_%curWinId%_x := orig_%curWinId%_x
 			showing_%curWinId%_y := A_ScreenHeight - height
@@ -1076,6 +1092,7 @@ unworkWindow:
 	WinSet, AlwaysOnTop, off, ahk_id %curWinId% ; always-on-top
 	WinHide, ahk_id %curWinId%
 	WinSet, Style, +0xC00000, ahk_id %curWinId% ; title bar
+;~     WinSet, Style, -0x40000, ahk_id %curWinId% ; No Border
 	WinSet, ExStyle, -0x80, ahk_id %curWinId% ; remove from task bar
 	WinShow, ahk_id %curWinId%
 return
@@ -1532,14 +1549,19 @@ showDesktop:
       send #d
    }
    if (x<0+5 and y<0+5) {
+;~       If WinActive ("ahk_class Progman")
+;~       {
+;~         Return
+;~       }
+;~       ToolTip %x% : %y% : %x_pos% : %y_pos%
       WinMinimize, A
-   }
-;~    ToolTip %x% : %y% : %x_pos% : %y_pos%
+ }
+
 Return
 
 ;-------------------------ÖÇÄÜF2----------------------------
 ~F2 Up::
-If Not (WiActive ("ahk_class CabinetWClass") or WinActive ("ahk_class Progman"))
+If Not (WinActive ("ahk_class CabinetWClass") or WinActive ("ahk_class Progman"))
 {
   Return
 }
