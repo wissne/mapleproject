@@ -911,8 +911,13 @@ menuExit:
 return
 
 ^!a::
-  if FileExist("QQScreenCapture.exe")
-  run, QQScreenCapture.exe
+  if FileExist("CaptureScreen.exe")
+  run, CaptureScreen.exe
+Return
+
+^!s::
+  if FileExist("GenStr.exe")
+  run, GenStr.exe
 Return
 
 
@@ -967,33 +972,6 @@ watchCursor:
                 Return
               }
           }
-		WinGetPos, orig_%curWinId%_x, orig_%curWinId%_y, width, height, ahk_id %curWinId% ; get the window size and store original position
-
-		if (mode = "right") {
-			showing_%curWinId%_x := A_ScreenWidth - width
-			showing_%curWinId%_y := orig_%curWinId%_y
-
-			hidden_%curWinId%_x := A_ScreenWidth - 1
-			hidden_%curWinId%_y := orig_%curWinId%_y
-		} else if (mode = "left") {
-			showing_%curWinId%_x := 0
-			showing_%curWinId%_y := orig_%curWinId%_y
-
-			hidden_%curWinId%_x := -width + 1
-			hidden_%curWinId%_y := orig_%curWinId%_y
-		} else if (mode = "up") {
-			showing_%curWinId%_x := orig_%curWinId%_x
-			showing_%curWinId%_y := 0
-
-			hidden_%curWinId%_x := orig_%curWinId%_x
-			hidden_%curWinId%_y := -height + 1
-		} else { ; down
-			showing_%curWinId%_x := orig_%curWinId%_x
-			showing_%curWinId%_y := A_ScreenHeight - height
-
-			hidden_%curWinId%_x := orig_%curWinId%_x
-			hidden_%curWinId%_y := A_ScreenHeight - 1
-		}
 ;~             ToolTip, %winParentId% : autohide_%winId% : 1 : %needHide%
             WinMove, ahk_id %needHide%, , hidden_%needHide%_x, hidden_%needHide%_y ; move it to 'hidden' position
 			WinActivate, ahk_id %previousActiveWindow% ; activate previously active window
@@ -1097,7 +1075,7 @@ unworkWindow:
 	WinSet, AlwaysOnTop, off, ahk_id %curWinId% ; always-on-top
 	WinHide, ahk_id %curWinId%
 	WinSet, Style, +0xC00000, ahk_id %curWinId% ; title bar
-;~     WinSet, Style, -0x40000, ahk_id %curWinId% ; No Border
+    WinSet, Style, +0x40000, ahk_id %curWinId% ; No Border
 	WinSet, ExStyle, -0x80, ahk_id %curWinId% ; remove from task bar
 	WinShow, ahk_id %curWinId%
 return
@@ -1174,19 +1152,22 @@ Return
 
 ~$^c::
 {
-  if gIndex > 0
+    if gIndex > 0
 	{
 		gCount := 0
 		gIndex := 0
 ;~ 		gStr := ""
     }
-    Clipboard :=
-    KeyWait c
-;~     Send ^c
+;~     Clipboard :=
 ;~     Sleep 200
+;~     ToolTip 123
+;~     ToolTip %Clipboard% 123
+    KeyWait, c
+;~     Send ^c
+;~     ToolTip %Clipboard% 123g
     ClipWait 1
 
-;~     MsgBox %Clipboard%
+;~     ToolTip %Clipboard% 123f
 ;~     if FileExist(Clipboard) or (gType != 1)
     if IsClipFile() <> 0
     {
@@ -1238,7 +1219,7 @@ Return
 		gIndex := 0
 ;~ 		gStr := ""
     }
-    Clipboard :=
+;~     Clipboard :=
     KeyWait c
     Sleep 100
     Send ^c
@@ -1342,6 +1323,7 @@ Return
 		gIndex := 0
 ;~ 		gStr := ""
     }
+;~     Clipboard :=
     KeyWait x
     ClipWait 1
 ;~     if FileExist(Clipboard) or (gType != 1)
