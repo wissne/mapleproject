@@ -891,8 +891,8 @@ menuAbout:
 	MsgBox, 8256, About, BoD winautohide v1.00.`n`nThis program and its source are in the public domain.`nContact BoD@JRAF.org for more information.
 return
 
-#end::
-^!end::
+$#end::
+$^!end::
 menuUnautohideAll:
 	Loop, Parse, autohideWindows, `,
 	{
@@ -903,8 +903,8 @@ menuUnautohideAll:
 	}
 return
 
-#Home::
-^!Home::
+$#Home::
+$^!Home::
 menuExit:
 	Gosub, menuUnautohideAll
 	ExitApp
@@ -1066,6 +1066,7 @@ workWindow:
 	WinSet, AlwaysOnTop, on, ahk_id %curWinId% ; always-on-top
 	WinHide, ahk_id %curWinId%
 	WinSet, Style, -0xC00000, ahk_id %curWinId% ; no title bar
+    WinSet, Style, -0x40000, ahk_id %curWinId% ; No Border
 	WinSet, ExStyle, +0x80, ahk_id %curWinId% ; remove from task bar
 	WinShow, ahk_id %curWinId%
 return
@@ -1099,7 +1100,7 @@ Return
 		gIndex := 0
 ;~ 		gStr := ""
     }
-    Clipboard :=
+;~     Clipboard :=
     KeyWait c
     Send ^c
 ;~     Sleep 200
@@ -1219,21 +1220,20 @@ Return
 		gIndex := 0
 ;~ 		gStr := ""
     }
-;~     Clipboard :=
+    Clipboard :=
     KeyWait c
-    Sleep 100
     Send ^c
     ClipWait 1
 ;~     if FileExist(Clipboard) or (gType != 1)
-    if IsClipFile() == 0
-    {
-		gCount := 0
-		gIndex := 0
+;~     if IsClipFile() == 0
+;~     {
+;~ 		gCount := 0
+;~ 		gIndex := 0
 ;~ 		gStr := ""
 ;~         MsgBox % gType 1
-        HideContent()
-        Return
-    }
+;~         HideContent()
+;~         Return
+;~     }
 ;~     MsgBox 123
 ;~     StringSplit,word_array,Clipboard,"`r`n"
 ;~     if FileExist(word_array1)
