@@ -486,13 +486,13 @@ return
 autoStart:
    if (autoStart = 0) {
       Menu ,Tray, Check, %L_auto_run%[&A]
-      RegWrite , REG_SZ, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\Run, MapleTools, %A_LineFile%
+      RegWrite , REG_SZ, HKEY_CURRENT_USER, SOFTWARE\Microsoft\Windows\CurrentVersion\Run, MapleTools, %A_LineFile%
       IniWrite, 1, ahk_setting.ini, lock, autoStart
       autoStart := 1
    }
    Else {
       Menu, Tray, UnCheck, %L_auto_run%[&A]
-      RegDelete, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\Run, MapleTools
+      RegDelete, HKEY_CURRENT_USER, SOFTWARE\Microsoft\Windows\CurrentVersion\Run, MapleTools
       IniWrite, 0, ahk_setting.ini, lock, autoStart
       autoStart := 0
    }
@@ -927,6 +927,11 @@ Return
 watchCursor:
 	MouseGetPos, , , winId ; get window under mouse pointer
     CoordMode, Mouse, Screen
+
+    GetKeyState, state, Ctrl
+    if state = U
+      HideContent()
+
     x_pos:=A_ScreenWidth-1
     y_pos:=A_ScreenHeight-1
     MouseGetPos, x, y
@@ -1548,16 +1553,16 @@ Return
 
 ;-------------------------智能F2----------------------------
 ~F2 Up::
-If Not (WinActive ("ahk_class CabinetWClass") or WinActive ("ahk_class Progman"))
-{
-  Return
-}
 ; 还记得 ~ 的用法么？
 date = %clipboard%
 ; 先把剪贴板的内容保存下来。往往剪贴板里存放的就是文件的新名字。
 send ^c
 ; 复制。为什么要复制呢？重命名的时候，系统会选中整个文件名。这时候就是复制了文件名（包括扩展名）
 ClipWait 1
+if clipboard =
+{
+Return
+}
 StringSplit, pos, clipboard,`.
 ; 分解字符串函数 StringSplit，我们要把剪贴板的文字以“.”为分隔符进行分割。假如我们有一个文件叫 appinn.com.txt（以下都会以这个文件名来讲解），那么到这里它就会被分割成 appinn、com、txt 三个字符串。这三个字符串组成了一个数组 pos，我们要输出它们各自的值时候这样写：%pos1%（也就是输出了 appinn），%pos2%，%pos3% 。因为“.”是个特殊的符号，所以这里我们要用“`”这个转义符，还记得回车的转义符么？就是“`n”啦。
 LastDot = % pos%pos0%
