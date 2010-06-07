@@ -189,14 +189,14 @@ Hotkey, !^+down, toggleWindowDown
 
 HotKey, #z, toggleSuspend
 Hotkey, #v, hiddenToolTip
-HotKey, ~ctrl, ctrlIsDown
-HotKey, ctrl up, ctrlIsUp
+;~ HotKey, ~ctrl, ctrlIsDown
+;~ HotKey, ctrl up, ctrlIsUp
 Hotkey, ~LButton, showDesktop
 
 /*
  * Timer initialization.
  */
-SetTimer, watchCursor, 300
+SetTimer, watchCursor, 50
 
 applicationname=Maple Tools
 CoordMode ,mouse,screen
@@ -380,7 +380,7 @@ start:
          Hotkey, LAlt, stop, off
          Hotkey, RAlt, stop, off
          Hotkey, Ctrl, stop, off
-         HotKey, ~ctrl, ctrlIsDown, On
+;~          HotKey, ~ctrl, ctrlIsDown, On
          Hotkey, ~LButton, showDesktop, On
          Hotkey, esc, stop, off
          Hotkey, del, stop, off
@@ -929,8 +929,18 @@ watchCursor:
     CoordMode, Mouse, Screen
 
     GetKeyState, state, Ctrl
-    if state = U
-      HideContent()
+    GetKeyState, state2, Alt
+    if state = D
+      FunShowClipBoard()
+    else if state = U
+    {
+;~       ToolTip %state2%
+      if state2 = D
+        FunShowClipBoard(1)
+      Else
+        HideContent()
+    }
+
 
     x_pos:=A_ScreenWidth-1
     y_pos:=A_ScreenHeight-1
@@ -1416,7 +1426,7 @@ OnClipboardChange:
 ;~     gType :=  A_EventInfo
 return
 
-FunShowClipBoard()
+FunShowClipBoard(isAlt = 0)
 {
     global gIndex
     global gCount
@@ -1459,26 +1469,30 @@ FunShowClipBoard()
         }
     }
 
-    ShowContent(gStr)
+    ShowContent(gStr, isAlt)
     Return
 }
 
 
 
-ctrlIsDown:
-    FunShowClipBoard()
-return
+;~ ctrlIsDown:
+;~     FunShowClipBoard()
+;~ return
 
-ctrlIsUp:
-  HideContent()
-Return
+;~ ctrlIsUp:
+;~   HideContent()
+;~ Return
 
 ; Show Clipboard ToolTips
-ShowContent(content)
+ShowContent(content, isAlt = 0)
 {
-    ToolTip, %content% , A_CaretX + 30 , A_CaretY + 30
-;~     MouseGetPos, xpos, ypos
-;~     ToolTip, %content% , xpos , ypos + 30
+    if (isAlt == 0)
+    {
+      ToolTip, %content% , A_CaretX + 30 , A_CaretY + 30
+    } else {
+      MouseGetPos, xpos, ypos
+      ToolTip, %content% , xpos + 30, ypos + 30
+    }
     return
 }
 
