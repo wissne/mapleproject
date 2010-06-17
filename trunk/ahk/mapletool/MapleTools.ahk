@@ -15,8 +15,13 @@ trans := 255
 gCount := 0
 gIndex := 0
 gStr := ""
+gStrAll := ""
 gType := 0
 gShowMsg := True
+gSuspend := False
+gShowAlt := False
+gShowAltLong := False
+gLastIsAlt := False
 
 ;--------------------------------------------------
 
@@ -199,7 +204,9 @@ Hotkey, ~LButton, showDesktop
 SetTimer, watchCursor, 50
 
 applicationname=Maple Tools
-CoordMode ,mouse,screen
+CoordMode, Mouse, Screen
+CoordMode, ToolTip, Screen
+CoordMode, Caret, Screen
 IfExist, MapleTools.ico
    Menu, tray, icon, MapleTools.ico
 
@@ -477,6 +484,9 @@ makeMenu:
    Menu, tray, Add, %L_auto_run%[&A], autoStart
    if (autoStart = 1)
       Menu, Tray, Check, %L_auto_run%[&A]
+   Menu, tray, Add
+   Menu, tray, Add, %L_show_alt%, toggleShowAlt
+   Menu, tray, Add, %L_show_alt_long%, toggleShowAltLong
    Menu, tray, Add, %L_about%..., about
    ;Menu, tray, Add, Reload Script, reloadScript
    ;Menu, tray, Add, Edit Script, editScript
@@ -496,9 +506,31 @@ autoStart:
       IniWrite, 0, ahk_setting.ini, lock, autoStart
       autoStart := 0
    }
-
 Return
 
+toggleShowAlt:
+  gShowAlt := not gShowAlt
+  if gShowAlt
+  {
+    Menu ,Tray, Check, %L_show_alt%
+  }
+  else
+  {
+    Menu ,Tray, UnCheck, %L_show_alt%
+  }
+Return
+
+toggleShowAltLong:
+  gShowAltLong := not gShowAltLong
+  if gShowAltLong
+  {
+    Menu ,Tray, Check, %L_show_alt_long%
+  }
+  else
+  {
+    Menu ,Tray, UnCheck, %L_show_alt_long%
+  }
+Return
 
 setFullscreen:
    if ( if_fullscreen = 1 )
@@ -597,6 +629,8 @@ setLang:
       L_fullscreen := lang_27
       L_auto_run := lang_28
       L_show_all_win := lang_29
+      L_show_alt := lang_30
+      L_show_alt_long := lang_31
       L_screenoff := lang_0
    }
    else
@@ -632,6 +666,8 @@ setLang:
       L_screenoff := "Turn off monitor"
       L_show_all_win := "Show all windows"
       L_auto_run := "Auto start"
+      L_show_alt := "Show alt tip"
+      L_show_alt_long := "Keep showing tip"
    }
 return
 
@@ -925,20 +961,48 @@ Return
  * Timer implementation.
  */
 watchCursor:
+;~     global gShowMsg
 	MouseGetPos, , , winId ; get window under mouse pointer
     CoordMode, Mouse, Screen
 
     GetKeyState, state, Ctrl
     GetKeyState, state2, Alt
-    if state = D
-      FunShowClipBoard()
-    else if state = U
+
+    i := gCount - 1
+    if i >= 0
     {
-;~       ToolTip %state2%
-      if state2 = D
-        FunShowClipBoard(1)
-      Else
+      j := gIndex - 1
+      if ( ClipBoard != Array%i% and ((j < 0) or ( Clipboard != Array%j% ) ))
+      {
+;~           MsgBox 111
+          gCount := 0
+          gIndex := 0
+          gStr := ""
+          gStrAll := ""
+      }
+    }
+    if gShowMsg
+    {
+      if state = D
+      {
+        gLastIsAlt := False
+        FunShowClipBoard()
+      }
+      else if state2 = D
+      {
+;~         MsgBox % gShowAlt
+        gLastIsAlt := True
+        if gShowAlt
+          FunShowClipBoard(1)
+      }
+      else if (not gShowAltLong or not gLastIsAlt)
+      {
         HideContent()
+      }
+    }
+    else
+    {
+      HideContent()
     }
 
 
@@ -1100,6 +1164,8 @@ return
 ;----------------- Maple Clip -------------------
 toggleSuspend:
   Suspend
+  gSuspend := not gSuspend
+  gShowMsg := not gSuspend
 return
 
 hiddenToolTip:
@@ -1116,6 +1182,7 @@ Return
 ;~ 		gStr := ""
     }
 ;~     Clipboard :=
+    SetTimer ,watchCursor, Off
     KeyWait c
     Send ^c
 ;~     Sleep 200
@@ -1155,6 +1222,7 @@ Return
             i := % gCount - 1
 ;~                 MsgBox 123
             Array%i% := Array%i% . Clipboard
+            Clipboard := Array%i%
 ;~             Msgbox % Array%i%
         }
 ;~ 		gStr .= Array%gCount% . "`r`n"
@@ -1163,6 +1231,7 @@ Return
     }
 ;~     MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
     FunShowClipBoard()
+    SetTimer ,watchCursor, On
 }
 Return
 
@@ -1178,6 +1247,7 @@ Return
 ;~     Sleep 200
 ;~     ToolTip 123
 ;~     ToolTip %Clipboard% 123
+    SetTimer ,watchCursor, Off
     KeyWait, c
 ;~     Send ^c
 ;~     ToolTip %Clipboard% 123g
@@ -1224,6 +1294,7 @@ Return
     }
 ;~     MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
     FunShowClipBoard()
+    SetTimer ,watchCursor, On
 }
 Return
 
@@ -1235,6 +1306,7 @@ Return
 		gIndex := 0
 ;~ 		gStr := ""
     }
+    SetTimer ,watchCursor, Off
     Clipboard :=
     KeyWait c
     Send ^c
@@ -1271,6 +1343,7 @@ Return
                 gCount := 0
                 gIndex := 0
                 Array%gCount% := Clipboard
+                Clipboard := Array%gCount%
             }
         }
 ;~ 		gStr .= Array%gCount% . "`r`n"
@@ -1280,6 +1353,7 @@ Return
     }
 ;~     MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
     FunShowClipBoard()
+    SetTimer ,watchCursor, On
 }
 Return
 
@@ -1307,13 +1381,13 @@ Return
 $^v::
 {
 	if (gIndex < gCount)
-	{
-		if (Clipboard is Number Or Clipboard is Text)
+    {
+       if (Clipboard is Number Or Clipboard is Text)
 		{
 			ClipBoard := Array%gIndex%
-			Array%gIndex% := ""
+;~ 			Array%gIndex% := ""
 			gIndex := gIndex + 1
-;~ 			MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
+;~ 			MsgBox % "Index:" . gIndex . " CgCountount: " . gCount . " Clipboard: " . Clipboard
         }
 ;~         MsgBox 123
     }
@@ -1322,6 +1396,7 @@ $^v::
 		gCount := 0
 		gIndex := 0
 		gStr := ""
+        gStrAll := ""
 ;~         MsgBox 234
     }
     Send ^v
@@ -1330,59 +1405,6 @@ $^v::
 }
 Return
 
-~$^x::
-{
-	if gIndex > 0
-	{
-		gCount := 0
-		gIndex := 0
-;~ 		gStr := ""
-    }
-;~     Clipboard :=
-    KeyWait x
-    ClipWait 1
-;~     if FileExist(Clipboard) or (gType != 1)
-    if IsClipFile() <> 0
-    {
-		gCount := 0
-		gIndex := 0
-;~ 		gStr := ""
-;~         MsgBox % gType
-        HideContent()
-        Return
-    }
-;~     StringSplit,word_array,Clipboard,"`r`n"
-;~     if FileExist(word_array1)
-;~     {
-;~ 		gCount := 0
-;~ 		gIndex := 0
-;~ 		gStr := ""
-;~         MsgBox % gType
-;~         Return
-;~     }
-	if (Clipboard is Number Or Clipboard is Text)
-	{
-		Array%gCount% := Clipboard
-        if gCount > 0
-        {
-            i := % gCount - 1
-            if (Array%i% == Clipboard)
-            {
-;~                 MsgBox 123
-                gCount := 0
-                gIndex := 0
-                Array%gCount% := Clipboard
-            }
-        }
-;~ 		gStr .= Array%gCount% . "`r`n"
-		gCount := gCount + 1
-;~ 		ClipBoard := Array%gIndex%
-;~ 		MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
-    }
-;~     MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
-    FunShowClipBoard()
-}
-Return
 
 ;~ ~LButton & RButton::
 ;~   KeyWait Lbutton
@@ -1431,6 +1453,7 @@ FunShowClipBoard(isAlt = 0)
     global gIndex
     global gCount
     global gStr
+    global gStrAll
     global Array
     global gShowMsg
     if (gIndex >= gCount || not gShowMsg)
@@ -1438,7 +1461,8 @@ FunShowClipBoard(isAlt = 0)
         HideContent()
         Return
     }
-    gStr := "=========== Maple Tip ==========="
+    gStr :=
+    gStrAll :=
     i := gIndex
     j := 1
 ;~     MsgBox % gIndex . gCount
@@ -1450,15 +1474,19 @@ FunShowClipBoard(isAlt = 0)
         if (i < gCount)
         {
             if gStr <>
-                gStr .= "`r`n"
-            If StrLen(Array%i%)>30
+              gStr .= "`r`n"
+            if gStrAll <>
+              gStrAll .= "`r`n"
+
+            If StrLen(Array%i%)>50
             {
-                gStr .= j .  spop . SubStr(Array%i%,1,28) . spot
+                gStr .= j .  spop . SubStr(Array%i%,1,48) . spot
             }
             Else
             {
                 gStr .= j .  spop . Array%i%
             }
+            gStrAll .= j .  spop . Array%i%
             i += 1
             j += 1
 ;~             MsgBox % gStr
@@ -1469,7 +1497,17 @@ FunShowClipBoard(isAlt = 0)
         }
     }
 
-    ShowContent(gStr, isAlt)
+
+    if isAlt = 0
+    {
+;~       MsgBox %isAlt%
+      ShowContent(gStr, 0)
+    }
+    else
+    {
+      ShowContent(gStrAll, 1)
+;~             MsgBox %isAlt%, 111
+    }
     Return
 }
 
@@ -1568,13 +1606,16 @@ Return
 ;-------------------------智能F2----------------------------
 ~F2 Up::
 ; 还记得 ~ 的用法么？
-date = %clipboard%
+data = %clipboard%
+SetTimer ,watchCursor, Off
 ; 先把剪贴板的内容保存下来。往往剪贴板里存放的就是文件的新名字。
 send ^c
 ; 复制。为什么要复制呢？重命名的时候，系统会选中整个文件名。这时候就是复制了文件名（包括扩展名）
 ClipWait 1
 if clipboard =
 {
+clipboard = %data%
+SetTimer ,watchCursor, On
 Return
 }
 StringSplit, pos, clipboard,`.
@@ -1583,7 +1624,11 @@ LastDot = % pos%pos0%
 ; 这句非常奇怪是吧？我们从后面开始说明，%pos0% 的值是 pos 数组的个数，继续上面的例子，那么这里 %pos0% 就是等于 3。“% pos%pos0%”就是数组中最后一个数！语法一定要这样写哦。到这里我们就把 txt(就是 pos3) 赋值给了 LastDot。
 IfEqual, pos0, 1
 ; 如果重命名的是一个文件夹，我们假如一个文件夹的名字是不带点的，所以上面的分解字符串得到的数组元素只有 1 个。这样的话就会返回。
-	return
+{
+  clipboard = %data%
+  SetTimer ,watchCursor, On
+  return
+}
 StepCount := StrLen(LastDot)
 StepCount2 := StrLen(clipboard) - StepCount - 1
 fileNamePrefix := SubStr(clipboard, 1, StepCount2)
@@ -1609,8 +1654,9 @@ send, ^+{Home}
 ; 再向做移动一次光标，相当于光标现在在在在最后一个“.”的左边。
 ;~ send +^{home}
 ; 选中最后一个“.”的左边所有的文字，这时就选中了文件名
-clipboard = %date%
+clipboard = %data%
 ; 还原剪贴板
+SetTimer ,watchCursor, On
 return
 
 
