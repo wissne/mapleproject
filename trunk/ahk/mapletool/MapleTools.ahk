@@ -22,6 +22,7 @@ gSuspend := False
 gShowAlt := False
 gShowAltLong := False
 gLastIsAlt := False
+gIsAltShowing := False
 
 ;--------------------------------------------------
 
@@ -192,11 +193,8 @@ Hotkey, !^+left, toggleWindowLeft
 Hotkey, !^+up, toggleWindowUp
 Hotkey, !^+down, toggleWindowDown
 
-HotKey, #z, toggleSuspend
-Hotkey, #v, hiddenToolTip
 ;~ HotKey, ~ctrl, ctrlIsDown
 ;~ HotKey, ctrl up, ctrlIsUp
-Hotkey, ~LButton, showDesktop
 
 /*
  * Timer initialization.
@@ -220,7 +218,32 @@ IniRead, if_fullscreen, ahk_setting.ini, lock, if_fullscreen, 0
 
 
 IniRead, hotkey, ahk_setting.ini, lock, hotkey, #k
+IniRead, hkToggleSuspend, ahk_setting.ini, lock, hkToggleSuspend, #z
+IniRead, hkToggleShowAlt, ahk_setting.ini, lock, hkToggleShowAlt, #x
+IniRead, hkToggleHiddenToolTip, ahk_setting.ini, lock, hkToggleHiddenToolTip, #c'
+IniRead, hkMinWin, ahk_setting.ini, lock, hkMinWin, #w
+IniRead, hkCloseWin, ahk_setting.ini, lock, hkCloseWin, #q
+IniRead, hkBackspace, ahk_setting.ini, lock, hkBackspace, #`
+IniRead, hkLastDir, ahk_setting.ini, lock, hkLastDir, ^Tab
+IniRead, hkGotoEnd, ahk_setting.ini, lock, hkGotoEnd, ^;
+IniRead, hkGotoHome, ahk_setting.ini, lock, hkGotoHome, ^'
+IniRead, hkPgUp, ahk_setting.ini, lock, hkPgUp, ![
+IniRead, hkPgDn, ahk_setting.ini, lock, hkPgDn, !]
+IniRead, hkDelete, ahk_setting.ini, lock, hkDelete, !.
+
 Hotkey, %hotkey%, start, On               ;Turn on the hotkey.
+HotKey, %hkToggleSuspend%, toggleSuspend, On
+HotKey, %hkToggleShowAlt%, toggleShowAlt, On
+Hotkey, %hkToggleHiddenToolTip%, hiddenToolTip, On
+HotKey, %hkMinWin%, triggleMinWin, On
+HotKey, %hkCloseWin%, triggleCloseWin, On
+HotKey, %hkBackspace%, triggleBackspace, On
+HotKey, %hkLastDir%, triggleLastDir, On
+HotKey, %hkGotoEnd%, triggleGotoEnd, On
+HotKey, %hkGotoHome%, triggleGotoHome, On
+HotKey, %hkPgUp%, trigglePgUp, On
+HotKey, %hkPgDn%, trigglePgDn, On
+HotKey, %hkDelete%, triggleDelete, On
 
 IniRead, language, ahk_setting.ini, lock, language, 0
 Gosub, setLang
@@ -236,6 +259,39 @@ if ( direct_lock = 1 )
    Gosub, start
 }
 return
+
+triggleMinWin:
+WinMinimize A
+Return
+
+triggleCloseWin:
+WinClose A
+Return
+
+triggleBackspace:
+Send  {backSpace}
+Return
+
+triggleLastDir:
+send !{left}
+Return
+
+triggleGotoEnd:
+Send {end}
+Return
+triggleGotoHome:
+Send {home}
+Return
+trigglePgUp:
+Send {PGUP}
+Return
+trigglePgDn:
+Send {PGDN}
+Return
+triggleDelete:
+Send {Del}
+return
+
 
 setPassword:
    InputBox, new_key, %L_password%, , HIDE, 130, 100
@@ -257,6 +313,7 @@ return
 
 start:
    SetTimer, CheckIdle, Off
+   SetTimer, watchCursor, Off
    SystemCursor(0)
    BlockInput, MouseMove
    if ( interface = 1 )
@@ -298,19 +355,6 @@ start:
          Gui, Show
       }
    }
-   if ( if_turnoff_monitor = 1 )
-   {
-      SetTimer, TurnoffMonitor, 3000
-      StringRight, H_key, hotkey, 1
-      KeyWait %H_key%
-      KeyWait LWin
-      KeyWait RWin
-      KeyWait Shift
-      KeyWait Control
-      KeyWait Alt
-      ;Power off the screen
-      SendMessage, 0x112, 0xF170, 2,,ahk_id 0xFFFF
-   }
    Hotkey, Lbutton, stop, on
    Hotkey, Rbutton, stop, on
    Hotkey, Mbutton, stop, on
@@ -324,6 +368,20 @@ start:
    Hotkey, f1, stop, on
    Hotkey, f4, stop, on
    Hotkey, tab, stop, on
+   if ( if_turnoff_monitor = 1 )
+   {
+      Sleep, 3000
+      SetTimer, TurnoffMonitor, 3000
+      StringRight, H_key, hotkey, 1
+      KeyWait %H_key%
+      KeyWait LWin
+      KeyWait RWin
+      KeyWait Shift
+      KeyWait Control
+      KeyWait Alt
+      ;Power off the screen
+      SendMessage, 0x112, 0xF170, 2,,ahk_id 0xFFFF
+   }
    i:=1
    Loop
    {
@@ -387,8 +445,6 @@ start:
          Hotkey, LAlt, stop, off
          Hotkey, RAlt, stop, off
          Hotkey, Ctrl, stop, off
-;~          HotKey, ~ctrl, ctrlIsDown, On
-         Hotkey, ~LButton, showDesktop, On
          Hotkey, esc, stop, off
          Hotkey, del, stop, off
          Hotkey, f1, stop, off
@@ -396,6 +452,7 @@ start:
          Hotkey, tab, stop, off
 
          SetTimer, CheckIdle, On
+         SetTimer, watchCursor, On
          return
       }
    }
@@ -408,7 +465,7 @@ makeMenu:
    Menu, tray, NoStandard
    Menu, tray, DeleteAll
    Menu, tray, Add, %L_lock%[&L], start
-   Menu, tray, Default, %L_lock%[&L]
+;~    Menu, tray, Default, %L_lock%[&L]
 ;~    Menu, tray, Add, %L_about%..., about
 ;~    Menu, tray, Add, %L_donate%..., donate
 ;~    Menu, tray, Add
@@ -488,6 +545,7 @@ makeMenu:
    Menu, tray, Add, %L_show_alt%, toggleShowAlt
    Menu, tray, Add, %L_show_alt_long%, toggleShowAltLong
    Menu, tray, Add, %L_about%..., about
+   Menu, tray, Default, %L_about%...
    ;Menu, tray, Add, Reload Script, reloadScript
    ;Menu, tray, Add, Edit Script, editScript
    Menu, tray, Add, %L_exit%[&X], menuExit
@@ -496,13 +554,13 @@ return
 autoStart:
    if (autoStart = 0) {
       Menu ,Tray, Check, %L_auto_run%[&A]
-      RegWrite , REG_SZ, HKEY_CURRENT_USER, SOFTWARE\Microsoft\Windows\CurrentVersion\Run, MapleTools, %A_LineFile%
+      FileCreateShortcut , %A_ScriptFullPath% , %A_startup%\MapleTools.lnk , %A_WorkingDir%
       IniWrite, 1, ahk_setting.ini, lock, autoStart
       autoStart := 1
    }
    Else {
       Menu, Tray, UnCheck, %L_auto_run%[&A]
-      RegDelete, HKEY_CURRENT_USER, SOFTWARE\Microsoft\Windows\CurrentVersion\Run, MapleTools
+      FileDelete , %A_startup%\MapleTools.lnk
       IniWrite, 0, ahk_setting.ini, lock, autoStart
       autoStart := 0
    }
@@ -1172,6 +1230,7 @@ hiddenToolTip:
   gShowMsg := not gShowMsg
 Return
 
+;~ ~LButton & RButton::WinMinimize A
 
 ~$^+c::
 {
@@ -1358,12 +1417,12 @@ Return
 Return
 
 
-~^!v::
+^!v::
 {
 ;~     MsgBox % gCount / 2
     i := gCount // 2
 ;~     MsgBox % i
-
+    SetTimer ,watchCursor, Off
     Loop %i%
     {
         tmpIndex1 := A_Index - 1
@@ -1373,13 +1432,47 @@ Return
         Array%tmpIndex2% := tmpStr
 ;~         MsgBox % tmpStr "," tmpIndex1 ":" tmpIndex2
     }
+    tmpIndex := gCount - 1
+    Clipboard := Array%tmpIndex%
     FunShowClipBoard()
+    SetTimer ,watchCursor, On
 }
 Return
 
 
 $^v::
 {
+	if (gIndex < gCount)
+    {
+       if (Clipboard is Number Or Clipboard is Text)
+		{
+			ClipBoard := Array%gIndex%
+;~ 			Array%gIndex% := ""
+			gIndex := gIndex + 1
+;~ 			MsgBox % "Index:" . gIndex . " CgCountount: " . gCount . " Clipboard: " . Clipboard
+        }
+;~         MsgBox 123
+    }
+	Else
+	{
+;~ 		gCount := 0
+;~ 		gIndex := 0
+;~ 		gStr := ""
+;~         gStrAll := ""
+;~         MsgBox 234
+    }
+    Send ^v
+    KeyWait v
+    FunShowClipBoard()
+}
+Return
+
+~$!Space::
+{
+  if (gIndex = gCount)
+  {
+    gIndex := 0
+  }
 	if (gIndex < gCount)
     {
        if (Clipboard is Number Or Clipboard is Text)
@@ -1400,7 +1493,7 @@ $^v::
 ;~         MsgBox 234
     }
     Send ^v
-    KeyWait v
+    KeyWait Space
     FunShowClipBoard()
 }
 Return
@@ -1583,25 +1676,6 @@ SetTrans:
         WinSet, Transparent, %trans%, A
     }
 return
-
-;----------------------×ÀÃæÏÔÊ¾---------------------------
-showDesktop:
-   x_pos:=A_ScreenWidth-1
-   y_pos:=A_ScreenHeight-1
-   MouseGetPos,x,y
-   if (x>x_pos-5 and y>y_pos-5) {
-      send #d
-   }
-   if (x<0+5 and y<0+5) {
-;~       If WinActive ("ahk_class Progman")
-;~       {
-;~         Return
-;~       }
-;~       ToolTip %x% : %y% : %x_pos% : %y_pos%
-      WinMinimize, A
- }
-
-Return
 
 ;-------------------------ÖÇÄÜF2----------------------------
 ~F2 Up::
@@ -1839,7 +1913,10 @@ Return
 
 Check_Alt_Hotkey2_Up:
   If ! ( GetKeyState(Alt_Hotkey2, "P") or GetKeyState(Alt_Hotkey2)) ; Alt key released
-    Gosub, ListView_Destroy
+  {
+  Gosub, ListView_Destroy
+  gShowAlt := gIsAltShowing
+  }
 Return
 
 
@@ -1850,6 +1927,14 @@ Return
 
 Display_List:
   Critical
+
+  if gShowAlt
+  {
+    gIsAltShowing := True
+    gShowAlt := False
+    HideContent()
+  }
+
   If Display_List_Shown =1 ; empty listview and image list if only updating
     {
     IL_Destroy(ImageListID1)
@@ -2039,6 +2124,7 @@ Else
     }
 
   Display_List_Shown =1 ; Gui 1 is shown back in Alt_Tab_Common_Stuff: section for initial creation
+
 Return
 
 
