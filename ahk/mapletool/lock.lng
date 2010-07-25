@@ -27,6 +27,8 @@ This tool is made with AutoHotKey
 Full Screen
 Auto start
 Show all windows
+Show alt tip
+Keep Showing tip
 Turn off monitor
 
 简体中文
@@ -57,6 +59,8 @@ Turn off monitor
 全屏显示
 开机运行
 显示所有窗口
+Alt键提示
+永远显示提示
 关闭屏幕
 
 繁體中文
@@ -87,4 +91,6 @@ Turn off monitor
 全屏顯示
 開機運行
 顯示所有窗體
+Alt鍵提示
+永遠顯示提示
 關閉螢幕
