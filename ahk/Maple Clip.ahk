@@ -117,7 +117,7 @@ send !{left}
 Return
 ;~ ~LButton & RButton::WinMinimize A
 
-~$^+c::
+$^+c::
 {
 	if gIndex > 0
 	{
@@ -242,7 +242,7 @@ Return
 }
 Return
 
-~$^!c::
+$^!c::
 {
 	if gIndex > 0
 	{
@@ -352,7 +352,7 @@ $^v::
 }
 Return
 
-~$!Space::
+$^+v::
 {
     if (gIndex = gCount)
     {
