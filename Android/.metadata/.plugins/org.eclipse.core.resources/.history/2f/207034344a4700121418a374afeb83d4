@@ -1,0 +1,20 @@
+package com.maple.paint;
+
+import android.os.Bundle;
+import android.app.Activity;
+import android.view.Menu;
+
+public class SurfaceViewAcitvity extends Activity {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_surface_view_acitvity);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_surface_view_acitvity, menu);
+        return true;
+    }
+}

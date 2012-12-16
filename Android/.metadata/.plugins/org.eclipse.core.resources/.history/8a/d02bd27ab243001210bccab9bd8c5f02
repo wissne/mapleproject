@@ -1,0 +1,130 @@
+package com.maple.dialog;
+
+import android.os.Bundle;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
+import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+
+public class MainActivity extends Activity {
+	
+	private static final int DIALOG_0 = 1;
+	private static final int DIALOG_1 = 2;
+	private static final int DIALOG_2 = 3;
+	private static final int DIALOG_3 = 4;
+	private static final int DIALOG_4 = 5;
+	private static final int DIALOG_5 = 6;
+	private static final int DIALOG_6 = 7;
+	private static final int DIALOG_7 = 8;
+	
+	private static final OnClickListener listener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			Button btn = (Button) v;
+			System.out.println(DIALOG_7);
+			switch (btn.getId()) {
+			case R.id.Button01:
+				break;
+			case R.id.Button02:
+				
+				break;
+			case R.id.Button03:
+				
+				break;
+			case R.id.Button04:
+				
+				break;
+			case R.id.Button05:
+				
+				break;
+			case R.id.Button06:
+				
+				break;
+			case R.id.Button07:
+				
+				break;
+			case R.id.Button08:
+				
+				break;
+
+			default:
+				break;
+			}
+		}
+
+
+	};
+	
+	private void CreateDialog(int i) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+		switch (i) {
+		case DIALOG_0:
+			builder.setIcon(R.drawable.ic_launcher);
+			builder.setTitle("你确定要离开吗？");
+			builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					showDialog("你选择了确定");
+				}
+			});
+			builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					showDialog("你选择了取消");
+				}
+			});
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	private Button buttons[];	
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        
+        buttons = new Button[8];
+        buttons[0] = (Button) findViewById(R.id.Button01);
+        buttons[1] = (Button) findViewById(R.id.Button02);
+        buttons[2] = (Button) findViewById(R.id.Button03);
+        buttons[3] = (Button) findViewById(R.id.Button04);
+        buttons[4] = (Button) findViewById(R.id.Button05);
+        buttons[5] = (Button) findViewById(R.id.Button06);
+        buttons[6] = (Button) findViewById(R.id.Button07);
+        buttons[7] = (Button) findViewById(R.id.Button08);
+        
+        for (int i = 0; i < buttons.length; i++) {
+        	buttons[i].setOnClickListener(listener);
+		}
+        
+        buttons[0].setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				CreateDialog(DIALOG_0);
+			}
+		});
+        
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main, menu);
+        return true;
+    }
+    
+    private void showDialog(String str) {
+    	new AlertDialog.Builder(MainActivity.this).setMessage(str).show();
+    }
+}
