@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="android.R"/>
+<fullyQualifiedTypeName name="android.R.id"/>
+<fullyQualifiedTypeName name="com.maple.button.ButtonClick"/>
+<fullyQualifiedTypeName name="com.maple.button.R.string"/>
+<fullyQualifiedTypeName name="com.maple.button.R.id"/>
+<fullyQualifiedTypeName name="com.maple.button.MainActivity"/>
+<fullyQualifiedTypeName name="java.lang.Integer"/>
+<fullyQualifiedTypeName name="android.net.Uri"/>
+<fullyQualifiedTypeName name="com.maple.indent.R.id"/>
+<fullyQualifiedTypeName name="com.maple.indent.SecondActivity"/>
+<fullyQualifiedTypeName name="com.maple.indent.MainActivity"/>
+<fullyQualifiedTypeName name="android.widget.Toast"/>
+<fullyQualifiedTypeName name="com.maple.activity.R.id"/>
+<fullyQualifiedTypeName name="com.maple.activity.MainActivity"/>
+<fullyQualifiedTypeName name="com.maple.activity.ThirdActivity"/>
+<fullyQualifiedTypeName name="android.widget.EditText"/>
+<fullyQualifiedTypeName name="android.os.Binder"/>
+<fullyQualifiedTypeName name="com.maple.service.R.id"/>
+<fullyQualifiedTypeName name="android.content.Context"/>
+<fullyQualifiedTypeName name="android.content.ServiceConnection"/>
+<fullyQualifiedTypeName name="com.maple.service.BindService.MyBinder"/>
+<fullyQualifiedTypeName name="com.maple.service.BindService"/>
+<fullyQualifiedTypeName name="android.content.Intent"/>
+<fullyQualifiedTypeName name="com.maple.service.MainActivity"/>
+<fullyQualifiedTypeName name="com.maple.service.MyService"/>
+<fullyQualifiedTypeName name="android.util.Log"/>
+<fullyQualifiedTypeName name="org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager"/>
+<fullyQualifiedTypeName name="com.maple.service.MyService.MyThread"/>
+<fullyQualifiedTypeName name="com.maple.service.ExampleService"/>
+<fullyQualifiedTypeName name="com.maple.service.MyIntentService"/>
+<fullyQualifiedTypeName name="android.widget.Button"/>
+<fullyQualifiedTypeName name="com.maple.dialog.R.id"/>
+<fullyQualifiedTypeName name="android.view.View.OnClickListener"/>
+<fullyQualifiedTypeName name="android.app.AlertDialog"/>
+<fullyQualifiedTypeName name="android.app.AlertDialog.Builder"/>
+<fullyQualifiedTypeName name="com.maple.dialog.R.drawable"/>
+<fullyQualifiedTypeName name="android.content.DialogInterface"/>
+<fullyQualifiedTypeName name="android.content.DialogInterface.OnClickListener"/>
+</qualifiedTypeNameHistroy>

@@ -1,0 +1,9 @@
+1351006402859	Rename type 'BindService'
+1351321353451	Extracts string 'Stop Binder Service' into R.string.stop_binder_service
+1351321362936	Extracts string 'Start Binder Service' into R.string.start_binder_service
+1351321406382	Extracts string 'Stop Binder Service' into R.string.stop_binder_service
+1351321412263	Extracts string 'Start Service' into R.string.start_service
+1351321416436	Extracts string 'Stop Service' into R.string.stop_service
+1351321421414	Extracts string 'Start Binder Service' into R.string.start_binder_service
+1351321433244	Extracts string 'Start Normal Service' into R.string.start_normal_service
+1351321437431	Extracts string 'Start Intent Service' into R.string.start_intent_service
