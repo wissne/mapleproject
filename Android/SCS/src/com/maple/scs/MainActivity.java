@@ -23,6 +23,8 @@ public class MainActivity extends Activity {
 	
 	private Button btnDisable;
 	
+	private Intent intent = null;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +38,7 @@ public class MainActivity extends Activity {
         btnEnable.setOnClickListener(new OnClickListener() {
 			
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, SCSService.class);
+				intent = new Intent(MainActivity.this, SCSService.class);
 				startService(intent);
 				
 				Toast.makeText(MainActivity.this, R.string.enable_success,
@@ -50,7 +52,7 @@ public class MainActivity extends Activity {
         btnDisable.setOnClickListener(new OnClickListener() {
 			
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, SCSService.class);
+				intent = new Intent(MainActivity.this, SCSService.class);
 				stopService(intent);
 				Toast.makeText(MainActivity.this, R.string.disable_success,
 						Toast.LENGTH_LONG).show();
