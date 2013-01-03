@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">智能连接</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">智能连接</string>
+    <string name="enable">开启智能连接</string>
+    <string name="disable">关闭智能连接</string>
+ 	<string name="enable_success">成功开启智能连接</string>
+    <string name="disable_success">成功关闭智能连接</string>
+</resources>
