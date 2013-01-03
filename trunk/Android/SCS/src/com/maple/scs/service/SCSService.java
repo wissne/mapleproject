@@ -40,16 +40,23 @@ public class SCSService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(TAG, "onStartCommand");
+		super.onStartCommand(intent, flags, startId);
 		
-		screenOnOffReceiver = new ScreenReceiver();
-		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(Intent.ACTION_SCREEN_ON);
-		intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-		registerReceiver(screenOnOffReceiver, intentFilter);
-		Log.i(TAG, "registerReceiver");
+		try {
+			screenOnOffReceiver = new ScreenReceiver();
+			IntentFilter intentFilter = new IntentFilter();
+			intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+			intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+			registerReceiver(screenOnOffReceiver, intentFilter);
+			Log.i(TAG, "registerReceiver");
+		} catch (Exception e) {
+			Log.e(TAG, e.toString());
+			e.printStackTrace();
+		}
 		
-		return super.onStartCommand(intent, flags, startId);
+		return START_STICKY;
 	}
+	
 
 	private class MyThread extends Thread {
 
