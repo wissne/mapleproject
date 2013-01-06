@@ -15,8 +15,8 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         
-        <service android:name=".service.SCSService" >
-        </service>
+        <service android:name=".service.SCSScreenService" />
+        <service android:name=".service.SCSThreadService" />
         
         <activity
             android:name=".MainActivity"
