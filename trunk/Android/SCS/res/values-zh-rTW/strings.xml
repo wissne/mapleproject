@@ -18,4 +18,6 @@
     <string name="min">分鍾</string>
     <string name="enable_time_connect">開啓間隔連接服務</string>
     <string name="disable_time_connect">關閉間隔連接服務</string>
+    <string name="enable_thread_success">成功開啓間隔連接服務</string>
+    <string name="disable_thread_success">成功關閉間隔連接服務</string>
 </resources>

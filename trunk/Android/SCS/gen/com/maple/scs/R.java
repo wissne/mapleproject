@@ -52,9 +52,11 @@ public final class R {
         public static final int des_enable=0x7f05000c;
         public static final int disable=0x7f050004;
         public static final int disable_success=0x7f050006;
+        public static final int disable_thread_success=0x7f050014;
         public static final int disable_time_connect=0x7f050012;
         public static final int enable=0x7f050003;
         public static final int enable_success=0x7f050005;
+        public static final int enable_thread_success=0x7f050013;
         public static final int enable_time_connect=0x7f050011;
         public static final int hits_open_service=0x7f050008;
         public static final int menu_settings=0x7f050001;

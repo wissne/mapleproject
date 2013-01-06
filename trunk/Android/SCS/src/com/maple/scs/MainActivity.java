@@ -85,15 +85,15 @@ public class MainActivity extends Activity {
 					// Start Service
 					startService(intentScreen);
 					Toast.makeText(MainActivity.this, R.string.enable_success,
-							Toast.LENGTH_LONG).show();
-					Log.i(Constant.TAG, "startService");
+							Toast.LENGTH_SHORT).show();
+					Log.i(Constant.TAG, "startScreenService");
 				} else {
 					intentScreen = new Intent(MainActivity.this, SCSScreenService.class);
 					// Stop Service
 					stopService(intentScreen);
 					Toast.makeText(MainActivity.this, R.string.disable_success,
-							Toast.LENGTH_LONG).show();
-					Log.i(Constant.TAG, "stopService");
+							Toast.LENGTH_SHORT).show();
+					Log.i(Constant.TAG, "stopScreenService");
 				}
 			}
 		});
@@ -106,10 +106,16 @@ public class MainActivity extends Activity {
 					intentThread = new Intent(MainActivity.this, SCSThreadService.class);
 					// Start Service
 					startService(intentThread);
+					Toast.makeText(MainActivity.this, R.string.enable_thread_success,
+							Toast.LENGTH_SHORT).show();
+					Log.i(Constant.TAG, "stopThreadService");
 				} else {
 					intentThread = new Intent(MainActivity.this, SCSThreadService.class);
 					// Start Service
 					stopService(intentThread);
+					Toast.makeText(MainActivity.this, R.string.disable_thread_success,
+							Toast.LENGTH_SHORT).show();
+					Log.i(Constant.TAG, "stopThreadService");
 				}
 				seekBarDisable.setEnabled(!isChecked);
 				seekBarEnable.setEnabled(!isChecked);
