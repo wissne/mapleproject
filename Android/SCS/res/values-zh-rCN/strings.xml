@@ -19,4 +19,6 @@
     <string name="min">分钟</string>
     <string name="enable_time_connect">开启间隔连接服务</string>
     <string name="disable_time_connect">关闭间隔连接服务</string>
+    <string name="enable_thread_success">成功开启间隔连接服务</string>
+    <string name="disable_thread_success">成功关闭间隔连接服务</string>
 </resources>
