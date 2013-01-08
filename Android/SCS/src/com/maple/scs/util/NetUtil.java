@@ -8,6 +8,10 @@ import android.util.Log;
 
 public class NetUtil {
 
+	private static final String SET_MOBILE_DATA_ENABLED = "setMobileDataEnabled";
+
+	private static final String GET_MOBILE_DATA_ENABLED = "getMobileDataEnabled";
+
 	private static ConnectivityManager cm;
 	
 	private static NetUtil netUtil;
@@ -23,12 +27,16 @@ public class NetUtil {
 	}
 
 	public boolean gprsEnable(boolean bEnable) {
-		boolean isOpen = gprsIsOpenMethod("getMobileDataEnabled");
+		boolean isOpen = gprsIsOpenMethod(GET_MOBILE_DATA_ENABLED);
 		if (isOpen == !bEnable) {
-			setGprsEnable("setMobileDataEnabled", bEnable);
+			setGprsEnable(SET_MOBILE_DATA_ENABLED, bEnable);
 		}
 
 		return isOpen;
+	}
+	
+	public boolean isGprsOpen() {
+		return gprsIsOpenMethod(GET_MOBILE_DATA_ENABLED);
 	}
 
 	public boolean gprsIsOpenMethod(String methodName) {
