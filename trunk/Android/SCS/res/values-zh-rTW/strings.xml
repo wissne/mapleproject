@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">智能連接</string>
+    <string name="app_name">GPRS智能連接</string>
     <string name="menu_settings">設置</string>
     <string name="title_activity_main">智能連接</string>
     <string name="enable">開啓智能連接服務</string>

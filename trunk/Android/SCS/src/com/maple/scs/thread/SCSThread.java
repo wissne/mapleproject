@@ -58,6 +58,12 @@ public class SCSThread extends Thread {
 			NetUtil net = NetUtil.getInstance(context);
 			while (!stopRequest) {
 				Thread.sleep(curDisable * 60000);
+				/*
+				 * 1.1 Fix GRPS is open, no need to turn off it, as user may still using
+				 */
+				if (net.isGprsOpen()) {
+					continue;
+				}
 				net.gprsEnable(true);
 				Log.i(Constant.TAG, "Enable network" + curDisable);
 				Thread.sleep(curEnable * 60000);
