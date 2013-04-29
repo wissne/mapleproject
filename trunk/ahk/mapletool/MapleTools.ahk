@@ -23,6 +23,9 @@ gShowAlt := False
 gShowAltLong := False
 gLastIsAlt := False
 gIsAltShowing := False
+gFromStr:="(.+)"
+gToStr:="'$1'"
+gJoinLine:=","
 
 ;--------------------------------------------------
 
@@ -147,37 +150,42 @@ LATEST VERSION CHANGES:
 
 ;========================================================================================================
 
-Gosub, Load_Settings_From_Ini
+IniRead, disableAltTab, ahk_setting.ini, lock, disableAltTab, 0
 
-OnExit, OnExit_Script_Closing
+if (disableAltTab = 0)
+{
+	Gosub, Load_Settings_From_Ini
 
-OnMessage( 0x06, "WM_ACTIVATE" )
+	OnExit, OnExit_Script_Closing
 
-Gosub, Initiate_Hotkeys ; initiate Alt-Tab and Alt-Shift-Tab hotkeys and translate some modifier symbols
+	OnMessage( 0x06, "WM_ACTIVATE" )
 
-WS_EX_APPWINDOW =0x40000
-WS_EX_TOOLWINDOW =0x80
-WS_DISABLED =0x8000000
-WS_VSCROLL =0x200000
-GW_OWNER = 4
+	Gosub, Initiate_Hotkeys ; initiate Alt-Tab and Alt-Shift-Tab hotkeys and translate some modifier symbols
 
-SysGet, Scrollbar_Vertical_Thickness, 2 ; 2 is SM_CXVSCROLL, Width of a vertical scroll bar
-If A_OSVersion =WIN_2000
-  lv_h_win_2000_adj =2 ; adjust height of main listview by +2 pixels to avoid scrollbar in windows 2000
-Else
-  lv_h_win_2000_adj =0
+	WS_EX_APPWINDOW =0x40000
+	WS_EX_TOOLWINDOW =0x80
+	WS_DISABLED =0x8000000
+	WS_VSCROLL =0x200000
+	GW_OWNER = 4
 
-WinGet, TaskBar_ID, ID, ahk_class Shell_TrayWnd ; for docked windows check
+	SysGet, Scrollbar_Vertical_Thickness, 2 ; 2 is SM_CXVSCROLL, Width of a vertical scroll bar
+	If A_OSVersion =WIN_2000
+	  lv_h_win_2000_adj =2 ; adjust height of main listview by +2 pixels to avoid scrollbar in windows 2000
+	Else
+	  lv_h_win_2000_adj =0
 
-Display_List_Shown =0
-Window_Hotkey =0
-Use_Large_Icons_Current =%Use_Large_Icons% ; for remembering original user setting but changing on the fly
-Gui_Dock_Windows_List = ; keep track of number of docked windows
-Blank = ; for If(array != blank)
-Time_Since_Last_Alt_Close =0 ; initialise time for repeat rate allowed for closing windows with alt+\
-Number_Tabs_To_Send =-1 ; initialise for Group hotkey
-New_Group_Loaded =1
-Viewed_Window_List =
+	WinGet, TaskBar_ID, ID, ahk_class Shell_TrayWnd ; for docked windows check
+
+	Display_List_Shown =0
+	Window_Hotkey =0
+	Use_Large_Icons_Current =%Use_Large_Icons% ; for remembering original user setting but changing on the fly
+	Gui_Dock_Windows_List = ; keep track of number of docked windows
+	Blank = ; for If(array != blank)
+	Time_Since_Last_Alt_Close =0 ; initialise time for repeat rate allowed for closing windows with alt+\
+	Number_Tabs_To_Send =-1 ; initialise for Group hotkey
+	New_Group_Loaded =1
+	Viewed_Window_List =
+}
 
 /*
  * Hotkey bindings
@@ -218,9 +226,11 @@ IniRead, if_fullscreen, ahk_setting.ini, lock, if_fullscreen, 0
 
 
 IniRead, hotkey, ahk_setting.ini, lock, hotkey, #k
-IniRead, hkToggleSuspend, ahk_setting.ini, lock, hkToggleSuspend, #z
-IniRead, hkToggleShowAlt, ahk_setting.ini, lock, hkToggleShowAlt, #x
-IniRead, hkToggleHiddenToolTip, ahk_setting.ini, lock, hkToggleHiddenToolTip, #c'
+IniRead, hkToggleSuspend, ahk_setting.ini, lock, hkToggleSuspend, #s
+IniRead, hkToggleShowAlt, ahk_setting.ini, lock, hkToggleShowAlt, #a
+IniRead, hkToggleHiddenToolTip, ahk_setting.ini, lock, hkToggleHiddenToolTip, #h 
+IniRead, hkSetTop, ahk_setting.ini, lock, hkSetTop, #t
+IniRead, hkSetNoTop, ahk_setting.ini, lock, hkSetNoTop, #+t 
 IniRead, hkMinWin, ahk_setting.ini, lock, hkMinWin, #w
 IniRead, hkCloseWin, ahk_setting.ini, lock, hkCloseWin, #q
 IniRead, hkBackspace, ahk_setting.ini, lock, hkBackspace, #`
@@ -230,13 +240,19 @@ IniRead, hkGotoHome, ahk_setting.ini, lock, hkGotoHome, ^'
 IniRead, hkPgUp, ahk_setting.ini, lock, hkPgUp, ![
 IniRead, hkPgDn, ahk_setting.ini, lock, hkPgDn, !]
 IniRead, hkDelete, ahk_setting.ini, lock, hkDelete, !.
+IniRead, hkReplaceString, ahk_setting.ini, lock, hkReplaceString, #j
+IniRead, hkReplaceStringSetting, ahk_setting.ini, lock, hkReplaceStringSetting, #g
 
 Hotkey, %hotkey%, start, On               ;Turn on the hotkey.
 HotKey, %hkToggleSuspend%, toggleSuspend, On
 HotKey, %hkToggleShowAlt%, toggleShowAlt, On
 Hotkey, %hkToggleHiddenToolTip%, hiddenToolTip, On
+Hotkey, %hkSetTop%, SetTop, On
+Hotkey, %hkSetNoTop%, SetNoTop, On
 HotKey, %hkMinWin%, triggleMinWin, On
 HotKey, %hkCloseWin%, triggleCloseWin, On
+HotKey, %hkReplaceString%, trigglehkReplaceString, On
+HotKey, %hkReplaceStringSetting%, trigglehkReplaceStringSetting, On
 HotKey, %hkBackspace%, triggleBackspace, On
 HotKey, %hkLastDir%, triggleLastDir, On
 HotKey, %hkGotoEnd%, triggleGotoEnd, On
@@ -1025,20 +1041,23 @@ watchCursor:
 
     GetKeyState, state, Ctrl
     GetKeyState, state2, Alt
+	GetKeyState, state3, LWin
 
     i := gCount - 1
-    if i >= 0
-    {
-      j := gIndex - 1
-      if ( ClipBoard != Array%i% and ((j < 0) or ( Clipboard != Array%j% ) ))
-      {
-;~           MsgBox 111
-          gCount := 0
-          gIndex := 0
-          gStr := ""
-          gStrAll := ""
-      }
-    }
+	;~  --------------------- Comment by maple begin 2013/01/21 --------------------
+;~    if i >= 0
+;~    {
+;~      j := gIndex - 1
+;~      if ( ClipBoard != Array%i% and ((j < 0) or ( Clipboard != Array%j% ) ))
+;~      {
+;~;~           MsgBox 111
+;~          gCount := 0
+;~          gIndex := 0
+;~          gStr := ""
+;~          gStrAll := ""
+;~      }	
+;~    }
+	;~  ---------------------  Comment by maple end 2013/01/21  --------------------
     if gShowMsg
     {
       if state = D
@@ -1046,6 +1065,11 @@ watchCursor:
         gLastIsAlt := False
         FunShowClipBoard()
       }
+	  else if state3 = D
+	  {
+		gLastIsAlt := False
+        FunShowClipBoard()  
+	  }
       else if state2 = D
       {
 ;~         MsgBox % gShowAlt
@@ -1230,71 +1254,47 @@ hiddenToolTip:
   gShowMsg := not gShowMsg
 Return
 
+SetTop:
+	winset AlwaysOnTop, Toggle, A
+	WinSet, Style, -0xC00000, A
+	WinSet, Style, -0x40000, A ; No Border
+	WinSet, ExStyle, +0x80, A ; remove from task bar
+return
+
+SetNoTop:
+	WinSet,Style,+0xC00000,A
+	winset AlwaysOnTop, Toggle, A
+	WinSet, Style, +0x40000, A ; No Border
+	WinSet, ExStyle, -0x80, A ; remove from task bar
+return
+
 ;~ ~LButton & RButton::WinMinimize A
 
-$^+c::
+$#z::
 {
-	if gIndex > 0
-	{
-		gCount := 0
-		gIndex := 0
-;~ 		gStr := ""
-    }
-;~     Clipboard :=
-    SetTimer ,watchCursor, Off
-    KeyWait c
-    Send ^c
-;~     Sleep 200
-    ClipWait 1
-
-;~     Msgbox % Clipboard
-;~     if FileExist(Clipboard) or (gType != 1)
-    if IsClipFile() <> 0
+	gIndex := 0
+	
+  	if (gIndex < gCount)
     {
-		gCount := 0
-		gIndex := 0
-;~ 		gStr := ""
-;~         MsgBox % gType 1
-        HideContent()
-        Return
-    }
-;~     StringSplit,word_array,Clipboard,"`r`n"
-;~     if FileExist(word_array1)
-;~     {
-;~ 		gCount := 0
-;~ 		gIndex := 0
-;~ 		gStr := ""
-;~         MsgBox % gType
-;~         Return
-;~     }
-	if (Clipboard is Number Or Clipboard is Text)
-	{
-;~         MsgBox % gCount
-        if gCount = 0
-        {
-            Array%gCount% := Clipboard
-;~             MsgBox % Clipboard
-            gCount := gCount + 1
+       if (Clipboard is Number Or Clipboard is Text)
+		{
+			Clipboard :=
+			loop, %gCount%
+			{
+				ClipBoard := ClipBoard . Array%gIndex% . "`r`n"
+				gIndex := gIndex + 1
+	;~ 			MsgBox % "Index:" . gIndex . " CgCountount: " . gCount . " Clipboard: " . Clipboard
+			}
         }
-        else if gCount > 0
-        {
-            i := % gCount - 1
-;~                 MsgBox 123
-            Array%i% := Array%i% . Clipboard
-            Clipboard := Array%i%
-;~             Msgbox % Array%i%
-        }
-;~ 		gStr .= Array%gCount% . "`r`n"
-;~ 		ClipBoard := Array%gIndex%
-;~ 		MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
+	;~  MsgBox 123
     }
-;~     MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
+    ;KeyWait z
+    Send ^v
     FunShowClipBoard()
-    SetTimer ,watchCursor, On
 }
 Return
 
-~$^c::
+$#c::
 {
     if gIndex > 0
 	{
@@ -1308,9 +1308,12 @@ Return
 ;~     ToolTip %Clipboard% 123
     SetTimer ,watchCursor, Off
     KeyWait, c
-;~     Send ^c
+	Send {Ctrl Down}
+	Send {c Down}
+	Send {c Up}
+	Send {Ctrl Up}
 ;~     ToolTip %Clipboard% 123g
-    ClipWait 1
+    ClipWait 5
 
 ;~     ToolTip %Clipboard% 123f
 ;~     if FileExist(Clipboard) or (gType != 1)
@@ -1357,7 +1360,7 @@ Return
 }
 Return
 
-$^!c::
+$#b::
 {
 	if gIndex > 0
 	{
@@ -1367,8 +1370,11 @@ $^!c::
     }
     SetTimer ,watchCursor, Off
     Clipboard :=
-    KeyWait c
-    Send ^c
+    KeyWait b
+    Send {Ctrl Down}
+	Send {c Down}
+	Send {c Up}
+	Send {Ctrl Up}
     ClipWait 1
 ;~     if FileExist(Clipboard) or (gType != 1)
 ;~     if IsClipFile() == 0
@@ -1393,6 +1399,7 @@ $^!c::
 	if (Clipboard is Number Or Clipboard is Text)
 	{
 		Array%gCount% := Clipboard
+;~		MsgBox % gType Clipboard
         if gCount > 0
         {
             i := % gCount - 1
@@ -1406,8 +1413,8 @@ $^!c::
             }
         }
 ;~ 		gStr .= Array%gCount% . "`r`n"
-		gCount := gCount + 1
-;~ 		ClipBoard := Array%gIndex%
+		ClipBoard := Array%gCount%
+		gCount := gCount + 1 		
 ;~ 		MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
     }
 ;~     MsgBox % "Index:" . gIndex . " Count: " . gCount . " Clipboard: " . Clipboard
@@ -1417,10 +1424,13 @@ $^!c::
 Return
 
 
-^!v::
+$#x::
 {
 ;~     MsgBox % gCount / 2
-    i := gCount // 2
+	if (gCount <= 0)
+		return
+		
+    i := gCount // 2	
 ;~     MsgBox % i
     SetTimer ,watchCursor, Off
     Loop %i%
@@ -1440,34 +1450,34 @@ Return
 Return
 
 
-$^v::
-{
-	if (gIndex < gCount)
-    {
-       if (Clipboard is Number Or Clipboard is Text)
-		{
-			ClipBoard := Array%gIndex%
-;~ 			Array%gIndex% := ""
-			gIndex := gIndex + 1
-;~ 			MsgBox % "Index:" . gIndex . " CgCountount: " . gCount . " Clipboard: " . Clipboard
-        }
-;~         MsgBox 123
-    }
-	Else
-	{
-;~ 		gCount := 0
-;~ 		gIndex := 0
-;~ 		gStr := ""
-;~         gStrAll := ""
-;~         MsgBox 234
-    }
-    Send ^v
-    KeyWait v
-    FunShowClipBoard()
-}
-Return
+;~$^v::
+;~{
+;~	if (gIndex < gCount)
+;~    {
+;~       if (Clipboard is Number Or Clipboard is Text)
+;~		{
+;~			ClipBoard := Array%gIndex%
+;~;~ 			Array%gIndex% := ""
+;~			gIndex := gIndex + 1
+;~;~ 			MsgBox % "Index:" . gIndex . " CgCountount: " . gCount . " Clipboard: " . Clipboard
+;~        }
+;~;~         MsgBox 123
+;~    }
+;~	Else
+;~	{
+;~;~ 		gCount := 0
+;~;~ 		gIndex := 0
+;~;~ 		gStr := ""
+;~;~         gStrAll := ""
+;~;~         MsgBox 234
+;~    }
+;~    Send ^v
+;~    KeyWait v
+;~    FunShowClipBoard()
+;~}
+;~Return
 
-$^+v::
+$#v::
 {
   if (gIndex = gCount)
   {
@@ -1492,11 +1502,211 @@ $^+v::
         gStrAll := ""
 ;~         MsgBox 234
     }
+    KeyWait v
     Send ^v
-    KeyWait Space
     FunShowClipBoard()
 }
 Return
+
+
+$#1::
+    if (gCount > 0)
+    {
+        Clipboard := Array0
+        Send {Ctrl Down}
+        Send {v Down}
+        Send {v Up}
+        Send {Ctrl Up}
+    }
+return
+
+#2::
+    if (gCount > 1)
+    {                
+        Clipboard := Array1
+        Send {Ctrl Down}
+        Send {v Down}
+        Send {v Up}
+        Send {Ctrl Up}
+    }
+return
+
+$#3::
+    if (gCount > 2)
+    {
+        Clipboard := Array2
+        Send {Ctrl Down}
+        Send {v Down}
+        Send {v Up}
+        Send {Ctrl Up}
+    }
+return
+
+$#4::
+    if (gCount > 3)
+    {
+        Clipboard := Array3
+        Send {Ctrl Down}
+        Send {v Down}
+        Send {v Up}
+        Send {Ctrl Up}
+    }
+return
+
+$#5::
+    if (gCount > 4)
+    {
+        Clipboard := Array4
+        Send {Ctrl Down}
+        Send {v Down}
+        Send {v Up}
+        Send {Ctrl Up}
+    }
+return
+
+$#6::
+    if (gCount > 5)
+    {
+        Clipboard := Array5
+        Send {Ctrl Down}
+        Send {v Down}
+        Send {v Up}
+        Send {Ctrl Up}
+    }
+return
+
+$#7::
+    if (gCount > 6)
+    {
+        Clipboard := Array6
+        Send {Ctrl Down}
+        Send {v Down}
+        Send {v Up}
+        Send {Ctrl Up}
+    }
+return
+
+$#8::
+    if (gCount > 7)
+    {
+        Clipboard := Array7
+        Send {Ctrl Down}
+        Send {v Down}
+        Send {v Up}
+        Send {Ctrl Up}
+    }
+return
+
+$#9::
+    if (gCount > 8)
+    {
+        Clipboard := Array8
+        Send {Ctrl Down}
+        Send {v Down}
+        Send {v Up}
+        Send {Ctrl Up}
+    }
+return
+
+$#0::
+    if (gCount > 9)
+    {
+        Clipboard := Array9
+        Send {Ctrl Down}
+        Send {v Down}
+        Send {v Up}
+        Send {Ctrl Up}
+    }
+return
+
+;~ --------------------- Add by maple begin 2013/01/09 --------------------
+;~ Replace Str
+trigglehkReplaceString:
+Send {Ctrl Down}
+Send {c Down}
+Send {c Up}
+Send {Ctrl Up}
+clipwait
+	s := clipboard
+	if (gFromStr != "" && gToStr != "")
+	{
+		s := RegExReplace(s, gFromStr, gToStr, count)		
+	}
+	if (gJoinLine != "")
+	{
+		s := RegExReplace(s, "\r\n", gJoinLine, count)
+	}
+	ClipBoard := s
+	Send {Ctrl Down}
+	Send {v Down}
+	Send {v Up}
+	Send {Ctrl Up}
+	;~Tooltip %s%
+	;~sleep 2000
+	;~Tooltip
+return
+
+trigglehkReplaceStringSetting:
+	Gui, 2:Destroy
+	Gui, -SysMenu
+	
+	Gui, 2:Add, Text, x12 y10 w70 h30 , Find what:
+	Gui, 2:Add, Edit, vGFromStr x90 y10 w200 r1 , %gFromStr%
+	Gui, 2:Add, Text, x12 y40 w70 h30 , Replace with:
+	Gui, 2:Add, Edit, vGToStr x90 y40 w200 r1 , %gToStr%
+	Gui, 2:Add, Text, x12 y70 w70 h30 , Join line:
+	Gui, 2:Add, Edit, vGJoinLine x90 y70 w200 r1 , %gJoinLine%
+	Gui, 2:Add, Radio, vDefSpace gDefSpace x20 y100 w50 r1 , Emp 
+	Gui, 2:Add, Radio, vDefComma gDefComma x70 y100 w40 r1 , `, 
+	Gui, 2:Add, Radio, vDefQuota gDefQuota x110 y100 w40 r1 , `',' 
+	Gui, 2:Add, Radio, vDefShu gDefShu x150 y100 w40 r1 , `|
+	Gui, 2:Add, Radio, vDefSelect gDefSelect x190 y100 w40 r1 , Sel
+	Gui, 2:Add, Radio, vDefRunSql gDefRunSql x230 y100 w40 r1 , Run
+	Gui, 2:Add, Button, x90 y130 w80 r1 default , Ok
+	Gui, 2:Add, Button, x180 y130 w80 r1 , Cancel
+	Gui, 2:Show, xCenter yCenter h160 w300, Setting	
+	
+return
+DefSpace:    
+    GuiControl, , GFromStr, \s*(\r\n)
+    GuiControl, , GToStr, $1
+    GuiControl, , GJoinLine, 
+return
+DefComma:
+    GuiControl, , GFromStr, 
+    GuiControl, , GToStr, 
+    GuiControl, , GJoinLine, ,
+return
+DefQuota:
+    GuiControl, , GFromStr, (.+)
+    GuiControl, , GToStr, '$1'
+    GuiControl, , GJoinLine, ,
+return
+DefShu:
+    GuiControl, , GFromStr, 
+    GuiControl, , GToStr, 
+    GuiControl, , GJoinLine, |
+return
+DefRunSql:
+    GuiControl, , GFromStr, (.+)
+    GuiControl, , GToStr, @"$1"
+    GuiControl, , GJoinLine,
+return
+DefSelect:
+    GuiControl, , GFromStr, (.+)
+    GuiControl, , GToStr, `select '$1' from dual `
+    GuiControl, , GJoinLine, `union all `
+return
+
+2ButtonOk:
+    Gui, Submit, NoHide
+    Gui, Destroy
+return
+2ButtonCancel:
+   Gui, Cancel, NoHide
+   Gui, Destroy
+return
+;~ ---------------------  Add by maple end 2013/01/09  --------------------
 
 
 ;~ ~LButton & RButton::
@@ -1561,7 +1771,7 @@ FunShowClipBoard(isAlt = 0)
 ;~     MsgBox % gIndex . gCount
 
     spot := "..."
-    spop := "、"
+    spop := ". "
     Loop
     {
         if (i < gCount)
@@ -1677,61 +1887,46 @@ SetTrans:
     }
 return
 
-;-------------------------智能F2----------------------------
-~F2 Up::
-; 还记得 ~ 的用法么？
-data = %clipboard%
-SetTimer ,watchCursor, Off
-; 先把剪贴板的内容保存下来。往往剪贴板里存放的就是文件的新名字。
-send ^c
-; 复制。为什么要复制呢？重命名的时候，系统会选中整个文件名。这时候就是复制了文件名（包括扩展名）
-ClipWait 1
-if clipboard =
-{
-clipboard = %data%
-SetTimer ,watchCursor, On
-Return
-}
-StringSplit, pos, clipboard,`.
-; 分解字符串函数 StringSplit，我们要把剪贴板的文字以“.”为分隔符进行分割。假如我们有一个文件叫 appinn.com.txt（以下都会以这个文件名来讲解），那么到这里它就会被分割成 appinn、com、txt 三个字符串。这三个字符串组成了一个数组 pos，我们要输出它们各自的值时候这样写：%pos1%（也就是输出了 appinn），%pos2%，%pos3% 。因为“.”是个特殊的符号，所以这里我们要用“`”这个转义符，还记得回车的转义符么？就是“`n”啦。
-LastDot = % pos%pos0%
-; 这句非常奇怪是吧？我们从后面开始说明，%pos0% 的值是 pos 数组的个数，继续上面的例子，那么这里 %pos0% 就是等于 3。“% pos%pos0%”就是数组中最后一个数！语法一定要这样写哦。到这里我们就把 txt(就是 pos3) 赋值给了 LastDot。
-IfEqual, pos0, 1
-; 如果重命名的是一个文件夹，我们假如一个文件夹的名字是不带点的，所以上面的分解字符串得到的数组元素只有 1 个。这样的话就会返回。
-{
-  clipboard = %data%
-  SetTimer ,watchCursor, On
-  return
-}
-StepCount := StrLen(LastDot)
-StepCount2 := StrLen(clipboard) - StepCount - 1
-fileNamePrefix := SubStr(clipboard, 1, StepCount2)
-Clipboard := "." . LastDot
-send, ^v
-send, {home}
-Clipboard := fileNamePrefix
-send, ^v
-send, ^+{Home}
-;~ MsgBox % SubStr(clipboard, 0, StrLen(clipboard)-StepCount)
-; 获得最后一个数组元素的长度。继续例子，把 3 赋值给 StepCount，也就是说 txt 是由 3 个字符组成的。
-;~ send +^{end}
-; 把光标移动到文件名的最后面。继续例子，现在的光标在最后一个 t 后面。
-;~ sleep 100
-; 暂停一下，保证脚本的正常。
-;~ loop %StepCount%
-;~ {
-; 开始循环，循环的次数是最后一个数组元素的长度（例子是循环 3 次）。
-;~ send {left}
-; 那么这里就会把光标向左移动三次，也就说，光标现在在最后一个“.”的右边。
-;~ }
-;~ send {left}
-; 再向做移动一次光标，相当于光标现在在在在最后一个“.”的左边。
-;~ send +^{home}
-; 选中最后一个“.”的左边所有的文字，这时就选中了文件名
-clipboard = %data%
-; 还原剪贴板
-SetTimer ,watchCursor, On
-return
+; Do not use
+;~F2 Up::
+
+;data = %clipboard%
+;SetTimer ,watchCursor, Off
+
+;send ^c
+
+;ClipWait 1
+;if clipboard =
+;{
+;clipboard = %data%
+;SetTimer ,watchCursor, On
+;Return
+;}
+;StringSplit, pos, clipboard,`.
+
+;LastDot = % pos%pos0%
+
+;IfEqual, pos0, 1
+
+;{
+;  clipboard = %data%
+;  SetTimer ,watchCursor, On
+;  return
+;}
+;StepCount := StrLen(LastDot)
+;StepCount2 := StrLen(clipboard) - StepCount - 1
+;fileNamePrefix := SubStr(clipboard, 1, StepCount2)
+;Clipboard := "." . LastDot
+;send, ^v
+;send, {home}
+;Clipboard := fileNamePrefix
+;send, ^v
+;send, ^+{Home}
+
+;clipboard = %data%
+
+;SetTimer ,watchCursor, On
+;return
 
 
 
