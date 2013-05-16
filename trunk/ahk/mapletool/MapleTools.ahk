@@ -1256,16 +1256,16 @@ Return
 
 SetTop:
 	winset AlwaysOnTop, Toggle, A
-	WinSet, Style, -0xC00000, A
-	WinSet, Style, -0x40000, A ; No Border
-	WinSet, ExStyle, +0x80, A ; remove from task bar
+;~	WinSet, Style, -0xC00000, A
+;~	WinSet, Style, -0x40000, A ; No Border
+;~	WinSet, ExStyle, +0x80, A ; remove from task bar
 return
 
 SetNoTop:
-	WinSet,Style,+0xC00000,A
+;~	WinSet,Style,+0xC00000,A
 	winset AlwaysOnTop, Toggle, A
-	WinSet, Style, +0x40000, A ; No Border
-	WinSet, ExStyle, -0x80, A ; remove from task bar
+;~	WinSet, Style, +0x40000, A ; No Border
+;~	WinSet, ExStyle, -0x80, A ; remove from task bar
 return
 
 ;~ ~LButton & RButton::WinMinimize A
@@ -1628,6 +1628,7 @@ Send {c Up}
 Send {Ctrl Up}
 clipwait
 	s := clipboard
+	s := RegExReplace(s, "\s*(\r\n)", "$1", count)
 	if (gFromStr != "" && gToStr != "")
 	{
 		s := RegExReplace(s, gFromStr, gToStr, count)		
