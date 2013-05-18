@@ -30,6 +30,7 @@ public class NetUtil {
 		boolean isOpen = gprsIsOpenMethod(GET_MOBILE_DATA_ENABLED);
 		if (isOpen == !bEnable) {
 			setGprsEnable(SET_MOBILE_DATA_ENABLED, bEnable);
+			Log.i(Constant.TAG, "function gprsEnable(" + bEnable + ")");
 		}
 
 		return isOpen;

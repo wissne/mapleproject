@@ -95,6 +95,26 @@ public class MainActivity extends Activity {
 							Toast.LENGTH_SHORT).show();
 					Log.i(Constant.TAG, "stopScreenService");
 				}
+				
+				if (isChecked) {
+					intentThread = new Intent(MainActivity.this, SCSThreadService.class);
+					// Start Service
+					saveIntData(Constant.TOGGLE_CONN_COUNT, 1);
+					startService(intentThread);
+//					Toast.makeText(MainActivity.this, R.string.enable_thread_success,
+//							Toast.LENGTH_SHORT).show();
+					Log.i(Constant.TAG, "stopThreadService");
+				} else {
+					intentThread = new Intent(MainActivity.this, SCSThreadService.class);
+					// Start Service
+					stopService(intentThread);
+//					Toast.makeText(MainActivity.this, R.string.disable_thread_success,
+//							Toast.LENGTH_SHORT).show();
+					Log.i(Constant.TAG, "stopThreadService");
+				}
+				seekBarDisable.setEnabled(!isChecked);
+				seekBarEnable.setEnabled(!isChecked);
+				saveBooleanData(Constant.TOGGLE_THREAD, isChecked);
 			}
 		});
         
@@ -102,24 +122,6 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (isChecked) {
-					intentThread = new Intent(MainActivity.this, SCSThreadService.class);
-					// Start Service
-					startService(intentThread);
-					Toast.makeText(MainActivity.this, R.string.enable_thread_success,
-							Toast.LENGTH_SHORT).show();
-					Log.i(Constant.TAG, "stopThreadService");
-				} else {
-					intentThread = new Intent(MainActivity.this, SCSThreadService.class);
-					// Start Service
-					stopService(intentThread);
-					Toast.makeText(MainActivity.this, R.string.disable_thread_success,
-							Toast.LENGTH_SHORT).show();
-					Log.i(Constant.TAG, "stopThreadService");
-				}
-				seekBarDisable.setEnabled(!isChecked);
-				seekBarEnable.setEnabled(!isChecked);
-				saveBooleanData(Constant.TOGGLE_THREAD, isChecked);
 			}
 		});
         
@@ -149,12 +151,10 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
-				if (toggleThreadService.isChecked()) {
 					intentThread = new Intent(MainActivity.this, SCSThreadService.class);
 					stopService(intentThread);
 					toggleThreadService.setChecked(false);
 					saveIntData(Constant.CURRENT_TIME_ENABLE, seekBar.getProgress());
-				}
 			}
 			
 			@Override
