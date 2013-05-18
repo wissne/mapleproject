@@ -3,12 +3,10 @@ package com.maple.scs.service;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.maple.scs.receiver.ScreenReceiver;
-import com.maple.scs.thread.SCSThread;
 import com.maple.scs.util.Constant;
 
 public class SCSScreenService extends Service {

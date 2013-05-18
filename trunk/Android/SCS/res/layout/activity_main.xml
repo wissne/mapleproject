@@ -24,29 +24,11 @@
         android:layout_height="3px"
         android:background="@drawable/fenge" />
 
-    <ToggleButton
-        android:id="@+id/toggleService"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:checked="false"
-        android:hint="@string/hits_open_service"
-        android:text="@string/scs"
-        android:textOff="@string/enable"
-        android:textOn="@string/disable" />
-
     <View
         android:id="@+id/View3"
         android:layout_width="wrap_content"
         android:layout_height="8px"
         android:background="@drawable/fenge" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/time_connect"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="#FF8C00" />
     <View
         android:id="@+id/view4"
         android:layout_width="wrap_content"
@@ -134,11 +116,22 @@
     </LinearLayout>
 
     <ToggleButton
+        android:id="@+id/toggleService"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:hint="@string/hits_open_service"
+        android:text="@string/scs"
+        android:textOff="@string/enable"
+        android:textOn="@string/disable" />
+
+    <ToggleButton
         android:id="@+id/toggleThread"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/time_connect"
         android:textOff="@string/enable_time_connect"
+        android:visibility="gone"
         android:textOn="@string/disable_time_connect" />
 
 </LinearLayout>
