@@ -308,6 +308,16 @@ triggleDelete:
 Send {Del}
 return
 
+!;::
+Send +{HOME}
+Send {Del}
+return
+
+!'::
+Send +{END}
+Send {Del}
+return
+
 
 setPassword:
    InputBox, new_key, %L_password%, , HIDE, 130, 100
