@@ -5,6 +5,7 @@
 #Include grep.ahk
 #InstallKeybdHook
 #InstallMouseHook
+
 ;#NoTrayIcon
 
 SetBatchLines, -1
@@ -309,12 +310,12 @@ Send {Del}
 return
 
 !;::
-Send +{HOME}
+Send +{END}
 Send {Del}
 return
 
 !'::
-Send +{END}
+Send +{HOME}
 Send {Del}
 return
 
@@ -1030,7 +1031,7 @@ menuExit:
 	ExitApp
 return
 
-^!a::
+^+x::
   if FileExist("CaptureScreen.exe")
   run, CaptureScreen.exe
 Return
@@ -1637,15 +1638,32 @@ Send {c Down}
 Send {c Up}
 Send {Ctrl Up}
 clipwait
+	
+  	if (gIndex < gCount)
+    {
+       if (Clipboard is Number Or Clipboard is Text)
+		{
+			Clipboard :=
+			loop, %gCount%
+			{
+				ClipBoard := ClipBoard . Array%gIndex% . "`r`n"
+				gIndex := gIndex + 1
+	;~ 			MsgBox % "Index:" . gIndex . " CgCountount: " . gCount . " Clipboard: " . Clipboard
+			}
+        }
+	;~  MsgBox 123
+    }
+	
 	s := clipboard
 	s := RegExReplace(s, "\s*(\r\n)", "$1", count)
-	if (gFromStr != "" && gToStr != "")
+	if (gFromStr != "")
 	{
 		s := RegExReplace(s, gFromStr, gToStr, count)		
 	}
 	if (gJoinLine != "")
 	{
 		s := RegExReplace(s, "\r\n", gJoinLine, count)
+		s := RegExReplace(s, gJoinLine . "$", "", count)
 	}
 	ClipBoard := s
 	Send {Ctrl Down}
@@ -1684,7 +1702,7 @@ DefSpace:
     GuiControl, , GJoinLine, 
 return
 DefComma:
-    GuiControl, , GFromStr, 
+    GuiControl, , GFromStr, \t+
     GuiControl, , GToStr, 
     GuiControl, , GJoinLine, ,
 return
@@ -1694,7 +1712,7 @@ DefQuota:
     GuiControl, , GJoinLine, ,
 return
 DefShu:
-    GuiControl, , GFromStr, 
+    GuiControl, , GFromStr, \t+
     GuiControl, , GToStr, 
     GuiControl, , GJoinLine, |
 return
