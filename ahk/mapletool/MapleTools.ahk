@@ -1702,27 +1702,27 @@ DefSpace:
     GuiControl, , GJoinLine, 
 return
 DefComma:
-    GuiControl, , GFromStr, \t+
-    GuiControl, , GToStr, 
+    GuiControl, , GFromStr, [\t ]+
+    GuiControl, , GToStr, ` `
     GuiControl, , GJoinLine, ,
 return
 DefQuota:
-    GuiControl, , GFromStr, (.+)
+    GuiControl, , GFromStr, [\t ]*(.+)[\t ]*
     GuiControl, , GToStr, '$1'
     GuiControl, , GJoinLine, ,
 return
 DefShu:
-    GuiControl, , GFromStr, \t+
-    GuiControl, , GToStr, 
+    GuiControl, , GFromStr, [\t ]+
+    GuiControl, , GToStr, ` `
     GuiControl, , GJoinLine, |
 return
 DefRunSql:
-    GuiControl, , GFromStr, (.+)
+    GuiControl, , GFromStr, [\t ]*(.+)[\t ]*
     GuiControl, , GToStr, @"$1"
     GuiControl, , GJoinLine,
 return
 DefSelect:
-    GuiControl, , GFromStr, (.+)
+    GuiControl, , GFromStr, [\t ]*(.+)[\t ]*
     GuiControl, , GToStr, `select '$1' from dual `
     GuiControl, , GJoinLine, `union all `
 return
