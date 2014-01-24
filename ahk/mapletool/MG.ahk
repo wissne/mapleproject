@@ -127,7 +127,7 @@ if islabel("g" . gesture)<>0
 	s := s . "(Exec cur before)"
 	else if (gesture = "lrd")
 	s := s . "(Exec all after)"
-	else if (gesture = "lru ")
+	else if (gesture = "lru")
 	s := s . "(Exec all before)"
 	else if (gesture = "dld")
 	s := s . "(Copy)"
