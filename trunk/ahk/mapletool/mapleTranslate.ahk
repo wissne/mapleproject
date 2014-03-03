@@ -4,6 +4,15 @@ CoordMode, Mouse, Screen
 CoordMode, ToolTip, Screen
 
 $MButton::
+	translate()
+return
+
+^!y::
+	translate()
+return
+
+translate()
+{
 	clipboard=
 	sleep,200
 	send,^c
@@ -77,7 +86,8 @@ $MButton::
 	;~ msgbox,%TanslateStr%
 	MouseGetPos, xpos, ypos
 	ToolTip, %TanslateStr%,%xpos% + 20,%ypos% + 20
-return
+	return
+}
 
 ~LButton::
 SetTimer, RemoveToolTip, 100
