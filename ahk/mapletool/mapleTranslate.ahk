@@ -11,10 +11,16 @@ return
 	translate()
 return
 
+^!x::
+InputBox, new_word, , , , 240, 100
+clipboard := new_word
+translate()
+return
+
 translate()
 {
-	clipboard=
-	sleep,200
+	;~clipboard=
+	;~sleep,200
 	send,^c
 	clipwait,2
 	StringReplace, clipboard, clipboard, `r`n, %A_SPACE%, All;;Copy the text after remove the newline character in the clipboard
