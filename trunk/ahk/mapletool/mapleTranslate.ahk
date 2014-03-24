@@ -7,7 +7,7 @@ $MButton::
 	translate()
 return
 
-^!y::
+^!z::
 	translate()
 return
 
@@ -21,15 +21,15 @@ translate()
 
 
 	Estr := clipboard
-	Gurl := "http://translate.google.com/?langpair=auto|zh-CN&text="
+	Gurl := "http://dict.youdao.com/search?le=eng&q="
 	Gurl.= Estr
 	WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
 	
 	WebRequest.SetProxy(2, "intpxy1.hk.hsbc:8080", "*.hsbc")
 	WebRequest.Open("GET",Gurl, false)
-	WebRequest.setRequestHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; rv:19.0) Gecko/20100101 Firefox/19.0")
+	WebRequest.setRequestHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.11 Safari/537.36")
 	WebRequest.setRequestHeader("Connection","keep-alive")
-	WebRequest.setRequestHeader("Host","translate.google.cn")
+	WebRequest.setRequestHeader("Host","dict.youdao.com")
 
 	WebRequest.Send()
 	errorcode := A_LastError
@@ -39,49 +39,40 @@ translate()
 	return
 	}
 	result := WebRequest.ResponseText
-	RegExMatch(result, "<span id=result_box(.*?)</span>", SubPat)
-	Tstr := "<span id=result_box" . SubPat1
-	TanslateStr1 := RegExReplace(Tstr, "<.*?>", "")
+	;~msgbox, %Gurl%
+	;~msgbox,%result%
 	
+	RegExMatch(result, "<h4 class=""wordGroup"">(.*?)</ul>", SubPat)
+	Tstr := SubPat1 
+	TanslateStr := Tstr
+	TanslateStr := RegExReplace(TanslateStr, "<[^>]+>", "`n")
+	TanslateStr := RegExReplace(TanslateStr, "\n +", "`n")
+	TanslateStr := RegExReplace(TanslateStr, "\n{8,}", "#_#`n")
+	TanslateStr := RegExReplace(TanslateStr, "\s*(\n)", "$1")
+	TanslateStr := RegExReplace(TanslateStr, "^\n", "")
+	TanslateStr := RegExReplace(TanslateStr, "#_#", "`n")
+	clipboard := TanslateStr
 	
-	Estr := clipboard
-	Gurl := "http://translate.google.com/?langpair=auto|en&text="
-	Gurl.= Estr
-	WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-	
-	WebRequest.SetProxy(2, "intpxy1.hk.hsbc:8080", "*.hsbc")
-	WebRequest.Open("GET",Gurl, false)
-	WebRequest.setRequestHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; rv:19.0) Gecko/20100101 Firefox/19.0")
-	WebRequest.setRequestHeader("Connection","keep-alive")
-	WebRequest.setRequestHeader("Host","translate.google.cn")
-
-	WebRequest.Send()
-	errorcode := A_LastError
-	if (errorcode != 0)
+	if (TanslateStr == "")
 	{
-	Traytip, network connection failure, please try again.
-	return
+		TanslateStr := "Sorry, no answer..."
 	}
-	result := WebRequest.ResponseText
-	RegExMatch(result, "<span id=result_box(.*?)</span>", SubPat)
-	Tstr := "<span id=result_box" . SubPat1
 	
-	TanslateStr2 :=RegExReplace(Tstr, "<.*?>", "")
 	
-	if (Estr == TanslateStr1)
-	{
-		TanslateStr := TanslateStr2
-		clipboard:=TanslateStr
-		TanslateStr.="`r`n"
-		TanslateStr.=TanslateStr1
-	}
-	else
-	{
-		TanslateStr := TanslateStr1
-		clipboard:=TanslateStr
-		TanslateStr.="`r`n"
-		TanslateStr.=TanslateStr2
-	}
+	;~if (Estr == TanslateStr1)
+	;~{
+	;~	TanslateStr := TanslateStr2
+	;~	clipboard:=TanslateStr
+	;~	TanslateStr.="`r`n"
+	;~	TanslateStr.=TanslateStr1
+	;~}
+	;~else
+	;~{
+	;~	TanslateStr := TanslateStr1
+	;~	clipboard:=TanslateStr
+	;~	TanslateStr.="`r`n"
+	;~	TanslateStr.=TanslateStr2
+	;~}
 	
 	;~ msgbox,%TanslateStr%
 	MouseGetPos, xpos, ypos
@@ -92,6 +83,11 @@ translate()
 ~LButton::
 SetTimer, RemoveToolTip, 100
 Return
+
+;~$F5::
+appExit:
+	ExitApp
+return
 
 RemoveToolTip:
 	SetTimer, RemoveToolTip, Off
