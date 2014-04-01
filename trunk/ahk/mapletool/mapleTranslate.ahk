@@ -17,14 +17,9 @@ clipboard := new_word
 translate()
 return
 
-translate()
+getHttpRequest()
 {
-	;~clipboard=
-	;~sleep,200
-	send,^c
-	clipwait,2
 	StringReplace, clipboard, clipboard, `r`n, %A_SPACE%, All;;Copy the text after remove the newline character in the clipboard
-
 
 	Estr := clipboard
 	Gurl := "http://dict.youdao.com/search?le=eng&q="
@@ -57,12 +52,29 @@ translate()
 	TanslateStr := RegExReplace(TanslateStr, "\s*(\n)", "$1")
 	TanslateStr := RegExReplace(TanslateStr, "^\n", "")
 	TanslateStr := RegExReplace(TanslateStr, "#_#", "`n")
-	clipboard := TanslateStr
-	
 	if (TanslateStr == "")
 	{
 		TanslateStr := "Sorry, no answer..."
+	}	
+	clipboard := TanslateStr
+}
+
+translate()
+{
+	send,^c
+	clipwait,2
+	
+	getHttpRequest()
+	
+	RegExMatch(clipboard, "(\w+)的变形", SubPat)
+	Tstr := SubPat1
+	if (Tstr != "")
+	{
+		clipboard:= Tstr
+		getHttpRequest()
 	}
+	
+
 	
 	
 	;~if (Estr == TanslateStr1)
@@ -80,9 +92,9 @@ translate()
 	;~	TanslateStr.=TanslateStr2
 	;~}
 	
-	;~ msgbox,%TanslateStr%
+	;~ msgbox,%clipboard%
 	MouseGetPos, xpos, ypos
-	ToolTip, %TanslateStr%,%xpos% + 20,%ypos% + 20
+	ToolTip, %clipboard%,%xpos% + 20,%ypos% + 20
 	return
 }
 
