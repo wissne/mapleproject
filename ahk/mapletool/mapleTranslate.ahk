@@ -52,11 +52,21 @@ getHttpRequest()
 	TanslateStr := RegExReplace(TanslateStr, "\s*(\n)", "$1")
 	TanslateStr := RegExReplace(TanslateStr, "^\n", "")
 	TanslateStr := RegExReplace(TanslateStr, "#_#", "`n")
+	clipboard := TanslateStr
 	if (TanslateStr == "")
 	{
-		TanslateStr := "Sorry, no answer..."
+		RegExMatch(result, "<div class=""trans-container"">(.*?)<p class=""additional""", SubPat)
+		Tstr := SubPat1 
+		TanslateStr := Tstr
+		TanslateStr := RegExReplace(TanslateStr, "<[^>]+>", "`n")
+		TanslateStr := RegExReplace(TanslateStr, "\n +", "`n")
+		TanslateStr := RegExReplace(TanslateStr, "\n{8,}", "#_#`n")
+		TanslateStr := RegExReplace(TanslateStr, "\s*(\n)", "$1")
+		TanslateStr := RegExReplace(TanslateStr, "^\n", "")
+		TanslateStr := RegExReplace(TanslateStr, "#_#", "`n")
+		clipboard := TanslateStr
 	}	
-	clipboard := TanslateStr
+	
 }
 
 translate()
