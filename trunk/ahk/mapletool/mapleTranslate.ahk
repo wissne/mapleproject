@@ -52,7 +52,7 @@ getHttpRequest()
 	TanslateStr := RegExReplace(TanslateStr, "\s*(\n)", "$1")
 	TanslateStr := RegExReplace(TanslateStr, "^\n", "")
 	TanslateStr := RegExReplace(TanslateStr, "#_#", "`n")
-  TanslateStr := RegExReplace(TanslateStr, "&.*;", "")
+	TanslateStr := RegExReplace(TanslateStr, "&.*;", "")
 	clipboard := TanslateStr
 	if (TanslateStr == "")
 	{
@@ -65,7 +65,7 @@ getHttpRequest()
 		TanslateStr := RegExReplace(TanslateStr, "\s*(\n)", "$1")
 		TanslateStr := RegExReplace(TanslateStr, "^\n", "")
 		TanslateStr := RegExReplace(TanslateStr, "#_#", "`n")
-    TanslateStr := RegExReplace(TanslateStr, "&.*;", "")
+		TanslateStr := RegExReplace(TanslateStr, "&.*;", "")
 		clipboard := TanslateStr
 	}
 	 if (TanslateStr == "")
