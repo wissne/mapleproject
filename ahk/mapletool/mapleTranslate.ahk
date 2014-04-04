@@ -67,7 +67,11 @@ getHttpRequest()
 		TanslateStr := RegExReplace(TanslateStr, "#_#", "`n")
     TanslateStr := RegExReplace(TanslateStr, "&.*;", "")
 		clipboard := TanslateStr
-	}	
+	}
+	 if (TanslateStr == "")
+	{
+		clipboard := "Sorry, nothing found..."
+	}
 	
 }
 
