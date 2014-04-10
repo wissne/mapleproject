@@ -68,9 +68,9 @@ getHttpRequest()
 		TanslateStr := RegExReplace(TanslateStr, "&.*;", "")
 		clipboard := TanslateStr
 	}
-	 if (TanslateStr == "")
+	if (TanslateStr == "")
 	{
-		clipboard := "Sorry, nothing found..."
+		clipboard := ""
 	}
 	
 }
@@ -78,8 +78,13 @@ getHttpRequest()
 translate()
 {
 	send,^c
-	clipwait,2
-	
+	MouseGetPos, xpos, ypos
+	clipwait,5
+	if (clipboard == null || clipboard == "")
+	{
+		ToolTip, Clipboard is null,%xpos% + 20,%ypos% + 20
+		return
+	}
 	getHttpRequest()
 	
 	RegExMatch(clipboard, "(\w+)的变形", SubPat)
@@ -89,7 +94,11 @@ translate()
 		clipboard:= Tstr
 		getHttpRequest()
 	}
-	
+	if (clipboard == "")
+	{
+		ToolTip, Can not translate it,%xpos% + 20,%ypos% + 20
+		return
+	}
 
 	
 	
@@ -109,7 +118,6 @@ translate()
 	;~}
 	
 	;~ msgbox,%clipboard%
-	MouseGetPos, xpos, ypos
 	ToolTip, %clipboard%,%xpos% + 20,%ypos% + 20
 	return
 }
