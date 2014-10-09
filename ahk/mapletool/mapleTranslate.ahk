@@ -3,7 +3,12 @@ ComObjError(false)
 CoordMode, Mouse, Screen
 CoordMode, ToolTip, Screen
 
+gShowMsg := False
+gBox := False
+
 $MButton::
+	global gBox
+	gBox := False
 	translate()
 return
 
@@ -12,8 +17,10 @@ return
 return
 
 ^!x::
+global gBox
 InputBox, new_word, , , , 240, 100
 clipboard := new_word
+gBox := True
 translate()
 return
 
@@ -100,9 +107,16 @@ getHttpRequest(translateWord = "")
 
 translate()
 {
-	send,^c
-	MouseGetPos, xpos, ypos
-	clipwait,1
+	global gBox
+	global gShowMsg
+	gShowMsg := True
+	
+	if (gBox == 0)
+	{
+		send,^c
+		MouseGetPos, xpos, ypos
+		clipwait,1
+	}
 	if (clipboard == null || clipboard == "")
 	{
 		ToolTip, Clipboard is null,%xpos% + 20,%ypos% + 20
@@ -134,8 +148,12 @@ translate()
 	return
 }
 
-~RButton::
+~$RButton Up::
+global gShowMsg
 SetTimer, RemoveToolTip, 100
+if (gShowMsg)
+Send, {LButton}
+gShowMsg := false
 Return
 
 ;~$F5::
