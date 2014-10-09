@@ -17,11 +17,43 @@ clipboard := new_word
 translate()
 return
 
-getHttpRequest()
+UtfDecode( str ) {
+  RawLen := StrLen(str)
+
+  Charset := 0    ; Put 1252 or 0
+
+  BufSize := (RawLen + 1) * 2
+  VarSetCapacity(Buf, BufSize, 0)
+
+  DllCall("MultiByteToWideChar", "uint", 65001, "int", 0, "str", str
+                               , "int", -1, "uint", &Buf, "uint", RawLen + 1)
+  DllCall("WideCharToMultiByte", "uint", Charset, "int", 0, "uint", &Buf, "int", -1
+                               , "str", str, "uint", RawLen + 1
+                               , "int", 0, "int", 0)
+  Return str
+}
+
+translateIt(content, path){
+	RegExMatch(content, path, SubPat)
+	;~Msgbox % SubPat1
+	result := SubPat1
+	result := RegExReplace(result, "<[^>]+>", "`n")
+	result := RegExReplace(result, "\n +", "`n")
+	result := RegExReplace(result, "\n{8,}", "#_#`n")
+	result := RegExReplace(result, "\s*(\n)", "$1")
+	result := RegExReplace(result, "^\n", "")
+	result := RegExReplace(result, "#_#", "`n")
+	result := RegExReplace(result, "&[^;]*;", "")
+	result := RegExReplace(result, "^ +", "")
+	result := RegExReplace(result, " {2,}", " ")
+	return result
+}
+
+getHttpRequest(translateWord = "")
 {
 	StringReplace, clipboard, clipboard, `r`n, %A_SPACE%, All;;Copy the text after remove the newline character in the clipboard
 
-	Estr := clipboard
+	Estr := translateWord
 	Gurl := "http://dict.youdao.com/search?le=eng&q="
 	Gurl.= Estr
 	WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
@@ -40,89 +72,69 @@ getHttpRequest()
 	return
 	}
 	result := WebRequest.ResponseText
+	respText := WebRequest.ResponseText
 	;~msgbox, %Gurl%
 	;~msgbox,%result%
-	
-	RegExMatch(result, "<h4 class=""wordGroup"">(.*?)</ul>", SubPat)
-	Tstr := SubPat1 
-	TanslateStr := Tstr
-	TanslateStr := RegExReplace(TanslateStr, "<[^>]+>", "`n")
-	TanslateStr := RegExReplace(TanslateStr, "\n +", "`n")
-	TanslateStr := RegExReplace(TanslateStr, "\n{8,}", "#_#`n")
-	TanslateStr := RegExReplace(TanslateStr, "\s*(\n)", "$1")
-	TanslateStr := RegExReplace(TanslateStr, "^\n", "")
-	TanslateStr := RegExReplace(TanslateStr, "#_#", "`n")
-	TanslateStr := RegExReplace(TanslateStr, "&.*;", "")
-	clipboard := TanslateStr
-	if (TanslateStr == "")
+	respText := RegExReplace(respText, "\n", "")
+
+	result := translateIt(respText, "<h4 class=""wordGroup"">(.*?)</ul>")
+	;~msgbox % Gurl
+	if (result == "")
 	{
-		RegExMatch(result, "<div class=""trans-container"">(.*?)<p class=""additional""", SubPat)
-		Tstr := SubPat1 
-		TanslateStr := Tstr
-		TanslateStr := RegExReplace(TanslateStr, "<[^>]+>", "`n")
-		TanslateStr := RegExReplace(TanslateStr, "\n +", "`n")
-		TanslateStr := RegExReplace(TanslateStr, "\n{8,}", "#_#`n")
-		TanslateStr := RegExReplace(TanslateStr, "\s*(\n)", "$1")
-		TanslateStr := RegExReplace(TanslateStr, "^\n", "")
-		TanslateStr := RegExReplace(TanslateStr, "#_#", "`n")
-		TanslateStr := RegExReplace(TanslateStr, "&.*;", "")
-		clipboard := TanslateStr
+		result := translateIt(respText, "pr-container more-collapse"">(.*?)<div class=""more")
+		;~msgbox % TansalteStr
+
+		if (result == "")
+		{
+			;~Msgbox % Tstr
+			result := translateIt(respText, "trans-container"">(.*?)<p class=""additional")
+		}
 	}
-	if (TanslateStr == "")
+	if (result == "")
 	{
-		clipboard := ""
+		result := ""
 	}
-	
+	return result
 }
+
 
 translate()
 {
 	send,^c
 	MouseGetPos, xpos, ypos
-	clipwait,5
+	clipwait,1
 	if (clipboard == null || clipboard == "")
 	{
 		ToolTip, Clipboard is null,%xpos% + 20,%ypos% + 20
 		return
 	}
-	getHttpRequest()
+
+	tranWorld := RegExReplace(clipboard, "([a-z]+)([A-Z]+)", "$1 $2")
+
+	tranWorld := RegExReplace(tranWorld, "[-\|_@]", " ")
+
+	;~msgbox % tranWorld
+	result := getHttpRequest(tranWorld)
 	
-	RegExMatch(clipboard, "(\w+)的变形", SubPat)
+	RegExMatch(result, "(\w+)的变形", SubPat)
 	Tstr := SubPat1
 	if (Tstr != "")
 	{
-		clipboard:= Tstr
-		getHttpRequest()
+		result := getHttpRequest(Tstr)
 	}
-	if (clipboard == "")
+	if (result == "")
 	{
-		ToolTip, Can not translate it,%xpos% + 20,%ypos% + 20
+		;~Msgbox , Can not translate [%tranWorld%]
+		ToolTip % "Can not translate it [" . tranWorld . "]",xpos + 20,ypos + 20
 		return
 	}
-
-	
-	
-	;~if (Estr == TanslateStr1)
-	;~{
-	;~	TanslateStr := TanslateStr2
-	;~	clipboard:=TanslateStr
-	;~	TanslateStr.="`r`n"
-	;~	TanslateStr.=TanslateStr1
-	;~}
-	;~else
-	;~{
-	;~	TanslateStr := TanslateStr1
-	;~	clipboard:=TanslateStr
-	;~	TanslateStr.="`r`n"
-	;~	TanslateStr.=TanslateStr2
-	;~}
-	
-	;~ msgbox,%clipboard%
-	ToolTip, %clipboard%,%xpos% + 20,%ypos% + 20
+	;~Msgbox % result
+	clipboard := (result)
+	ToolTip % clipboard,xpos + 20,ypos + 20
 	return
 }
 
-~LButton::
+~RButton::
 SetTimer, RemoveToolTip, 100
 Return
 
